@@ -1,0 +1,138 @@
+package com.austin.goaltracker.View.Goals;
+
+import android.app.Activity;
+import android.app.ActivityOptions;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.transition.Slide;
+import android.transition.Transition;
+import android.view.Gravity;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.austin.goaltracker.Controller.GoalMediator;
+import com.austin.goaltracker.Controller.ToastDisplayer;
+import com.austin.goaltracker.Controller.Util;
+import com.austin.goaltracker.Model.Account;
+import com.austin.goaltracker.Model.CountdownCompleterGoal;
+import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.R;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+public class GoalsCountdownCreatorActivity extends Activity {
+    boolean firstCall = true;  // For setting up calendar one day ahead
+    int year_x, month_x, day_x;
+    static final int DIALOG_ID = 0;
+    String goalTask;
+    Goal.IncrementType type;
+    TextView dateFinish;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        setContentView(R.layout.activity_goals_countdown_creator);
+        setupWindowAnimations();
+
+        final Calendar c = Calendar.getInstance();
+        year_x = c.get(Calendar.YEAR);
+        month_x = c.get(Calendar.MONTH);
+        day_x = c.get(Calendar.DAY_OF_MONTH) + 1;
+
+        dateFinish = ((TextView) findViewById(R.id.textDateEnd));
+        dateFinish.setText(createDateFinishString(month_x, day_x, year_x));
+        dateFinish.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showDialog(DIALOG_ID);
+            }
+        });
+
+        Button createGoalButton = (Button) findViewById(R.id.buttonfinish);
+        createGoalButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                goalTask = ((EditText) findViewById(R.id.goaltask)).getText().toString();
+                type = GoalMediator.convertUItoType(((Spinner) findViewById(R.id.goalincrement)).getSelectedItem().toString());
+                if (!goalTask.equals("")) {
+                    Account user = Util.currentUser;
+                    CountdownCompleterGoal newGoal = new CountdownCompleterGoal(GoalMediator.pasteGoalTitle(), type, new GregorianCalendar(year_x, month_x, day_x));
+                    newGoal.setTask(goalTask);
+                    user.addGoal(newGoal);
+                    Util.updateAccountOnDB(user);
+                    ToastDisplayer.displayHint("Goal Created",
+                            ToastDisplayer.MessageType.SUCCESS, getApplicationContext());
+                    Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
+                    startActivity(i);
+                } else {
+                    ToastDisplayer.displayHint("Fill in all fields",
+                            ToastDisplayer.MessageType.FAILURE, getApplicationContext());
+                }
+            }
+        });
+    }
+
+    private String createDateFinishString(int month, int day, int year) {
+        GregorianCalendar g = new GregorianCalendar(year, month, day);
+        Calendar startDate = Calendar.getInstance();
+        long dayDiff = 0;
+        while (startDate.before(g)) {
+            startDate.add(Calendar.DAY_OF_MONTH, 1);
+            dayDiff++;
+        }
+        SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy");
+        return String.format("Finish on %s\n    %d %s from now", df.format(g.getTime()), dayDiff,
+                (dayDiff != 1) ? "days" : "day");
+    }
+
+    // Date picker listener variable used to create a dialog
+    private DatePickerDialog.OnDateSetListener dPickerListener = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            year_x = year;
+            month_x = monthOfYear;
+            day_x = dayOfMonth;
+            firstCall = false;
+            dateFinish.setText(createDateFinishString(month_x, day_x, year_x));
+        }
+    };
+
+    protected Dialog onCreateDialog(int id) {
+        if (id == DIALOG_ID) {
+            return new DatePickerDialog(this, dPickerListener, year_x, month_x, day_x);
+        } else {
+            return null;
+        }
+    }
+
+    private void setupWindowAnimations() {
+        Transition slideIn = new Slide(Gravity.RIGHT);
+        slideIn.setDuration(600);
+        getWindow().setEnterTransition(slideIn);
+        Transition slideOut = new Slide(Gravity.RIGHT);
+        slideOut.setDuration(600);
+        getWindow().setExitTransition(slideOut);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent i = new Intent(getApplicationContext(), GoalsTypeSelectActivity.class);
+                startActivity(i, ActivityOptions.makeSceneTransitionAnimation(GoalsCountdownCreatorActivity.this).toBundle());
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+}

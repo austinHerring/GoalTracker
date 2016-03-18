@@ -1,0 +1,51 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "com.austin.goaltracker"
+        minSdkVersion 21
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+    }
+    /*
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    */
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
+    repositories {
+        maven {
+            url "https://jitpack.io"
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile files('libs/mail.jar')
+    compile files('libs/activation.jar')
+    compile files('libs/additionnal.jar')
+    compile 'com.firebase:firebase-client-android:2.5.1'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.google.android.gms:play-services:8.4.0'
+    compile 'com.android.support:support-v4:23.1.1'
+    compile 'me.itangqi.waveloadingview:library:0.1.5'
+    compile 'hanks.xyz:smallbang-library:0.1.2'
+    compile 'me.alexrs:wave-drawable:1.0.0'
+    compile project(path: ':gcm', configuration: 'android-endpoints')
+    compile 'com.google.android.gms:play-services-gcm:8.4.0'
+}
+
+apply plugin: 'com.google.gms.google-services'

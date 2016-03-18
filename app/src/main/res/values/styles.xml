@@ -1,0 +1,88 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppThemePurple" parent="android:Theme.Material.Light">
+        <!-- Main theme colors -->
+        <!--   branding color for the app bar -->
+        <item name="android:colorPrimary">@color/primaryP</item>
+        <!--   darker variant for the status bar and contextual app bars -->
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <!--   theme UI controls like checkboxes and text fields -->
+        <item name="android:colorAccent">@color/text2</item>
+        <!--   branding color for app navigation at bottom -->
+        <item name="android:navigationBarColor">@color/primaryP</item>
+        <!--   background color -->
+        <item name="android:windowBackground">@color/primaryW</item>
+        <!--   menu overflow text item color -->
+        <item name="android:itemTextAppearance">@style/mainText</item>
+        <!--   menu bar colors  -->
+        <item name="android:titleTextColor">@color/primaryW</item>
+        <item name="android:textColorPrimary">@color/primaryW</item>
+        <!--   Spinner Styles -->
+        <item name="android:spinnerItemStyle">@style/SpinnerTextStyle</item>
+        <item name="android:spinnerDropDownItemStyle">@style/SpinnerTextStyle</item>
+        <!--   Datepicker Style -->
+        <item name="android:datePickerDialogTheme">@style/DatepickerStyle</item>
+        <!--   Other colors -->
+        <item name="android:textColorSecondary">@color/text3</item>
+        <item name="android:textColorTertiary">@color/text2</item>
+    </style>
+
+    <!-- SPLASH SCREEN STYLE-->
+    <style name="AppSplashPurple" parent="android:Theme.Material.Light">
+        <!--   branding color for the app bar -->
+        <item name="android:colorPrimary">@color/primaryP</item>
+        <!--   background color -->
+        <item name="android:windowBackground">@color/primaryP</item>
+        <!--   text colors -->
+        <item name="android:textColorPrimary">@color/primaryW</item>
+        <item name="android:textColorSecondary">@color/accentDark</item>
+        <item name="android:textColorTertiary">@color/brand</item>
+    </style>
+
+    <!-- Settings Dark STYLE-->
+    <style name="AppSettings" parent="android:Theme.Material.Light">
+        <!--   branding color for the app bar -->
+        <item name="android:colorPrimary">@color/brand2</item>
+        <!--   darker variant for the status bar and contextual app bars -->
+        <item name="android:colorPrimaryDark">@color/brand2</item>
+        <!--   theme UI controls like checkboxes and text fields -->
+        <item name="android:colorAccent">@color/text2</item>
+        <!--   branding color for app navigation at bottom -->
+        <item name="android:navigationBarColor">@color/brand2</item>
+        <!--   background color -->
+        <item name="android:windowBackground">@color/primary_dark</item>
+        <!--   text colors -->
+        <item name="android:textColorPrimary">@color/fading</item>
+        <item name="android:textColorSecondary">@color/accentSuperDark</item>
+        <item name="android:textColorTertiary">@color/text2</item>
+
+    </style>
+
+    <style name="DatepickerStyle" parent="android:Theme.Material.Light.Dialog">
+        <!--   Band and current day color -->
+        <item name="android:colorAccent">@color/primaryP</item>
+        <!--   Month and number colors -->
+        <item name="android:textColorPrimary">@color/text3</item>
+        <!--   Week colors -->
+        <item name="android:textColorSecondary">@color/text2</item>
+    </style>
+
+    <style name="SpinnerTextStyle" parent="@android:style/Widget.TextView.SpinnerItem">
+        <item name="android:textColor">@color/primaryP</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="mainText" parent="@android:style/TextAppearance.Large">
+        <item name="android:textColor">@color/primaryP</item>
+    </style>
+
+    <style name="subTextBlue" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@color/text3</item>
+    </style>
+
+    <style name="subTextRed" parent="@android:style/TextAppearance.Large">
+        <item name="android:textColor">@color/text2</item>
+    </style>
+
+</resources>
+

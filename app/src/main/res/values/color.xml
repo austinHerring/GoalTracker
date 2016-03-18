@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primaryP">#b058ff</color>
+    <color name="primaryFragmentBacking">#f7e4ff</color>
+    <color name="primary_dark">#7127ff</color>
+    <color name="accentLight">#f5d3ff</color>
+    <color name="accentDark">#e9c5ff</color>
+    <color name="accentSuperDark">#9848ff</color>
+    <color name="primaryW">#ffffff</color>
+    <color name="text1">#b058ff</color>
+    <color name="text2">#ff98085d</color>
+    <color name="text3">#ff5314ff</color>
+    <color name="brand">#bd7545a3</color>
+    <color name="brand2">#402559</color>
+    <color name="fading">#c568ff</color>
+    <color name="spinner_background">#61bc6fff</color>
+    <color name="spinner_background2">#24b058ff</color>
+    <color name="spinner_in_use">#bdb8c2</color>
+    <color name="goal_list_blue_background">#a68069ff</color>
+    <color name="goal_list_red_background">#7bee0893</color>
+</resources>

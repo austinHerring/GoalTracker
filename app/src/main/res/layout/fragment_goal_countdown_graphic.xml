@@ -1,0 +1,86 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="260dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    tools:context="com.austin.goaltracker.View.Goals.GoalCountdownGraphicFragment"
+    android:background="@drawable/countdown_flag_backing">
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:textColor="@color/primaryP"
+        android:id="@+id/goal_title"
+
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit ="marquee_forever"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:scrollHorizontally="true"/>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="@color/primaryP"
+        android:id="@+id/goal_task"
+
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit ="marquee_forever"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:scrollHorizontally="true"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textColor="@color/primaryP"
+            android:textSize="16sp"
+            android:paddingEnd="3dp"
+            android:id="@+id/goal_start"
+            android:layout_gravity="center_vertical|left"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/percent_complete_icon"
+            android:gravity="center_horizontal" />
+
+        <me.itangqi.waveloadingview.WaveLoadingView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:id="@+id/percent_complete_icon"
+            app:mlv_borderColor="@color/primaryP"
+            app:mlv_borderWidth="2dp"
+            app:mlv_progressValue="70"
+            app:mlv_shapeType="circle"
+            app:mlv_titleCenterColor="@color/accentDark"
+            app:mlv_titleCenterSize="50sp"
+            app:mlv_waveAmplitude="40"
+            app:mlv_waveColor="@color/primaryP"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textColor="@color/primaryP"
+            android:textSize="16sp"
+            android:id="@+id/goal_end"
+            android:paddingStart="3dp"
+            android:layout_gravity="right|center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/percent_complete_icon"
+            android:gravity="center_horizontal" />
+
+    </RelativeLayout>
+
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/primaryP"
+        android:textSize="20sp"
+        android:gravity="center_horizontal"
+        android:id="@+id/goal_remaining_units"/>
+
+</LinearLayout>

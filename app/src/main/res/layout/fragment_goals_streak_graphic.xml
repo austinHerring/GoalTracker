@@ -1,0 +1,87 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="260dp"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    tools:context="com.austin.goaltracker.View.Goals.GoalsStreakGraphicFragment"
+    android:background="@drawable/streak_flame_backing">
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:textColor="@color/primaryP"
+        android:id="@+id/goal_title"
+        android:text="title"
+        android:layout_gravity="right"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit ="marquee_forever"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:scrollHorizontally="true"/>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="@color/primaryP"
+        android:id="@+id/goal_task"
+        android:text="task"
+        android:layout_gravity="right"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit ="marquee_forever"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:scrollHorizontally="true"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="@color/primaryP"
+            android:id="@+id/goal_cheat_ratio"
+            android:layout_gravity="center_horizontal"/>
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="5dp"
+            android:paddingBottom="0dp"
+            android:id="@+id/remainingCheats"
+            android:layout_gravity="center_horizontal" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/streak_graphic">
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textSize="52sp"
+            android:textColor="@color/primaryP"
+            android:id="@+id/streak_number"
+            android:layout_gravity="center"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/primaryP"
+            android:id="@+id/goal_units_completed"
+            android:layout_gravity="center_horizontal|bottom"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/primaryP"
+            android:id="@+id/goal_started_date"
+            android:layout_gravity="left|top" />
+
+    </FrameLayout>
+
+
+</LinearLayout>

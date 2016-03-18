@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_goals">My Personal Goals</string>
+    <string name="button_new_object">+</string>
+    <string name="title_activity_goals_type_select">Goal Selection</string>
+    <string name="text_goal_title">Give your new goal a title</string>
+    <string name="text_goal_type">Select a type of goal</string>
+    <string name="prompt_title">Title of Goal</string>
+    <string name="buttonFor_streak">Streak\n\n\nMaintain a goal for\nas long as possible</string>
+    <string name="buttonFor_countdown">Countdown\n\n\nSet a target goal\nand aim to finish it</string>
+    <string name="text_task">What do you want to do?</string>
+    <string name="prompt_task">Task To Do</string>
+    <string name="task_increment">How often do you want to do it?</string>
+    <string name="task_duration">When do you want to stop?</string>
+    <string name="task_cheat">Allot skips in your streak?</string>
+    <string name="task_cheatSub">Number of skip times: </string>
+    <string-array name="increment_types">
+        <item>Every Hour</item>
+        <item>Every Day</item>
+        <item>Every Other Day</item>
+        <item>Every Week</item>
+        <item>Every Other Week</item>
+        <item>Every Month</item>
+        <item>Every Year</item>
+        <item>Custom Frequency&#8230;</item>
+    </string-array>
+    <string name="button_finish">Finish</string>
+</resources>

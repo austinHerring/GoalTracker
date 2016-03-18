@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Goal Tracker</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_logout">Logout</string>
+    <string name="title_activity_registration">Registration</string>
+    <string name="prompt_name_first">First Name</string>
+    <string name="prompt_name_last">Last Name</string>
+    <string name="action_create_account">Create My New Account!</string>
+    <string name="direction_registration">Please fill out the information below to set up your new account</string>
+    <string name="direction_password">Password must contain at least: 6 characters, 1 number, 1 uppercase and 1 lowercase letter </string>
+    <string name="title_activity_forgot_password">Forgot Password</string>
+    <string name="action_submit">Submit</string>
+    <string name="message_forget_password">Awkward&#8230; Looks like you forgot your password. Don\'t worry, just submit your username and we\'ll send you an email with a temporary password. You\'ll be Goal Tracking again in no time!</string>
+    <string name="title_activity_settings">Account Settings</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_friendsbaseactivity_list">Items</string>
+    <string name="title_friendsbaseactivity_detail">FriendsBaseActivity Detail</string>
+    <string name="title_activity_goals_streak_creator">Streak Goal Creator</string>
+    <string name="title_activity_goals_countdown_creator">Countdown Goal Creator</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

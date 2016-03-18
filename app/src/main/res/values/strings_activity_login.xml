@@ -1,0 +1,18 @@
+<resources>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="header_app_name">GOAL TRACKER</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_username">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_password_confirm">Confirm Password</string>
+    <string name="action_login">Sign In</string>
+    <string name="action_forgot_password">\?</string>
+    <string name="action_register">Register</string>
+    <string name="error_invalid_username_or_password">This email address is invalid</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+</resources>

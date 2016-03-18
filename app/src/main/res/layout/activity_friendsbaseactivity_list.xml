@@ -1,0 +1,27 @@
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/friendsbaseactivity_list"
+    android:name="com.austin.goaltracker.View.FriendsBaseActivityListFragment"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_marginLeft="16dp" android:layout_marginRight="16dp"
+    tools:context="com.austin.goaltracker.View.FriendsBaseActivityListActivity"
+    tools:layout="@android:layout/list_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="@string/button_new_object"
+            android:id="@+id/button"/>
+
+        <Spinner
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner"/>
+    </LinearLayout>
+
+
+</fragment>

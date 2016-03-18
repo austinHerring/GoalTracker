@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="android:Theme.Material.Light">
+    </style>
+    <style parent="@android:style/Widget.Spinner" name="SpinnerAsEditText">
+        <!-- Main theme colors -->
+        <!--   branding color for the app bar -->
+        <item name="android:colorPrimary">@color/primaryP</item>
+        <!--   darker variant for the status bar and contextual app bars -->
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <!--   theme UI controls like checkboxes and text fields -->
+        <item name="android:colorAccent">@color/accentLight</item>
+        <!--   branding color for app navigation at bottom -->
+        <item name="android:navigationBarColor">@color/primaryP</item>
+        <!--   background color -->
+        <item name="android:windowBackground">@color/primaryW</item>
+        <!--   text colors -->
+        <item name="android:titleTextColor">@color/primaryW</item>
+        <item name="android:textColorPrimary">@color/text1</item>
+        <item name="android:textColorSecondary">@color/text2</item>
+        <item name="android:textColorTertiary">@color/text3</item>
+    </style>
+</resources>
