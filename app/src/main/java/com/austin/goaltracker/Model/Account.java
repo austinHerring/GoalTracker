@@ -15,6 +15,7 @@ public class Account {
     private Password password;
     private String email;
     private ArrayList<Goal> goals = new ArrayList<>();
+    private ArrayList<String> registedGCMDevices = new ArrayList<>();
     private ArrayList<Account> friends = new ArrayList<>();
     private String id;
 
@@ -103,6 +104,14 @@ public class Account {
 
     public boolean addGoal(Goal g) {
         return goals.add(g);
+    }
+
+    public boolean addRegisteredDevice(String deviceID) {
+        return deviceID != null && !registedGCMDevices.contains(deviceID) && registedGCMDevices.add(deviceID);
+    }
+
+    public ArrayList<String> getRegistedGCMDevices() {
+        return registedGCMDevices;
     }
 
     /**

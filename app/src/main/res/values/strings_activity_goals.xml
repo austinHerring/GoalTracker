@@ -14,6 +14,7 @@
     <string name="task_duration">When do you want to stop?</string>
     <string name="task_cheat">Allot skips in your streak?</string>
     <string name="task_cheatSub">Number of skip times: </string>
+    <string name="task_timeToPrompt">At what time should we remind you?</string>
     <string-array name="increment_types">
         <item>Every Hour</item>
         <item>Every Day</item>

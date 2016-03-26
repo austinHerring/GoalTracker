@@ -21,12 +21,18 @@ import com.austin.goaltracker.Model.Account;
 import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.austin.goaltracker.R;
+import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import java.util.Calendar;
 
-public class GoalsStreakCreatorActivity extends Activity {
+public class GoalsStreakCreatorActivity extends Activity implements TimePickerDialog.OnTimeSetListener {
     String goalTask;
     Goal.IncrementType type;
     int skipNumber;
+    int mPromptMinute;
+    int mPromptHour;
+    Button setButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,23 @@ public class GoalsStreakCreatorActivity extends Activity {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(R.layout.activity_goals_streak_creator);
         setupWindowAnimations();
+
+        //SET CURRENT TIME
+        mPromptMinute = Calendar.getInstance().get(Calendar.MINUTE);
+        mPromptHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        setButton = (Button) findViewById(R.id.promptTimeStreak);
+        setPromptTimeDisplay();
+
+        setButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog dpd = TimePickerDialog.newInstance(
+                        GoalsStreakCreatorActivity.this, mPromptHour, mPromptMinute, false);
+                dpd.show(getFragmentManager(), "Datepickerdialog");
+                dpd.setAccentColor(getResources().getColor(R.color.primaryP));
+                dpd.setTitle("Select a Prompt Time");
+            }
+        });
 
         Button createGoalButton = (Button) findViewById(R.id.buttonfinish);
         createGoalButton.setOnClickListener(new View.OnClickListener() {
@@ -47,6 +70,8 @@ public class GoalsStreakCreatorActivity extends Activity {
                     newGoal.setTask(goalTask);
                     newGoal.setCheatNumber(skipNumber);
                     newGoal.setCheatsRemaining(skipNumber);
+                    String cronKey = Util.addCronJobToDB(newGoal, mPromptMinute, mPromptHour);
+                    newGoal.setCronJobKey(cronKey);
                     user.addGoal(newGoal);
                     Util.updateAccountOnDB(user);
                     ToastDisplayer.displayHint("Goal Created",
@@ -81,5 +106,20 @@ public class GoalsStreakCreatorActivity extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int day) {
+        mPromptHour = hourOfDay;
+        mPromptMinute = minute;
+        setPromptTimeDisplay();
+    }
+
+    private void setPromptTimeDisplay() {
+        int h = mPromptHour % 12 == 0 ? 12 : mPromptHour % 12;
+        String m = String.format("%02d", mPromptMinute);
+        String partOfDay = mPromptHour > 11 ? " PM" : " AM";
+        String result = h + ":" + m + partOfDay;
+        setButton.setText(result);
     }
 }

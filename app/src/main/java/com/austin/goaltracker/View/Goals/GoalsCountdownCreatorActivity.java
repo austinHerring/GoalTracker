@@ -25,18 +25,24 @@ import com.austin.goaltracker.Model.Account;
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.R;
+import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-public class GoalsCountdownCreatorActivity extends Activity {
+public class GoalsCountdownCreatorActivity extends Activity implements TimePickerDialog.OnTimeSetListener {
     boolean firstCall = true;  // For setting up calendar one day ahead
     int year_x, month_x, day_x;
     static final int DIALOG_ID = 0;
     String goalTask;
     Goal.IncrementType type;
+    Button setButtonDate;
     TextView dateFinish;
+    int mPromptMinute;
+    int mPromptHour;
+    Button setButtonTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,18 +51,36 @@ public class GoalsCountdownCreatorActivity extends Activity {
         setContentView(R.layout.activity_goals_countdown_creator);
         setupWindowAnimations();
 
+        //SET CURRENT TIME
+        mPromptMinute = Calendar.getInstance().get(Calendar.MINUTE);
+        mPromptHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        setButtonTime = (Button) findViewById(R.id.promptTimeCountdown);
+        setPromptTimeDisplay();
+
+        setButtonTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog dpd = TimePickerDialog.newInstance(
+                        GoalsCountdownCreatorActivity.this, mPromptHour, mPromptMinute, false);
+                dpd.show(getFragmentManager(), "Datepickerdialog");
+                dpd.setAccentColor(getResources().getColor(R.color.primaryP));
+                dpd.setTitle("Select a Prompt Time");
+            }
+        });
+
+        //SET CURRENT DATE
         final Calendar c = Calendar.getInstance();
         year_x = c.get(Calendar.YEAR);
         month_x = c.get(Calendar.MONTH);
         day_x = c.get(Calendar.DAY_OF_MONTH) + 1;
-
-        dateFinish = ((TextView) findViewById(R.id.textDateEnd));
-        dateFinish.setText(createDateFinishString(month_x, day_x, year_x));
-        dateFinish.setOnClickListener(new View.OnClickListener() {
+        setButtonDate = (Button) findViewById(R.id.promptDate);
+        setButtonDate.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 showDialog(DIALOG_ID);
             }
         });
+        dateFinish = (TextView) findViewById(R.id.textDateEnd);
+        setPromptDateDisplay();
 
         Button createGoalButton = (Button) findViewById(R.id.buttonfinish);
         createGoalButton.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +91,8 @@ public class GoalsCountdownCreatorActivity extends Activity {
                     Account user = Util.currentUser;
                     CountdownCompleterGoal newGoal = new CountdownCompleterGoal(GoalMediator.pasteGoalTitle(), type, new GregorianCalendar(year_x, month_x, day_x));
                     newGoal.setTask(goalTask);
+                    String cronKey = Util.addCronJobToDB(newGoal, mPromptMinute, mPromptHour);
+                    newGoal.setCronJobKey(cronKey);
                     user.addGoal(newGoal);
                     Util.updateAccountOnDB(user);
                     ToastDisplayer.displayHint("Goal Created",
@@ -81,8 +107,8 @@ public class GoalsCountdownCreatorActivity extends Activity {
         });
     }
 
-    private String createDateFinishString(int month, int day, int year) {
-        GregorianCalendar g = new GregorianCalendar(year, month, day);
+    private void setPromptDateDisplay() {
+        GregorianCalendar g = new GregorianCalendar(year_x, month_x, day_x);
         Calendar startDate = Calendar.getInstance();
         long dayDiff = 0;
         while (startDate.before(g)) {
@@ -90,8 +116,8 @@ public class GoalsCountdownCreatorActivity extends Activity {
             dayDiff++;
         }
         SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy");
-        return String.format("Finish on %s\n    %d %s from now", df.format(g.getTime()), dayDiff,
-                (dayDiff != 1) ? "days" : "day");
+        setButtonDate.setText(df.format(g.getTime()));
+        dateFinish.setText(String.format("%d %s from now", dayDiff, (dayDiff != 1) ? "days" : "day"));
     }
 
     // Date picker listener variable used to create a dialog
@@ -102,7 +128,7 @@ public class GoalsCountdownCreatorActivity extends Activity {
             month_x = monthOfYear;
             day_x = dayOfMonth;
             firstCall = false;
-            dateFinish.setText(createDateFinishString(month_x, day_x, year_x));
+            setPromptDateDisplay();
         }
     };
 
@@ -134,5 +160,20 @@ public class GoalsCountdownCreatorActivity extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int day) {
+        mPromptHour = hourOfDay;
+        mPromptMinute = minute;
+        setPromptTimeDisplay();
+    }
+
+    private void setPromptTimeDisplay() {
+        int h = mPromptHour % 12 == 0 ? 12 : mPromptHour % 12;
+        String m = String.format("%02d", mPromptMinute);
+        String partOfDay = mPromptHour > 11 ? " PM" : " AM";
+        String result = h + ":" + m + partOfDay;
+        setButtonTime.setText(result);
     }
 }

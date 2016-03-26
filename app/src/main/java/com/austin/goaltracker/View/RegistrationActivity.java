@@ -75,6 +75,8 @@ public class RegistrationActivity extends Activity {
                     EmailDispatcher dispatcher = new EmailDispatcher();
                     errorMessage = dispatcher.send(new NewMemberEmail(Util.currentUser));
                     if (errorMessage == null) {
+                        Util.currentUser.addRegisteredDevice(LoginMediator.pasteDeviceRegID());
+                        Util.updateAccountRegIdsOnDB(Util.currentUser);
                         Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
                         i.putExtra("TabNumber", 0);
                         startActivity(i);

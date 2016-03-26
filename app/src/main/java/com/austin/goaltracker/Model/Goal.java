@@ -21,6 +21,7 @@ public abstract class Goal {
     protected IncrementType incrementType;
     private ArrayList<Account> supporters;
     private Classification classification;
+    private String cronJobKey;
 
     Goal(String name, IncrementType type, Classification c) {
         goalName = name;
@@ -66,6 +67,28 @@ public abstract class Goal {
         }
     }
 
+    public String getCronJobKey() {
+        return cronJobKey;
+    }
+
+    public String generateCron(int minuteToPrompt, int hourToPrompt) {
+        //TODO: ADD HOUR/MINUTE to PROMPT to the UI
+        //(Seconds: 0-59) (Minutes: 0-59) (Hours: 0-23) (Day of Month: 1-31) (Months: 0-11) (Day of Week: 0-6)
+        switch (incrementType) {
+            case HOURLY: return "0 " + minuteToPrompt + " * * * *";
+            case DAILY: return "0 " + minuteToPrompt + " " + hourToPrompt + " * * *";
+            case BIDAILY: return "0 " + minuteToPrompt + " " + hourToPrompt + " */2 * *";
+            case WEEKLY: return "0 " + minuteToPrompt + " " + hourToPrompt + " */7 * *";
+            case BIWEEKLY: return "0 " + minuteToPrompt + " " + hourToPrompt + " */14 * *";
+            case MONTHLY: return "0 " + minuteToPrompt + " " + hourToPrompt + " "
+                    + dateOfOrigin.get(Calendar.DAY_OF_MONTH) + " * *";
+            case YEARLY: return "0 " + minuteToPrompt + " " + hourToPrompt + " "
+                    + dateOfOrigin.get(Calendar.DAY_OF_MONTH) + " "
+                    + dateOfOrigin.get(Calendar.MONTH) + " *";
+        }
+        return "*/10 * * * * *";
+    }
+
     public String originDateToString() {
         SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy");
         return "Was Established:\n" + df.format(dateOfOrigin.getTime());
@@ -108,6 +131,25 @@ public abstract class Goal {
 
     public void setDateOfOrigin(Calendar date) {
         dateOfOrigin = date;
+    }
+
+    public void setCronJobKey(String key) {
+        cronJobKey = key;
+    }
+
+    public String toNotificationMessage() {
+        String str = goalName +": Did you make progress ";
+        if (incrementType == IncrementType.HOURLY) {
+            return str + "last hour?";
+        } else if (incrementType == IncrementType.DAILY || incrementType == IncrementType.BIDAILY) {
+            return str + "today?";
+        } else if (incrementType == IncrementType.WEEKLY || incrementType == IncrementType.BIWEEKLY) {
+            return str + "last week?";
+        } else if (incrementType == IncrementType.MONTHLY) {
+            return str + "last month?";
+        } else {
+            return str + "last year";
+        }
     }
 
     abstract String toBasicInfo();

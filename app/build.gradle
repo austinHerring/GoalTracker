@@ -46,6 +46,7 @@ dependencies {
     compile 'me.alexrs:wave-drawable:1.0.0'
     compile project(path: ':gcm', configuration: 'android-endpoints')
     compile 'com.google.android.gms:play-services-gcm:8.4.0'
+    compile 'com.wdullaer:materialdatetimepicker:2.3.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -7,7 +7,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.austin.goaltracker.gcm.messaging.Messaging;
 import com.austin.goaltracker.gcm.registration.Registration;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -15,8 +14,6 @@ import com.google.android.gms.iid.InstanceID;
 import com.austin.goaltracker.Model.GCMPreferences;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
-import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
 
@@ -49,6 +46,8 @@ public class RegistrationIntentService extends IntentService {
             Log.i(TAG, "GCM Registration Token: " + token);
 
             sendRegistrationToServer(token);
+            LoginMediator.copyDeviceRegID(token);
+            Log.i(TAG, "GCM Registration Token copied to mediator");
 
             // Subscribe to topic channels
             subscribeTopics(token);

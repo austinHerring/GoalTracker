@@ -40,9 +40,10 @@ public class BaseActivityAdapter extends ArrayAdapter<String>
     {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row = inflater.inflate(R.layout.layout_spinner, parent, false);
-        TextView label=(TextView)row.findViewById(R.id.baseList);
-        label.setText(activities[position]);
-
+        TextView label=  (TextView)row.findViewById(R.id.baseList);
+        if (label != null) {
+            label.setText(activities[position]);
+        }
         return row;
     }
 

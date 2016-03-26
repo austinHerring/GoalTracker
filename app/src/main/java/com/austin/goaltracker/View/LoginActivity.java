@@ -14,6 +14,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -34,12 +36,13 @@ public class LoginActivity extends Activity {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = "LOGIN ACTIVITY";
 
-    private BroadcastReceiver mRegistrationBroadcastReceiver;
     private boolean isReceiverRegistered;
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     private EditText usernameInput;
     private EditText passwordInput;
     private String errorMessage;
+    private boolean isConnected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,28 +53,14 @@ public class LoginActivity extends Activity {
         setTitle("Login");
         setContentView(R.layout.activity_login);
 
-        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                SharedPreferences sharedPreferences =
-                        PreferenceManager.getDefaultSharedPreferences(context);
-                boolean sentToken = sharedPreferences
-                        .getBoolean(GCMPreferences.SENT_TOKEN_TO_SERVER, false);
-                if (sentToken) {
-                    Log.i(TAG, "SENT!!!");
-                } else {
-                    Log.i(TAG, "NOT SENT");
-                }
-            }
-        };
+        ConnectivityManager cm =
+                (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
-        // Registering BroadcastReceiver
-        registerReceiver();
-
-        if (checkPlayServices()) {
-            // Start IntentService to register this application with GCM.
-            Intent intent = new Intent(this, RegistrationIntentService.class);
-            startService(intent);
+        // Attempt to get registration token
+        if (isConnected) {
+            setUpGCM();
         }
 
         //set up GUI components
@@ -82,7 +71,7 @@ public class LoginActivity extends Activity {
             public void onClick(View v) {
                 String usernameInfo = usernameInput.getText().toString();
                 String passwordInfo = passwordInput.getText().toString();
-                validateLogin(usernameInfo, passwordInfo);
+                validateLoginAndSignIn(usernameInfo, passwordInfo);
             }
         });
 
@@ -110,7 +99,7 @@ public class LoginActivity extends Activity {
      * @param username The input username.
      * @param password The input password.
      */
-    void validateLogin(String username, String password) {
+    void validateLoginAndSignIn(String username, String password) {
         final String usernameInput = username;
         final String passwordInput = password;
         Util.db.child("accounts").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -119,9 +108,16 @@ public class LoginActivity extends Activity {
                 Util.retrieveUsers(snapshot);
                 errorMessage = Util.authenticate(usernameInput, passwordInput);
                 if (errorMessage == null) {
-                    Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
-                    i.putExtra("TabNumber", 0);
-                    startActivity(i);
+                    if (isConnected) {
+                        Util.currentUser.addRegisteredDevice(LoginMediator.pasteDeviceRegID());
+                        Util.updateAccountRegIdsOnDB(Util.currentUser);
+                        Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
+                        i.putExtra("TabNumber", 0);
+                        startActivity(i);
+                    } else {
+                        ToastDisplayer.displayHint("Not Connected to Internet",
+                                ToastDisplayer.MessageType.FAILURE, getApplicationContext());
+                    }
                 } else {
                     ToastDisplayer.displayHint(errorMessage,
                             ToastDisplayer.MessageType.FAILURE, getApplicationContext());
@@ -146,6 +142,32 @@ public class LoginActivity extends Activity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
         isReceiverRegistered = false;
         super.onPause();
+    }
+
+    private void setUpGCM() {
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                SharedPreferences sharedPreferences =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                boolean sentToken = sharedPreferences
+                        .getBoolean(GCMPreferences.SENT_TOKEN_TO_SERVER, false);
+                if (sentToken) {
+                    Log.i(TAG, "SENT!!!");
+                } else {
+                    Log.i(TAG, "NOT SENT");
+                }
+            }
+        };
+
+        // Registering BroadcastReceiver
+        registerReceiver();
+
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
     }
 
     private void registerReceiver() {

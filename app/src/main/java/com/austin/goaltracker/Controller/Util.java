@@ -1,5 +1,7 @@
 package com.austin.goaltracker.Controller;
 
+import android.util.Log;
+
 import com.austin.goaltracker.Model.Account;
 
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
@@ -12,9 +14,14 @@ import com.firebase.client.FirebaseException;
 
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Austin Herring
@@ -100,6 +107,7 @@ public class Util {
         map.put("password object", generatePasswordMapping(account.getPasswordObject()));
         map.put("email", account.getEmail());
         map.put("goals", generateGoalMapping(account.getGoals()));
+        map.put("registered device ids", generateDeviceIdMapping(account.getRegistedGCMDevices()));
         return map;
     }
 
@@ -119,6 +127,7 @@ public class Util {
             map.put("date broken", goal.getBrokenDate());
             map.put("task", goal.getTask());
             map.put("frequency", goal.getIncrementType());
+            map.put("cron key", goal.getCronJobKey());
             if (goal.classification().equals(Goal.Classification.COUNTDOWN)) {
                 map.put("date end", ((CountdownCompleterGoal) goal).getDateDesiredFinish());
                 map.put("percent progress", ((CountdownCompleterGoal) goal).getPercentProgress());
@@ -133,6 +142,22 @@ public class Util {
             listOfGoals.add(map);
         }
         return listOfGoals;
+    }
+
+    /**
+     * Accounts are represented as hashmaps to access particular data
+     *
+     * @param regIDs The list of goals to generate a HashMap for.
+     * @return The HashMap.
+     */
+    private static ArrayList<HashMap<String, Object>> generateDeviceIdMapping(ArrayList<String> regIDs) {
+        ArrayList<HashMap<String, Object>> listOfRegIDs = new ArrayList<>();
+        for (String regID : regIDs) {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("device reg id", regID);
+            listOfRegIDs.add(map);
+        }
+        return listOfRegIDs;
     }
 
     /**
@@ -177,6 +202,9 @@ public class Util {
                         hydratePassword(account),
                         (String)account.get("email"),
                         (String)account.get("id"));
+                if (account.get("registered device ids") != null) {
+                    accountToAdd = retrieveUserRegIds(account, accountToAdd);
+                }
                 registeredUsers.put(id, (account.get("goals") != null) ?
                         retrieveUserGoals(account, accountToAdd) : accountToAdd);
             }
@@ -195,6 +223,7 @@ public class Util {
                 CountdownCompleterGoal goalToAdd = new CountdownCompleterGoal();
                 goalToAdd.setName((String) goal.get("name"));
                 goalToAdd.setTask((String) goal.get("task"));
+                goalToAdd.setCronJobKey((String) goal.get("cron key"));
                 goalToAdd.setUnitsRemaining((String) goal.get("units remaining string"));
                 goalToAdd.setIncrementType(Converter.stringToFrequency((String) goal.get("frequency")));
                 goalToAdd.setDateOfOrigin(Converter.stringToCalendar((String) goal.get("date start")));
@@ -208,6 +237,7 @@ public class Util {
                 StreakSustainerGoal goalToAdd = new StreakSustainerGoal();
                 goalToAdd.setName((String)goal.get("name"));
                 goalToAdd.setTask((String) goal.get("task"));
+                goalToAdd.setCronJobKey((String) goal.get("cron key"));
                 goalToAdd.setIncrementType(Converter.stringToFrequency((String) goal.get("frequency")));
                 goalToAdd.setDateOfOrigin(Converter.stringToCalendar((String) goal.get("date start")));
                 goalToAdd.setBrokenDate(Converter.stringToCalendar((String) goal.get("date broken")));
@@ -216,6 +246,19 @@ public class Util {
                 goalToAdd.setStreak(((Long)goal.get("streak number")).intValue());
                 accountToAdd.addGoal(goalToAdd);
             }
+        }
+        return accountToAdd;
+    }
+
+    /**
+     * Loops through the goals for an account and converts it from DB to Object
+     *
+     * @param account the account given in from DB
+     * @param accountToAdd the account to hydrate goals for
+     */
+    public static Account retrieveUserRegIds(HashMap account, Account accountToAdd) {
+        for(String regID : (ArrayList<String>) account.get("registered device ids")) {
+            accountToAdd.addRegisteredDevice(regID);
         }
         return accountToAdd;
     }
@@ -262,6 +305,29 @@ public class Util {
         Firebase currentRef = accountsRef.child(account.getId());
         HashMap<String, Object> current = generateAccountMapping(account);
         currentRef.setValue(current);
+    }
 
+    /**
+     * Updates a the registered device ids list on the db after a login
+     *
+     * @param account account to update
+     */
+    public static void updateAccountRegIdsOnDB(Account account) {
+        Firebase accountRef = db.child("accounts").child(account.getId());
+        Firebase regdeviceidsRef = accountRef.child("registered device ids");
+        regdeviceidsRef.setValue(account.getRegistedGCMDevices());
+    }
+
+    public static String addCronJobToDB(Goal goal, int promptMinute, int promptHour) {
+        Firebase cronJobsRef = db.child("cronJobs");
+        Firebase newCronJobRef = cronJobsRef.push();
+
+        Map<String, Object> job = new HashMap<>();
+        job.put("message", goal.toNotificationMessage());
+        job.put("cron", goal.generateCron(promptMinute, promptHour));
+        job.put("registered devices", currentUser.getRegistedGCMDevices());
+        newCronJobRef.setValue(job);
+
+        return newCronJobRef.getKey();
     }
 }
