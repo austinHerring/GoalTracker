@@ -16,13 +16,17 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_gravity="center_horizontal"/>
 
-    <AutoCompleteTextView android:id="@+id/goaltitle" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:hint="@string/prompt_title"
-        android:inputType="textAutoCorrect" android:maxLines="1"
-        android:singleLine="true"
+    <AutoCompleteTextView android:id="@+id/goaltitle"
+        android:hint="@string/prompt_title"
         android:maxLength="25"
-        android:layout_gravity="center_vertical"
-        android:textColor="@color/primaryP" />
+        android:maxLines="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textAutoCorrect"
+        android:singleLine="true"
+        android:textColor="@color/primaryP"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal" />
 
     <TextView android:text="@string/text_goal_type"
         android:layout_width="match_parent"

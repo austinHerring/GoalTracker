@@ -1,14 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
-  <filter>
-        <filter-name>ObjectifyFilter</filter-name>
-        <filter-class>com.googlecode.objectify.ObjectifyFilter</filter-class>
-  </filter>
-  <filter-mapping>
-        <filter-name>ObjectifyFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-  </filter-mapping>
-   <servlet>
+    <filter>
+          <filter-name>ObjectifyFilter</filter-name>
+          <filter-class>com.googlecode.objectify.ObjectifyFilter</filter-class>
+    </filter>
+    <filter-mapping>
+          <filter-name>ObjectifyFilter</filter-name>
+          <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <servlet>
+        <servlet-name>cronJobListener</servlet-name>
+        <servlet-class>com.austin.goaltracker.gcm.CronJobServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>cronJobListener</servlet-name>
+        <url-pattern>/_ah/start</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>cronJobManager</servlet-name>
+        <servlet-class>com.austin.goaltracker.gcm.CronJobManager</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>cronJobManager</servlet-name>
+        <url-pattern>/cronJobManager</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>sender</servlet-name>
+        <servlet-class>com.austin.goaltracker.gcm.NotificationSender</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>sender</servlet-name>
+        <url-pattern>/sender</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>SystemServiceServlet</servlet-name>
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>

@@ -34,6 +34,9 @@ public class GoalsTypeSelectActivity extends Activity {
                 if (goalTitle.getText().toString().equals("")) {
                     ToastDisplayer.displayHint("Fill in all fields",
                             ToastDisplayer.MessageType.FAILURE, getApplicationContext());
+                } else if(goalTitle.getText().toString().contains(";")) {
+                    ToastDisplayer.displayHint("Semicolons are not permitted",
+                            ToastDisplayer.MessageType.FAILURE, getApplicationContext());
                 } else {
                     GoalMediator.copyInfo1(goalTitle.getText().toString());
                     Intent i = new Intent(getApplicationContext(), GoalsCountdownCreatorActivity.class);

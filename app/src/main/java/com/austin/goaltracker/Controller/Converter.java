@@ -17,19 +17,13 @@ import java.util.List;
  */
 public class Converter {
 
-    public static Calendar stringToCalendar(String date) {
-        if (date.equals("NA")) {
+    public static Calendar longToCalendar(long date) {
+        if (date == 0) {
             return null;
         }
-        //PROBLEM HERE
-        List<String> numbers = Arrays.asList(date.split(","));
-        int[] ints = new int[3];
-        int i = 0;
-        for (String number : numbers) {
-            ints[i] = Integer.parseInt(number);
-            i++;
-        }
-        return new GregorianCalendar(ints[0], ints[1], ints[2]);
+        Calendar c = new GregorianCalendar();
+        c.setTimeInMillis(date);
+        return c;
     }
 
     public static Goal.IncrementType stringToFrequency(String input) {

@@ -53,7 +53,7 @@ public class RegistrationEndpoint {
         }
         RegistrationRecord record = new RegistrationRecord();
         record.setRegId(regId);
-        ofy().save().entity(record).now();
+        ofy().save().entity(record).now(); // async without adding .now()
     }
 
     /**

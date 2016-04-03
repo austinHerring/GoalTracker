@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/739geEJc4v8214z3BVAhcfODqCI\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/5-EsJndeU8NDoKzcLcX3Zn6lHNM\"",
  "discoveryVersion": "v1",
  "id": "registration:v1",
  "name": "registration",
@@ -13,9 +13,9 @@
   "x32": "http://www.google.com/images/icons/product/search-32.gif"
  },
  "protocol": "rest",
- "baseUrl": "https://myApplicationId.appspot.com/_ah/api/registration/v1/",
+ "baseUrl": "https://goal-tracker-1235.appspot.com/_ah/api/registration/v1/",
  "basePath": "/_ah/api/registration/v1/",
- "rootUrl": "https://myApplicationId.appspot.com/_ah/api/",
+ "rootUrl": "https://goal-tracker-1235.appspot.com/_ah/api/",
  "servicePath": "registration/v1/",
  "batchPath": "batch",
  "parameters": {

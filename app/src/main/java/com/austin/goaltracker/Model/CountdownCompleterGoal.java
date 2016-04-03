@@ -126,9 +126,10 @@ public class CountdownCompleterGoal extends Goal {
         }
     }
 
-    public String getDateDesiredFinish() {
-        return dateDesiredFinish.get(Calendar.YEAR) + "," + dateDesiredFinish.get(Calendar.MONTH)
-                + "," + dateDesiredFinish.get(Calendar.DAY_OF_MONTH);
+    public Calendar getDateDesiredFinish() {
+//        return dateDesiredFinish.get(Calendar.YEAR) + "," + dateDesiredFinish.get(Calendar.MONTH)
+//                + "," + dateDesiredFinish.get(Calendar.DAY_OF_MONTH);
+        return dateDesiredFinish;
     }
 
     public int getPercentProgress() {

@@ -55,38 +55,22 @@ public abstract class Goal {
         return indexInDB;
     }
 
-    public String getDateOfOrigin() {
-        return dateOfOrigin.get(Calendar.YEAR) + "," + dateOfOrigin.get(Calendar.MONTH) + "," + dateOfOrigin.get(Calendar.DAY_OF_MONTH);
+    public Calendar getDateOfOrigin() {
+        //return dateOfOrigin.get(Calendar.YEAR) + "," + dateOfOrigin.get(Calendar.MONTH) + "," + dateOfOrigin.get(Calendar.DAY_OF_MONTH);
+        return dateOfOrigin;
     }
 
-    public String getBrokenDate() {
+    public Calendar getBrokenDate() {
         if (dateBroken != null) {
-            return dateBroken.get(Calendar.YEAR) + "," + dateBroken.get(Calendar.MONTH) + "," + dateBroken.get(Calendar.DAY_OF_MONTH);
+            //return dateBroken.get(Calendar.YEAR) + "," + dateBroken.get(Calendar.MONTH) + "," + dateBroken.get(Calendar.DAY_OF_MONTH);
+            return dateBroken;
         } else {
-            return "NA";
+            return null;
         }
     }
 
     public String getCronJobKey() {
         return cronJobKey;
-    }
-
-    public String generateCron(int minuteToPrompt, int hourToPrompt) {
-        //TODO: ADD HOUR/MINUTE to PROMPT to the UI
-        //(Seconds: 0-59) (Minutes: 0-59) (Hours: 0-23) (Day of Month: 1-31) (Months: 0-11) (Day of Week: 0-6)
-        switch (incrementType) {
-            case HOURLY: return "0 " + minuteToPrompt + " * * * *";
-            case DAILY: return "0 " + minuteToPrompt + " " + hourToPrompt + " * * *";
-            case BIDAILY: return "0 " + minuteToPrompt + " " + hourToPrompt + " */2 * *";
-            case WEEKLY: return "0 " + minuteToPrompt + " " + hourToPrompt + " */7 * *";
-            case BIWEEKLY: return "0 " + minuteToPrompt + " " + hourToPrompt + " */14 * *";
-            case MONTHLY: return "0 " + minuteToPrompt + " " + hourToPrompt + " "
-                    + dateOfOrigin.get(Calendar.DAY_OF_MONTH) + " * *";
-            case YEARLY: return "0 " + minuteToPrompt + " " + hourToPrompt + " "
-                    + dateOfOrigin.get(Calendar.DAY_OF_MONTH) + " "
-                    + dateOfOrigin.get(Calendar.MONTH) + " *";
-        }
-        return "*/10 * * * * *";
     }
 
     public String originDateToString() {
@@ -138,6 +122,7 @@ public abstract class Goal {
     }
 
     public String toNotificationMessage() {
+        //TODO PREVENT SEMICOLONS FOR PARSING
         String str = goalName +": Did you make progress ";
         if (incrementType == IncrementType.HOURLY) {
             return str + "last hour?";

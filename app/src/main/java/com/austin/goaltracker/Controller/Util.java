@@ -1,7 +1,5 @@
 package com.austin.goaltracker.Controller;
 
-import android.util.Log;
-
 import com.austin.goaltracker.Model.Account;
 
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
@@ -12,16 +10,16 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseException;
 
-import com.austin.goaltracker.Model.CountdownCompleterGoal;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
+import java.util.TimeZone;
 
 /**
  * @author Austin Herring
@@ -226,24 +224,28 @@ public class Util {
                 goalToAdd.setCronJobKey((String) goal.get("cron key"));
                 goalToAdd.setUnitsRemaining((String) goal.get("units remaining string"));
                 goalToAdd.setIncrementType(Converter.stringToFrequency((String) goal.get("frequency")));
-                goalToAdd.setDateOfOrigin(Converter.stringToCalendar((String) goal.get("date start")));
-                goalToAdd.setBrokenDate(Converter.stringToCalendar((String) goal.get("date broken")));
-                goalToAdd.setDateDesiredFinish(Converter.stringToCalendar((String) goal.get("date end")));
+                goalToAdd.setDateOfOrigin(Converter.longToCalendar((Long) goal.get("date start")));
+                if (goal.get("date broken") != null) {
+                    goalToAdd.setBrokenDate(Converter.longToCalendar((Long) goal.get("date broken")));
+                }
+                goalToAdd.setDateDesiredFinish(Converter.longToCalendar((Long) goal.get("date end")));
                 goalToAdd.setPercentProgress(((Long) goal.get("percent progress")).intValue());
                 goalToAdd.setRemainingCheckpoints(((Long) goal.get("remaining checkpoints")).intValue());
                 goalToAdd.setTotalCheckpoints(((Long)goal.get("total checkpoints")).intValue());
                 accountToAdd.addGoal(goalToAdd);
             } else {
                 StreakSustainerGoal goalToAdd = new StreakSustainerGoal();
-                goalToAdd.setName((String)goal.get("name"));
+                goalToAdd.setName((String) goal.get("name"));
                 goalToAdd.setTask((String) goal.get("task"));
                 goalToAdd.setCronJobKey((String) goal.get("cron key"));
                 goalToAdd.setIncrementType(Converter.stringToFrequency((String) goal.get("frequency")));
-                goalToAdd.setDateOfOrigin(Converter.stringToCalendar((String) goal.get("date start")));
-                goalToAdd.setBrokenDate(Converter.stringToCalendar((String) goal.get("date broken")));
+                goalToAdd.setDateOfOrigin(Converter.longToCalendar((Long) goal.get("date start")));
+                if (goal.get("date broken") != null) {
+                    goalToAdd.setBrokenDate(Converter.longToCalendar((Long) goal.get("date broken")));
+                }
                 goalToAdd.setCheatNumber(((Long) goal.get("cheat number")).intValue());
-                goalToAdd.setCheatsRemaining(((Long)goal.get("cheats remaining")).intValue());
-                goalToAdd.setStreak(((Long)goal.get("streak number")).intValue());
+                goalToAdd.setCheatsRemaining(((Long) goal.get("cheats remaining")).intValue());
+                goalToAdd.setStreak(((Long) goal.get("streak number")).intValue());
                 accountToAdd.addGoal(goalToAdd);
             }
         }
@@ -251,14 +253,14 @@ public class Util {
     }
 
     /**
-     * Loops through the goals for an account and converts it from DB to Object
+     * Loops through the registered devices for an account and converts it from DB to Object
      *
      * @param account the account given in from DB
      * @param accountToAdd the account to hydrate goals for
      */
     public static Account retrieveUserRegIds(HashMap account, Account accountToAdd) {
-        for(String regID : (ArrayList<String>) account.get("registered device ids")) {
-            accountToAdd.addRegisteredDevice(regID);
+        for(HashMap<String, Object> device : (ArrayList<HashMap<String, Object>>) account.get("registered device ids")) {
+            accountToAdd.addRegisteredDevice((String) device.get("device reg id"));
         }
         return accountToAdd;
     }
@@ -324,10 +326,23 @@ public class Util {
 
         Map<String, Object> job = new HashMap<>();
         job.put("message", goal.toNotificationMessage());
-        job.put("cron", goal.generateCron(promptMinute, promptHour));
-        job.put("registered devices", currentUser.getRegistedGCMDevices());
+        job.put("registeredDevices", currentUser.getRegistedGCMDevices());
+        job.put("frequency", goal.getIncrementType());
+        job.put("promptMinute", promptMinute);
+        job.put("promptHour", promptHour);
+        job.put("lastRun", determineLastRunDate(goal));
+
         newCronJobRef.setValue(job);
 
         return newCronJobRef.getKey();
+    }
+
+    private static long determineLastRunDate(Goal goal) {
+        if (goal.classification().equals(Goal.Classification.STREAK)) {
+            return -1;
+        } else {
+            CountdownCompleterGoal g = (CountdownCompleterGoal) goal;
+            return g.getDateDesiredFinish().getTimeInMillis();
+        }
     }
 }

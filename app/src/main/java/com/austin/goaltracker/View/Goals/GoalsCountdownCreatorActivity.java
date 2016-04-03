@@ -89,7 +89,10 @@ public class GoalsCountdownCreatorActivity extends Activity implements TimePicke
                 type = GoalMediator.convertUItoType(((Spinner) findViewById(R.id.goalincrement)).getSelectedItem().toString());
                 if (!goalTask.equals("")) {
                     Account user = Util.currentUser;
-                    CountdownCompleterGoal newGoal = new CountdownCompleterGoal(GoalMediator.pasteGoalTitle(), type, new GregorianCalendar(year_x, month_x, day_x));
+                    Calendar endDate = new GregorianCalendar(year_x, month_x, day_x);
+                    endDate.set(Calendar.HOUR_OF_DAY, mPromptHour);
+                    endDate.set(Calendar.MINUTE, mPromptMinute);
+                    CountdownCompleterGoal newGoal = new CountdownCompleterGoal(GoalMediator.pasteGoalTitle(), type, endDate);
                     newGoal.setTask(goalTask);
                     String cronKey = Util.addCronJobToDB(newGoal, mPromptMinute, mPromptHour);
                     newGoal.setCronJobKey(cronKey);

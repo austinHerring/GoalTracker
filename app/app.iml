@@ -135,8 +135,8 @@
     <orderEntry type="library" exported="" name="play-services-appinvite-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="additionnal" level="project" />
     <orderEntry type="library" exported="" name="play-services-gcm-8.4.0" level="project" />
-    <orderEntry type="library" exported="" name="google-http-client-android-1.19.0" level="project" />
     <orderEntry type="library" exported="" name="gcm-android-endpoints" level="project" />
+    <orderEntry type="library" exported="" name="google-http-client-android-1.19.0" level="project" />
     <orderEntry type="library" exported="" name="google-oauth-client-1.19.0" level="project" />
     <orderEntry type="library" exported="" name="activation" level="project" />
     <orderEntry type="library" exported="" name="google-api-client-1.19.0" level="project" />

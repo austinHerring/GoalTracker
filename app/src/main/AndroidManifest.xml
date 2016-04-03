@@ -4,8 +4,11 @@
     package="com.austin.goaltracker" >
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <permission android:name="com.austin.goaltracker.permission.C2D_MESSAGE"
-    android:protectionLevel="signature" />
+
+    <permission
+        android:name="com.austin.goaltracker.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
     <uses-permission android:name="com.austin.goaltracker.permission.C2D_MESSAGE" />
 
     <!-- To access Google+ APIs: -->
@@ -21,8 +24,6 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-
-
 
     <application
         android:allowBackup="true"
@@ -118,21 +119,24 @@
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.example.gcm" />
             </intent-filter>
         </receiver>
 
-        <service android:name="com.austin.goaltracker.Controller.RegistrationIntentService" android:exported="false"/>
         <service
-            android:name="com.austin.goaltracker.Controller.GCMListenerService"
+            android:name=".Controller.RegistrationIntentService"
+            android:exported="false" />
+        <service
+            android:name=".Controller.GCMListenerService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
         <service
-            android:name="com.austin.goaltracker.Controller.MyInstanceIDListenerService"
-            android:exported="false">
+            android:name=".Controller.MyInstanceIDListenerService"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>

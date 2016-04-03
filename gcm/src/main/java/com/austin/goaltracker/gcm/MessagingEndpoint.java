@@ -13,7 +13,10 @@ import com.google.android.gcm.server.Sender;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
 
+import java.awt.image.AreaAveragingScaleFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Named;
@@ -47,20 +50,27 @@ public class MessagingEndpoint {
     /**
      * Send to the first 10 devices (You can modify this to send to any number of devices or a specific device)
      *
-     * @param message The message to send
+     * @param rawMessage The raw message with the note and reg ids
      */
-    public void sendMessage(@Named("message") String message) throws IOException {
-        if(message == null || message.trim().length() == 0) {
+    public void sendMessage(@Named("message") String rawMessage) throws IOException {
+        if(rawMessage == null || rawMessage.trim().length() == 0) {
             log.warning("Not sending message because it is empty");
             return;
         }
+
+        String message = parseMessageForNote(rawMessage);
         // crop longer messages
         if (message.length() > 1000) {
             message = message.substring(0, 1000) + "[...]";
         }
         Sender sender = new Sender(API_KEY);
         Message msg = new Message.Builder().addData("message", message).build();
-        List<RegistrationRecord> records = ofy().load().type(RegistrationRecord.class).limit(10).list();
+
+
+        List<RegistrationRecord> records = new ArrayList<>();
+        for (String id : parseMessageForIds(rawMessage)) {
+            records.add(ofy().load().type(RegistrationRecord.class).filter("regId", id).first().now());
+        }
         for(RegistrationRecord record : records) {
             Result result = sender.send(msg, record.getRegId(), 5);
             if (result.getMessageId() != null) {
@@ -84,5 +94,15 @@ public class MessagingEndpoint {
                 }
             }
         }
+    }
+
+    private String parseMessageForNote(String m) {
+        return Arrays.asList(m.split(";")).get(0);
+    }
+
+    private ArrayList<String> parseMessageForIds(String m) {
+        ArrayList<String> list = (ArrayList<String>) Arrays.asList(m.split(";"));
+        list.remove(0);
+        return list;
     }
 }
