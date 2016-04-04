@@ -8,7 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Created by austin on 4/1/16.
+ * @author Austin Herring
+ * @version 1.0
+ *
+ * Background task scheduled in the GAE queue that utilizes Messaging Endpoint to send messages
  */
 @SuppressWarnings("serial")
 public class NotificationSender extends HttpServlet {

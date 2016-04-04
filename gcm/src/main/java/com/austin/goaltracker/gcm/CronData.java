@@ -3,7 +3,10 @@ package com.austin.goaltracker.gcm;
 import java.util.List;
 
 /**
- * Created by austin on 4/2/16.
+ * @author Austin Herring
+ * @version 1.0
+ *
+ * A POJO class that is hydrated from JSON when cron jobs from Firebase are queried
  */
 public class CronData {
 

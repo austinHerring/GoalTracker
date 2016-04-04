@@ -2,12 +2,8 @@ package com.austin.goaltracker.Controller;
 
 import com.austin.goaltracker.Model.Goal;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 /**
  * @author Austin Herring

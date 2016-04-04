@@ -24,7 +24,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Created by austin on 4/1/16.
+ * @author Austin Herring
+ * @version 1.0
+ *
+ * A Servlet class that is called by cron.xml to check the datastaore for pending notifications.
+ * Then it schedules a message task in the queue and updates the next runtime for the job
+ *
  */
 @SuppressWarnings("serial")
 public class CronJobManager extends HttpServlet {

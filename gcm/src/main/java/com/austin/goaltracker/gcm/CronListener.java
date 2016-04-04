@@ -13,7 +13,10 @@ import java.util.Calendar;
 import java.util.logging.Logger;
 
 /**
- * Created by austin on 3/30/16.
+ * @author Austin Herring
+ * @version 1.0
+ *
+ * Firebase Listener that adds jobs to the GAE datastore when a new cron is generated in firebase
  */
 public class CronListener implements ChildEventListener{
     static Logger Log = Logger.getLogger(CronListener.class.getName());
