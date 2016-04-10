@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.gcm.registration.Registration;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -21,8 +22,6 @@ public class RegistrationIntentService extends IntentService {
 
     private static final String TAG = "RegIntentService";
     private static final String[] TOPICS = {"global"};
-    private static final String PROJECT_NUMBER = "226374478657";
-    private static final String PROJECT_ADDRESS = "https://goal-tracker-1235.appspot.com/_ah/api/";
 
     public RegistrationIntentService() {
         super(TAG);
@@ -33,30 +32,22 @@ public class RegistrationIntentService extends IntentService {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         try {
-            // [START register_for_gcm]
-            // Initially this call goes out to the network to retrieve the token, subsequent calls
-            // are local.
-            // R.string.gcm_defaultSenderId (the Sender ID) is typically derived from google-services.json.
-            // See https://developers.google.com/cloud-messaging/android/start for details on this file.
-            // [START get_token]
             InstanceID instanceID = InstanceID.getInstance(this);
-            String token = instanceID.getToken(PROJECT_NUMBER,
+            String token = instanceID.getToken(GoalTrackerApplication.PROJECT_NUMBER,
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-            // [END get_token]
             Log.i(TAG, "GCM Registration Token: " + token);
 
-            sendRegistrationToServer(token);
-            LoginMediator.copyDeviceRegID(token);
-            Log.i(TAG, "GCM Registration Token copied to mediator");
+            // Create a Registration record in datastore associated with an account
+            sendRegistrationToServer(token, intent.getStringExtra("accountId"));
 
             // Subscribe to topic channels
             subscribeTopics(token);
 
-            // You should store a boolean that indicates whether the generated token has been
-            // sent to your server. If the boolean is false, send the token to your server,
-            // otherwise your server should have already received the token.
+            // Stored boolean that indicates whether the generated token has been
+            // sent to server. If the boolean is false, send the token to the server,
+            // otherwise the server should have already received the token.
             sharedPreferences.edit().putBoolean(GCMPreferences.SENT_TOKEN_TO_SERVER, true).apply();
-            // [END register_for_gcm]
+
         } catch (Exception e) {
             Log.d(TAG, "Failed to complete token refresh Did you change default version of deployment from 1?", e);
             // If an exception happens while fetching the new token or updating our registration data
@@ -76,31 +67,15 @@ public class RegistrationIntentService extends IntentService {
      *
      * @param token The new token.
      */
-    private void sendRegistrationToServer(String token) throws IOException {
-        /*
+    private void sendRegistrationToServer(String token, String accountId) throws IOException {
         Registration.Builder builder = new Registration.Builder(AndroidHttp.newCompatibleTransport(),
                 new AndroidJsonFactory(), null)
-                // Need setRootUrl and setGoogleClientRequestInitializer only for local testing,
-                // otherwise they can be skipped
-                .setRootUrl("http://10.0.2.2:8080/_ah/api/")
-                .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
-                    @Override
-                    public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest)
-                            throws IOException {
-                        abstractGoogleClientRequest.setDisableGZipContent(true);
-                    }
-                });
-        builder.setApplicationName("Goal Tracker");
-        */
-
-        Registration.Builder builder = new Registration.Builder(AndroidHttp.newCompatibleTransport(),
-                new AndroidJsonFactory(), null)
-                .setRootUrl(PROJECT_ADDRESS)
+                .setRootUrl(GoalTrackerApplication.PROJECT_ADDRESS)
                 .setApplicationName("Goal Tracker");
 
         Registration regService = builder.build();
 
-        regService.register(token).execute();
+        regService.register(token, accountId).execute();
     }
 
     /**
@@ -109,13 +84,11 @@ public class RegistrationIntentService extends IntentService {
      * @param token GCM token
      * @throws IOException if unable to reach the GCM PubSub service
      */
-    // [START subscribe_topics]
     private void subscribeTopics(String token) throws IOException {
         GcmPubSub pubSub = GcmPubSub.getInstance(this);
         for (String topic : TOPICS) {
             pubSub.subscribe(token, "/topics/" + topic, null);
         }
     }
-    // [END subscribe_topics]
 
 }

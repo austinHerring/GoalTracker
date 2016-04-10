@@ -1,6 +1,6 @@
 {
  "kind": "discovery#rpcDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/5-EsJndeU8NDoKzcLcX3Zn6lHNM\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/Tmojsz5arRt7lslZOnODC5SRv8I\"",
  "discoveryVersion": "v1",
  "id": "registration:v1",
  "name": "registration",
@@ -90,6 +90,9 @@
    "id": "RegistrationRecord",
    "type": "object",
    "properties": {
+    "accountId": {
+     "type": "string"
+    },
     "regId": {
      "type": "string"
     }
@@ -101,14 +104,13 @@
    "id": "registration.listDevices",
    "allowGet": true,
    "parameters": {
-    "count": {
-     "type": "integer",
-     "required": true,
-     "format": "int32"
+    "accountId": {
+     "type": "string",
+     "required": true
     }
    },
    "parameterOrder": [
-    "count"
+    "accountId"
    ],
    "returns": {
     "$ref": "CollectionResponse_RegistrationRecord"
@@ -120,13 +122,18 @@
   "registration.register": {
    "id": "registration.register",
    "parameters": {
+    "accountId": {
+     "type": "string",
+     "required": true
+    },
     "regId": {
      "type": "string",
      "required": true
     }
    },
    "parameterOrder": [
-    "regId"
+    "regId",
+    "accountId"
    ],
    "scopes": [
     "https://www.googleapis.com/auth/userinfo.email"
@@ -135,13 +142,18 @@
   "registration.unregister": {
    "id": "registration.unregister",
    "parameters": {
+    "accountId": {
+     "type": "string",
+     "required": true
+    },
     "regId": {
      "type": "string",
      "required": true
     }
    },
    "parameterOrder": [
-    "regId"
+    "regId",
+    "accountId"
    ],
    "scopes": [
     "https://www.googleapis.com/auth/userinfo.email"

@@ -18,12 +18,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.austin.goaltracker.Controller.GAEDatastoreController;
 import com.austin.goaltracker.Controller.GoalMediator;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Account;
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.R;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -50,6 +52,7 @@ public class GoalsCountdownCreatorActivity extends Activity implements TimePicke
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(R.layout.activity_goals_countdown_creator);
         setupWindowAnimations();
+        GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
 
         //SET CURRENT TIME
         mPromptMinute = Calendar.getInstance().get(Calendar.MINUTE);
@@ -94,7 +97,7 @@ public class GoalsCountdownCreatorActivity extends Activity implements TimePicke
                     endDate.set(Calendar.MINUTE, mPromptMinute);
                     CountdownCompleterGoal newGoal = new CountdownCompleterGoal(GoalMediator.pasteGoalTitle(), type, endDate);
                     newGoal.setTask(goalTask);
-                    String cronKey = Util.addCronJobToDB(newGoal, mPromptMinute, mPromptHour);
+                    String cronKey = GAEDatastoreController.persistCron(newGoal, mPromptMinute, mPromptHour);
                     newGoal.setCronJobKey(cronKey);
                     user.addGoal(newGoal);
                     Util.updateAccountOnDB(user);

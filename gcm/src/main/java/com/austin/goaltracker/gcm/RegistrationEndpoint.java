@@ -1,9 +1,3 @@
-/*
-   For step-by-step instructions on connecting your Android application to this backend module,
-   see "App Engine Backend with Google Cloud Messaging" template documentation at
-   https://github.com/GoogleCloudPlatform/gradle-appengine-templates/tree/master/GcmEndpoints
-*/
-
 package com.austin.goaltracker.gcm;
 
 import com.google.api.server.spi.config.Api;
@@ -19,13 +13,6 @@ import static com.austin.goaltracker.gcm.OfyService.ofy;
 
 /**
  * A registration endpoint class we are exposing for a device's GCM registration id on the backend
- *
- * For more information, see
- * https://developers.google.com/appengine/docs/java/endpoints/
- *
- * NOTE: This endpoint does not use any form of authorization or
- * authentication! If this app is deployed, anyone can access this endpoint! If
- * you'd like to add authentication, take a look at the documentation.
  */
 @Api(
   name = "registration",
@@ -44,15 +31,17 @@ public class RegistrationEndpoint {
      * Register a device to the backend
      *
      * @param regId The Google Cloud Messaging registration Id to add
+     * @param accountId the account Id that has the associated registered device
      */
     @ApiMethod(name = "register")
-    public void registerDevice(@Named("regId") String regId) {
-        if(findRecord(regId) != null) {
-            log.info("Device " + regId + " already registered, skipping register");
+    public void registerDevice(@Named("regId") String regId, @Named("accountId") String accountId) {
+        if(findRecord(regId, accountId) != null) {
+            log.info("Device " + regId + " already registered for account " + accountId);
             return;
         }
         RegistrationRecord record = new RegistrationRecord();
         record.setRegId(regId);
+        record.setAccountId(accountId);
         ofy().save().entity(record).now(); // async without adding .now()
     }
 
@@ -60,31 +49,35 @@ public class RegistrationEndpoint {
      * Unregister a device from the backend
      *
      * @param regId The Google Cloud Messaging registration Id to remove
+     * @param accountId the account Id that has the associated registered device
      */
     @ApiMethod(name = "unregister")
-    public void unregisterDevice(@Named("regId") String regId) {
-        RegistrationRecord record = findRecord(regId);
+    public void unregisterDevice(@Named("regId") String regId, @Named("accountId") String accountId) {
+        RegistrationRecord record = findRecord(regId, accountId);
         if(record == null) {
-            log.info("Device " + regId + " not registered, skipping unregister");
+            log.info("Device " + regId + " not registered for account " + accountId);
             return;
         }
         ofy().delete().entity(record).now();
     }
 
     /**
-     * Return a collection of registered devices
+     * Return a collection of registered devices for a user account
      *
-     * @param count The number of devices to list
+     * @param accountId The user to list the devices he is registered with
      * @return a list of Google Cloud Messaging registration Ids
      */
     @ApiMethod(name = "listDevices")
-    public CollectionResponse<RegistrationRecord> listDevices(@Named("count") int count) {
-        List<RegistrationRecord> records = ofy().load().type(RegistrationRecord.class).limit(count).list();
+    public CollectionResponse<RegistrationRecord> listDevices(@Named("accountId") String accountId) {
+        List<RegistrationRecord> records = ofy().load().type(RegistrationRecord.class).filter("accountId", accountId).list();
         return CollectionResponse.<RegistrationRecord>builder().setItems(records).build();
     }
 
-    private RegistrationRecord findRecord(String regId) {
-        return ofy().load().type(RegistrationRecord.class).filter("regId", regId).first().now();
+    private RegistrationRecord findRecord(String regId, String accountId) {
+        return ofy().load().type(RegistrationRecord.class)
+                .filter("accountId", accountId)
+                .filter("regId", regId)
+                .first().now();
     }
 
 }

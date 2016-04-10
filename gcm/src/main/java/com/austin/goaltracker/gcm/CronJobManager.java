@@ -1,17 +1,16 @@
 package com.austin.goaltracker.gcm;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
+
+import static com.austin.goaltracker.gcm.OfyService.ofy;
 import static com.google.appengine.api.taskqueue.TaskOptions.Builder.*;
 
 import java.io.IOException;
@@ -33,83 +32,73 @@ import javax.servlet.http.HttpServletResponse;
  */
 @SuppressWarnings("serial")
 public class CronJobManager extends HttpServlet {
-    static Logger Log = Logger.getLogger(CronListener.class.getName());
-    public static Firebase db = new Firebase("https://flickering-inferno-500.firebaseio.com/cronJobs");
-
-    private static final Logger log = Logger.getLogger(CronJobManager.class
-            .getName());
+    private static final Logger Log = Logger.getLogger(CronJobManager.class.getName());
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
-        log.info("Running cron loop");
         long currentTime = Calendar.getInstance().getTimeInMillis() / 1000L;
-        log.info("Current time: " + currentTime);
 
         // FILTER OUT OF DATE NOTIFICATIONS
         DatastoreService datastore = DatastoreServiceFactory
                 .getDatastoreService();
-        Query query = new Query("NotificationJob")
-                .setFilter(new Query.FilterPredicate("next_run_ts",
-                        Query.FilterOperator.LESS_THAN_OR_EQUAL, currentTime));
+
+        //TODO CHANGE BACK TO LESS_THAN_OR_EQUAL
+        Query query = new Query("CronData")
+                .setFilter(new Query.FilterPredicate("nextRunTS",
+                        Query.FilterOperator.GREATER_THAN_OR_EQUAL, currentTime));
         PreparedQuery pq = datastore.prepare(query);
 
         for (Entity job : pq.asIterable()) {
             processJob(job);
         }
+        resp.setContentType("text/plain");
+        resp.getWriter().println("Entity processed");
     }
 
     private void processJob(Entity job) {
-        String key = KeyFactory.keyToString(job.getKey());
+        CronData cronData = new CronData(job);
         DatastoreService datastore = DatastoreServiceFactory
                 .getDatastoreService();
 
-        final CronData[] cronData = {null};
-        db.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                cronData[0] = dataSnapshot.getValue(CronData.class);
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                Log.severe("The read failed: " + firebaseError.getMessage());
-            }
-        });
+        String key = cronData.getCronKey();
+        Log.info("PROCESSING A JOB FOR CRON KEY: " + key);
 
         // ADD SENDING MESSAGE TO QUEUE
+        String rawMessage = constructRawMessage(cronData);
         Queue queue = QueueFactory.getDefaultQueue();
-        queue.add(withUrl("/sender").param("rawMessage", constructRawMessage(cronData)));
+        queue.add(withUrl("/sender").param("rawMessage", rawMessage));
 
         // UPDATE NEXT RUN DATE OR DELETE IF GOAL IS DONE
-        String frequency = cronData[0].getFrequency();
-        long lastRun = cronData[0].getlastRun();
-        long previousNextRun = (Long) job.getProperty("next_run_ts");
+        String frequency = cronData.getFrequency();
+        long terminalRun = cronData.getLastRun();
+        long previousNextRun = cronData.getNextRunTS();
         long futureNextRun = getNextRun(frequency, previousNextRun);
 
-        if (lastRun != -1 && futureNextRun > lastRun) {
+        //TODO MAKE SURE IM NOT PUTTING IN DUPLICATES
+        if (terminalRun != -1 && futureNextRun > terminalRun) {
             datastore.delete(job.getKey());
         } else {
-            job.setProperty("next_run_ts", futureNextRun);
-            datastore.put(job);
+            cronData.setNextRunTS(futureNextRun);
+            datastore.put(cronData.toEntity());
         }
     }
 
     private long getNextRun(String frequency, long previousnextRun) {
         Calendar futureNextRun = Calendar.getInstance();
         futureNextRun.setTimeInMillis(previousnextRun);
-        if (frequency == "HOURLY") {
+        if (frequency.equals("HOURLY")) {
             futureNextRun.add(Calendar.HOUR_OF_DAY, 1);
-        } else if (frequency == "DAILY") {
+        } else if (frequency.equals("DAILY")) {
             futureNextRun.add(Calendar.DATE, 1);
-        } else if (frequency == "BIDAILY") {
+        } else if (frequency.equals("BIDAILY")) {
             futureNextRun.add(Calendar.DATE, 2);
-        } else if (frequency == "WEEKLY") {
+        } else if (frequency.equals("WEEKLY")) {
             futureNextRun.add(Calendar.DATE, 7);
-        } else if (frequency == "BIWEEKLY") {
+        } else if (frequency.equals("BIWEEKLY")) {
             futureNextRun.add(Calendar.DATE, 1);
-        } else if (frequency == "MONTHLY") {
+        } else if (frequency.equals("MONTHLY")) {
             futureNextRun.add(Calendar.MONTH, 1);
-        } else if (frequency == "YEARLY") {
+        } else if (frequency.equals("YEARLY")) {
             futureNextRun.add(Calendar.YEAR, 1);
         } else {
             Log.severe("WHEN FINDING NEXT RUN DATE A FREQUENCY WAS NOT DETECTED");
@@ -118,13 +107,7 @@ public class CronJobManager extends HttpServlet {
         return futureNextRun.getTimeInMillis();
     }
 
-    private String constructRawMessage(CronData[] cronData) {
-        String messageRaw = cronData[0].getMessage();
-        List<String> deviceIds = cronData[0].getRegisteredDevices();
-        for(String id : deviceIds) {
-            messageRaw += ";" + id;
-        }
-
-        return messageRaw;
+    private String constructRawMessage(CronData cronData) {
+        return cronData.getMessage() + ";" + cronData.getAccountId();
     }
 }

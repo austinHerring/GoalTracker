@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/5-EsJndeU8NDoKzcLcX3Zn6lHNM\"",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/Tmojsz5arRt7lslZOnODC5SRv8I\"",
  "discoveryVersion": "v1",
  "id": "registration:v1",
  "name": "registration",
@@ -92,6 +92,9 @@
    "id": "RegistrationRecord",
    "type": "object",
    "properties": {
+    "accountId": {
+     "type": "string"
+    },
     "regId": {
      "type": "string"
     }
@@ -101,18 +104,17 @@
  "methods": {
   "listDevices": {
    "id": "registration.listDevices",
-   "path": "registrationrecord/{count}",
+   "path": "registrationrecord/{accountId}",
    "httpMethod": "GET",
    "parameters": {
-    "count": {
-     "type": "integer",
+    "accountId": {
+     "type": "string",
      "required": true,
-     "format": "int32",
      "location": "path"
     }
    },
    "parameterOrder": [
-    "count"
+    "accountId"
    ],
    "response": {
     "$ref": "CollectionResponse_RegistrationRecord"
@@ -123,9 +125,14 @@
   },
   "register": {
    "id": "registration.register",
-   "path": "registerDevice/{regId}",
+   "path": "registerDevice/{regId}/{accountId}",
    "httpMethod": "POST",
    "parameters": {
+    "accountId": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    },
     "regId": {
      "type": "string",
      "required": true,
@@ -133,7 +140,8 @@
     }
    },
    "parameterOrder": [
-    "regId"
+    "regId",
+    "accountId"
    ],
    "scopes": [
     "https://www.googleapis.com/auth/userinfo.email"
@@ -141,9 +149,14 @@
   },
   "unregister": {
    "id": "registration.unregister",
-   "path": "unregisterDevice/{regId}",
+   "path": "unregisterDevice/{regId}/{accountId}",
    "httpMethod": "POST",
    "parameters": {
+    "accountId": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    },
     "regId": {
      "type": "string",
      "required": true,
@@ -151,7 +164,8 @@
     }
    },
    "parameterOrder": [
-    "regId"
+    "regId",
+    "accountId"
    ],
    "scopes": [
     "https://www.googleapis.com/auth/userinfo.email"

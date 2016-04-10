@@ -3,6 +3,7 @@ package com.austin.goaltracker.View.Goals;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.austin.goaltracker.Controller.GoalAdapter;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.austin.goaltracker.R;
 
@@ -35,6 +37,7 @@ public class GoalsBaseActivity extends FragmentActivity implements AdapterView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_goals_base);
+        GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
 
         spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
         spinner.setAdapter(new BaseActivityAdapter(this, R.layout.layout_spinner_dropdown, activities));
@@ -113,5 +116,19 @@ public class GoalsBaseActivity extends FragmentActivity implements AdapterView.O
     @Override
     public String toString() {
         return "Goals";
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GoalTrackerApplication.INSTANCE.registerReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(GoalTrackerApplication.INSTANCE)
+                .unregisterReceiver(GoalTrackerApplication.INSTANCE.mRegistrationBroadcastReceiver);
+        GoalTrackerApplication.INSTANCE.isReceiverRegistered = false;
+        super.onPause();
     }
 }

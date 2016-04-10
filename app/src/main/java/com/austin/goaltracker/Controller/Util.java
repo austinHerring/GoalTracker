@@ -12,7 +12,6 @@ import com.firebase.client.FirebaseException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Austin Herring
@@ -98,7 +97,6 @@ public class Util {
         map.put("password object", generatePasswordMapping(account.getPasswordObject()));
         map.put("email", account.getEmail());
         map.put("goals", generateGoalMapping(account.getGoals()));
-        map.put("registered device ids", generateDeviceIdMapping(account.getRegistedGCMDevices()));
         return map;
     }
 
@@ -133,22 +131,6 @@ public class Util {
             listOfGoals.add(map);
         }
         return listOfGoals;
-    }
-
-    /**
-     * Accounts are represented as hashmaps to access particular data
-     *
-     * @param regIDs The list of goals to generate a HashMap for.
-     * @return The HashMap.
-     */
-    private static ArrayList<HashMap<String, Object>> generateDeviceIdMapping(ArrayList<String> regIDs) {
-        ArrayList<HashMap<String, Object>> listOfRegIDs = new ArrayList<>();
-        for (String regID : regIDs) {
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("device reg id", regID);
-            listOfRegIDs.add(map);
-        }
-        return listOfRegIDs;
     }
 
     /**
@@ -193,9 +175,6 @@ public class Util {
                         hydratePassword(account),
                         (String)account.get("email"),
                         (String)account.get("id"));
-                if (account.get("registered device ids") != null) {
-                    accountToAdd = retrieveUserRegIds(account, accountToAdd);
-                }
                 registeredUsers.put(id, (account.get("goals") != null) ?
                         retrieveUserGoals(account, accountToAdd) : accountToAdd);
             }
@@ -246,19 +225,6 @@ public class Util {
     }
 
     /**
-     * Loops through the registered devices for an account and converts it from DB to Object
-     *
-     * @param account the account given in from DB
-     * @param accountToAdd the account to hydrate goals for
-     */
-    public static Account retrieveUserRegIds(HashMap account, Account accountToAdd) {
-        for(HashMap<String, Object> device : (ArrayList<HashMap<String, Object>>) account.get("registered device ids")) {
-            accountToAdd.addRegisteredDevice((String) device.get("device reg id"));
-        }
-        return accountToAdd;
-    }
-
-    /**
      * gets password object from the hashmap returned from firebase
      *
      * @param account firebase snapshot of data
@@ -300,42 +266,5 @@ public class Util {
         Firebase currentRef = accountsRef.child(account.getId());
         HashMap<String, Object> current = generateAccountMapping(account);
         currentRef.setValue(current);
-    }
-
-    /**
-     * Updates a the registered device ids list on the db after a login
-     *
-     * @param account account to update
-     */
-    public static void updateAccountRegIdsOnDB(Account account) {
-        Firebase accountRef = db.child("accounts").child(account.getId());
-        Firebase regdeviceidsRef = accountRef.child("registered device ids");
-        regdeviceidsRef.setValue(account.getRegistedGCMDevices());
-    }
-
-    public static String addCronJobToDB(Goal goal, int promptMinute, int promptHour) {
-        Firebase cronJobsRef = db.child("cronJobs");
-        Firebase newCronJobRef = cronJobsRef.push();
-
-        Map<String, Object> job = new HashMap<>();
-        job.put("message", goal.toNotificationMessage());
-        job.put("registeredDevices", currentUser.getRegistedGCMDevices());
-        job.put("frequency", goal.getIncrementType());
-        job.put("promptMinute", promptMinute);
-        job.put("promptHour", promptHour);
-        job.put("lastRun", determineLastRunDate(goal));
-
-        newCronJobRef.setValue(job);
-
-        return newCronJobRef.getKey();
-    }
-
-    private static long determineLastRunDate(Goal goal) {
-        if (goal.classification().equals(Goal.Classification.STREAK)) {
-            return -1;
-        } else {
-            CountdownCompleterGoal g = (CountdownCompleterGoal) goal;
-            return g.getDateDesiredFinish().getTimeInMillis();
-        }
     }
 }

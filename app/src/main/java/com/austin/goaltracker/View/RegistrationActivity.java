@@ -3,14 +3,18 @@ package com.austin.goaltracker.View;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.austin.goaltracker.Controller.EmailDispatcher;
+import com.austin.goaltracker.Controller.GAEDatastoreController;
 import com.austin.goaltracker.Controller.LoginMediator;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
+import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.NewMemberEmail;
 import com.austin.goaltracker.R;
 import com.austin.goaltracker.View.Goals.GoalsBaseActivity;
@@ -75,10 +79,10 @@ public class RegistrationActivity extends Activity {
                     EmailDispatcher dispatcher = new EmailDispatcher();
                     errorMessage = dispatcher.send(new NewMemberEmail(Util.currentUser));
                     if (errorMessage == null) {
-                        Util.currentUser.addRegisteredDevice(LoginMediator.pasteDeviceRegID());
-                        Util.updateAccountRegIdsOnDB(Util.currentUser);
+
+                        //TODO LOOK INTO WHY IT CRASHES
+                        GAEDatastoreController.registerdeviceForCurrentUser();
                         Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
-                        i.putExtra("TabNumber", 0);
                         startActivity(i);
                         ToastDisplayer.displayHint("Registration Successful",
                                 ToastDisplayer.MessageType.SUCCESS, getApplicationContext());
@@ -97,5 +101,19 @@ public class RegistrationActivity extends Activity {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GoalTrackerApplication.INSTANCE.registerReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(GoalTrackerApplication.INSTANCE)
+                .unregisterReceiver(GoalTrackerApplication.INSTANCE.mRegistrationBroadcastReceiver);
+        GoalTrackerApplication.INSTANCE.isReceiverRegistered = false;
+        super.onPause();
     }
 }

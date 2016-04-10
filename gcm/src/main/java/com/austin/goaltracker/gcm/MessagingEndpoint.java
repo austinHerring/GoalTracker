@@ -12,11 +12,13 @@ import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
+import com.google.api.server.spi.response.CollectionResponse;
 
 import java.awt.image.AreaAveragingScaleFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Named;
@@ -66,12 +68,12 @@ public class MessagingEndpoint {
         Sender sender = new Sender(API_KEY);
         Message msg = new Message.Builder().addData("message", message).build();
 
+        // GETS THE REGISTRATION RECORDS FOR A USER ACCOUNT
+        RegistrationEndpoint registrationEndpoint = new RegistrationEndpoint();
+        CollectionResponse<RegistrationRecord> records = registrationEndpoint.listDevices(parseMessageForIds(rawMessage));
 
-        List<RegistrationRecord> records = new ArrayList<>();
-        for (String id : parseMessageForIds(rawMessage)) {
-            records.add(ofy().load().type(RegistrationRecord.class).filter("regId", id).first().now());
-        }
-        for(RegistrationRecord record : records) {
+
+        for(RegistrationRecord record : records.getItems()) {
             Result result = sender.send(msg, record.getRegId(), 5);
             if (result.getMessageId() != null) {
                 log.info("Message sent to " + record.getRegId());
@@ -100,9 +102,7 @@ public class MessagingEndpoint {
         return Arrays.asList(m.split(";")).get(0);
     }
 
-    private ArrayList<String> parseMessageForIds(String m) {
-        ArrayList<String> list = (ArrayList<String>) Arrays.asList(m.split(";"));
-        list.remove(0);
-        return list;
+    private String parseMessageForIds(String m) {
+        return Arrays.asList(m.split(";")).get(1);
     }
 }

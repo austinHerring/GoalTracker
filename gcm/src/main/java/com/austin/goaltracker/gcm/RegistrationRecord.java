@@ -11,8 +11,8 @@ public class RegistrationRecord {
     @Id
     Long id; // Will automatically generate ID on save
 
-    @Index
-    private String regId;
+    @Index private String regId;
+    @Index private String accountId;
 
     public RegistrationRecord() {}
 
@@ -20,7 +20,15 @@ public class RegistrationRecord {
         return regId;
     }
 
+    public String getAccountId() {
+        return accountId;
+    }
+
     public void setRegId(String regId) {
         this.regId = regId;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 }

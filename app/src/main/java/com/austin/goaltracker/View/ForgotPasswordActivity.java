@@ -11,6 +11,7 @@ import com.austin.goaltracker.Controller.EmailDispatcher;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Account;
+import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.NewPasswordEmail;
 import com.austin.goaltracker.R;
 import com.firebase.client.DataSnapshot;
@@ -25,6 +26,7 @@ public class ForgotPasswordActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
+        GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
         username = (EditText) findViewById(R.id.username);
 
         Button submitButton = (Button) findViewById(R.id.buttonSubmit);

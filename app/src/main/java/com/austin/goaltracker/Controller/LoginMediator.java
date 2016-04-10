@@ -10,15 +10,10 @@ public class LoginMediator {
     // These are used to copy over a username and password from login screen to registration screen
     public static String usernameCarryOver;
     public static String passwordCarryOver;
-    public static String deviceRegIDCarryOver;
 
     public static void copyLoginInfo(String username, String password) {
         usernameCarryOver = username;
         passwordCarryOver = password;
-    }
-
-    public static void copyDeviceRegID(String id) {
-        deviceRegIDCarryOver = id;
     }
 
     public static String pasteUsername() {
@@ -29,7 +24,4 @@ public class LoginMediator {
         return passwordCarryOver;
     }
 
-    public static String pasteDeviceRegID() {
-        return deviceRegIDCarryOver;
-    }
 }

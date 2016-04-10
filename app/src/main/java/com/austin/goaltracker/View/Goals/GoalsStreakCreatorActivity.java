@@ -14,11 +14,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.austin.goaltracker.Controller.GAEDatastoreController;
 import com.austin.goaltracker.Controller.GoalMediator;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Account;
 import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.austin.goaltracker.R;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
@@ -40,6 +42,7 @@ public class GoalsStreakCreatorActivity extends Activity implements TimePickerDi
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(R.layout.activity_goals_streak_creator);
         setupWindowAnimations();
+        GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
 
         //SET CURRENT TIME
         mPromptMinute = Calendar.getInstance().get(Calendar.MINUTE);
@@ -70,7 +73,7 @@ public class GoalsStreakCreatorActivity extends Activity implements TimePickerDi
                     newGoal.setTask(goalTask);
                     newGoal.setCheatNumber(skipNumber);
                     newGoal.setCheatsRemaining(skipNumber);
-                    String cronKey = Util.addCronJobToDB(newGoal, mPromptMinute, mPromptHour);
+                    String cronKey = GAEDatastoreController.persistCron(newGoal, mPromptMinute, mPromptHour);
                     newGoal.setCronJobKey(cronKey);
                     user.addGoal(newGoal);
                     Util.updateAccountOnDB(user);

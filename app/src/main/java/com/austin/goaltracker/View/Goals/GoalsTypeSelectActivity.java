@@ -13,6 +13,7 @@ import android.widget.EditText;
 
 import com.austin.goaltracker.Controller.GoalMediator;
 import com.austin.goaltracker.Controller.ToastDisplayer;
+import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.R;
 
 public class GoalsTypeSelectActivity extends Activity {
@@ -24,6 +25,7 @@ public class GoalsTypeSelectActivity extends Activity {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(R.layout.activity_goals_type_select);
         setupWindowAnimations();
+        GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
 
         //set up GUI components
         goalTitle = (EditText) findViewById(R.id.goaltitle);
