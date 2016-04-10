@@ -32,7 +32,11 @@
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>com.austin.goaltracker.gcm.CronJobEndpoint, com.austin.goaltracker.gcm.RegistrationEndpoint, com.austin.goaltracker.gcm.MessagingEndpoint</param-value>
+            <param-value>
+                com.austin.goaltracker.gcm.CronJobEndpoint,
+                com.austin.goaltracker.gcm.RegistrationEndpoint,
+                com.austin.goaltracker.gcm.MessagingEndpoint
+            </param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

@@ -45,7 +45,7 @@ public class CronJobManager extends HttpServlet {
         //TODO CHANGE BACK TO LESS_THAN_OR_EQUAL
         Query query = new Query("CronData")
                 .setFilter(new Query.FilterPredicate("nextRunTS",
-                        Query.FilterOperator.GREATER_THAN_OR_EQUAL, currentTime));
+                        Query.FilterOperator.LESS_THAN_OR_EQUAL, currentTime));
         PreparedQuery pq = datastore.prepare(query);
 
         for (Entity job : pq.asIterable()) {
