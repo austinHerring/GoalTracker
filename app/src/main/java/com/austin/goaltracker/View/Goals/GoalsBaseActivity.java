@@ -52,7 +52,7 @@ public class GoalsBaseActivity extends FragmentActivity implements AdapterView.O
         });
 
         listOfGoals = (ListView) findViewById(R.id.listOfGoals);
-        GoalAdapter arrayAdapter = new GoalAdapter(this, android.R.layout.simple_list_item_1, Util.currentUser.getGoals());
+        GoalAdapter arrayAdapter = new GoalAdapter(this, android.R.layout.simple_list_item_1, Util.currentUser.goalsToList());
         listOfGoals.setAdapter(arrayAdapter);
         listOfGoals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

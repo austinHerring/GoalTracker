@@ -12,6 +12,7 @@ import android.util.Log;
 import com.austin.goaltracker.R;
 
 import com.austin.goaltracker.View.LoginActivity;
+import com.austin.goaltracker.View.PendingReminders.ReminderListActivity;
 import com.google.android.gms.gcm.GcmListenerService;
 
 public class GCMListenerService extends GcmListenerService {
@@ -28,8 +29,13 @@ public class GCMListenerService extends GcmListenerService {
     @Override
     public void onMessageReceived(String from, Bundle data) {
         String message = data.getString("message");
-        Log.d(TAG, "From: " + from);
+        String accountId = data.getString("accountId");
+        //TODO Create a a GoalReminderItem from the ids
+        //TODO Store this in the Firebase Account Info
+        String goalId = data.getString("goalId");
         Log.d(TAG, "Message: " + message);
+        Log.d(TAG, "accountId: " + accountId);
+        Log.d(TAG, "goalId: " + goalId);
         sendNotification(message);
     }
 
@@ -39,7 +45,12 @@ public class GCMListenerService extends GcmListenerService {
      * @param message GCM message received.
      */
     private void sendNotification(String message) {
-        Intent intent = new Intent(this, LoginActivity.class);
+        Intent intent;
+        if (Util.currentUser != null) {
+            intent = new Intent(this, ReminderListActivity.class);
+        } else {
+            intent = new Intent(this, LoginActivity.class);
+        }
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);

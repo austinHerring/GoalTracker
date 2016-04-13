@@ -18,6 +18,7 @@ public class CronData {
     @Index transient private String cronKey;
     private String message;
     private String accountId;
+    private String goalId;
     private String frequency;
     @Index transient private long nextRunTS;
     private long lastRun;
@@ -30,16 +31,18 @@ public class CronData {
         this.cronKey = (String) entity.getProperty("cronKey");
         this.message = (String) entity.getProperty("message");
         this.accountId = (String) entity.getProperty("accountId");
+        this.goalId = (String) entity.getProperty("goalId");
         this.frequency = (String) entity.getProperty("frequency");
         this.nextRunTS = (Long) entity.getProperty("nextRunTS");
         this.lastRun = (Long) entity.getProperty("lastRun");
     }
 
-    public CronData(String cronKey, String message, String accountId,
+    public CronData(String cronKey, String message, String accountId, String goalId,
                     String frequency, long nextRunTS, long lastRun) {
         this.cronKey = cronKey;
         this.message = message;
         this.accountId = accountId;
+        this.goalId = goalId;
         this.frequency = frequency;
         this.nextRunTS = nextRunTS;
         this.lastRun = lastRun;
@@ -55,6 +58,10 @@ public class CronData {
 
     public String getAccountId() {
         return accountId;
+    }
+
+    public String getGoalId() {
+        return goalId;
     }
 
     public String getFrequency() {

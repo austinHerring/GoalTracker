@@ -1,6 +1,8 @@
 package com.austin.goaltracker.Model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Austin Herring
@@ -14,7 +16,7 @@ public class Account {
     private String username;
     private Password password;
     private String email;
-    private ArrayList<Goal> goals = new ArrayList<>();
+    private HashMap<String, Goal> goals= new HashMap<>();
     private ArrayList<Account> friends = new ArrayList<>();
     private String id;
 
@@ -27,12 +29,12 @@ public class Account {
      * @param password the password of the account
      * @param email the email of the account
      */
-    public Account(String nameFirst, String nameLast,String username, String password, String
+    public Account(String nameFirst, String nameLast,String username, Password password, String
             email) {
         this.nameFirst = nameFirst;
         this.nameLast = nameLast;
         this.username = username;
-        this.password = new Password(password);
+        this.password = password;
         this.email = email;
     }
 
@@ -79,8 +81,12 @@ public class Account {
         return this.password.toPasswordString();
     }
 
-    public void setPassword(String password) {
-        this.password = new Password(password);
+    public void setPassword(Password password) {
+        this.password = password;
+    }
+
+    public void setGoals(HashMap<String, Goal> goals) {
+        this.goals = goals;
     }
 
     public String getPasswordDate() {
@@ -97,12 +103,16 @@ public class Account {
 
     public void setId(String id) { this.id = id; }
 
-    public ArrayList<Goal> getGoals() {
+    public HashMap<String, Goal> getGoals() {
         return goals;
     }
 
-    public boolean addGoal(Goal g) {
-        return goals.add(g);
+    public void addGoal(String id, Goal goal) {
+        goals.put(id, goal);
+    }
+
+    public ArrayList<Goal> goalsToList() {
+        return new ArrayList<>(goals.values());
     }
 
     /**

@@ -73,14 +73,12 @@ public class RegistrationActivity extends Activity {
         Util.db.child("accounts").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                Util.retrieveUsers(snapshot);
-                errorMessage = Util.registerUser(nF, nL, u, p, e);
+                Util.retrieveUsersToLocal(snapshot);
+                errorMessage = Util.registerUserOnDB(nF, nL, u, p, e);
                 if (errorMessage == null) {
                     EmailDispatcher dispatcher = new EmailDispatcher();
                     errorMessage = dispatcher.send(new NewMemberEmail(Util.currentUser));
                     if (errorMessage == null) {
-
-                        //TODO LOOK INTO WHY IT CRASHES
                         GAEDatastoreController.registerdeviceForCurrentUser();
                         Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
                         startActivity(i);

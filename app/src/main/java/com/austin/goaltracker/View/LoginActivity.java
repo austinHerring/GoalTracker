@@ -88,7 +88,7 @@ public class LoginActivity extends Activity {
         Util.db.child("accounts").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                Util.retrieveUsers(snapshot);
+                Util.retrieveUsersToLocal(snapshot);
                 errorMessage = Util.authenticate(usernameInput, passwordInput);
                 if (errorMessage == null) {
                     if (isConnected) {

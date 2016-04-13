@@ -36,13 +36,12 @@ public class CronJobManager extends HttpServlet {
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
-        long currentTime = Calendar.getInstance().getTimeInMillis() / 1000L;
+        long currentTime = Calendar.getInstance().getTimeInMillis();
 
         // FILTER OUT OF DATE NOTIFICATIONS
         DatastoreService datastore = DatastoreServiceFactory
                 .getDatastoreService();
 
-        //TODO CHANGE BACK TO LESS_THAN_OR_EQUAL
         Query query = new Query("CronData")
                 .setFilter(new Query.FilterPredicate("nextRunTS",
                         Query.FilterOperator.LESS_THAN_OR_EQUAL, currentTime));
@@ -74,7 +73,6 @@ public class CronJobManager extends HttpServlet {
         long previousNextRun = cronData.getNextRunTS();
         long futureNextRun = getNextRun(frequency, previousNextRun);
 
-        //TODO MAKE SURE IM NOT PUTTING IN DUPLICATES
         if (terminalRun != -1 && futureNextRun > terminalRun) {
             datastore.delete(job.getKey());
         } else {
@@ -87,7 +85,7 @@ public class CronJobManager extends HttpServlet {
         Calendar futureNextRun = Calendar.getInstance();
         futureNextRun.setTimeInMillis(previousnextRun);
         if (frequency.equals("HOURLY")) {
-            futureNextRun.add(Calendar.HOUR_OF_DAY, 1);
+            futureNextRun.add(Calendar.HOUR, 1);
         } else if (frequency.equals("DAILY")) {
             futureNextRun.add(Calendar.DATE, 1);
         } else if (frequency.equals("BIDAILY")) {
@@ -108,6 +106,6 @@ public class CronJobManager extends HttpServlet {
     }
 
     private String constructRawMessage(CronData cronData) {
-        return cronData.getMessage() + ";" + cronData.getAccountId();
+        return cronData.getMessage() + ";" + cronData.getAccountId() + ";" + cronData.getGoalId();
     }
 }

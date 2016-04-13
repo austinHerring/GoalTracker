@@ -27,6 +27,7 @@ import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.R;
+import com.firebase.client.FirebaseException;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -91,7 +92,7 @@ public class GoalsCountdownCreatorActivity extends Activity implements TimePicke
                 goalTask = ((EditText) findViewById(R.id.goaltask)).getText().toString();
                 type = GoalMediator.convertUItoType(((Spinner) findViewById(R.id.goalincrement)).getSelectedItem().toString());
                 if (!goalTask.equals("")) {
-                    Account user = Util.currentUser;
+                    Account account = Util.currentUser;
                     Calendar endDate = new GregorianCalendar(year_x, month_x, day_x);
                     endDate.set(Calendar.HOUR_OF_DAY, mPromptHour);
                     endDate.set(Calendar.MINUTE, mPromptMinute);
@@ -99,12 +100,17 @@ public class GoalsCountdownCreatorActivity extends Activity implements TimePicke
                     newGoal.setTask(goalTask);
                     String cronKey = GAEDatastoreController.persistCron(newGoal, mPromptMinute, mPromptHour);
                     newGoal.setCronJobKey(cronKey);
-                    user.addGoal(newGoal);
-                    Util.updateAccountOnDB(user);
-                    ToastDisplayer.displayHint("Goal Created",
-                            ToastDisplayer.MessageType.SUCCESS, getApplicationContext());
-                    Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
-                    startActivity(i);
+                    try {
+                        Util.updateAccountGoalOnDB(account.getId(), newGoal);
+                        account.addGoal(newGoal.getId(), newGoal);
+                        ToastDisplayer.displayHint("Goal Created",
+                                ToastDisplayer.MessageType.SUCCESS, getApplicationContext());
+                        Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
+                        startActivity(i);
+                    } catch (FirebaseException e) {
+                        ToastDisplayer.displayHint("Could not connect to database",
+                                ToastDisplayer.MessageType.FAILURE, getApplicationContext());
+                    }
                 } else {
                     ToastDisplayer.displayHint("Fill in all fields",
                             ToastDisplayer.MessageType.FAILURE, getApplicationContext());

@@ -14,12 +14,8 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.response.CollectionResponse;
 
-import java.awt.image.AreaAveragingScaleFilter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Named;
 
@@ -61,20 +57,25 @@ public class MessagingEndpoint {
         }
 
         String message = parseMessageForNote(rawMessage);
+        String accountId = parseMessageForAccountId(rawMessage);
+        String goalId = parseMessageForGoalId(rawMessage);
         // crop longer messages
         if (message.length() > 1000) {
             message = message.substring(0, 1000) + "[...]";
         }
         Sender sender = new Sender(API_KEY);
-        Message msg = new Message.Builder().addData("message", message).build();
+        Message msg = new Message.Builder()
+                .addData("message", message)
+                .addData("accountId", accountId)
+                .addData("goalId", goalId)
+                .build();
 
         // GETS THE REGISTRATION RECORDS FOR A USER ACCOUNT
         RegistrationEndpoint registrationEndpoint = new RegistrationEndpoint();
-        CollectionResponse<RegistrationRecord> records = registrationEndpoint.listDevices(parseMessageForIds(rawMessage));
-
+        CollectionResponse<RegistrationRecord> records = registrationEndpoint.listDevices(accountId);
 
         for(RegistrationRecord record : records.getItems()) {
-            Result result = sender.send(msg, record.getRegId(), 5);
+            Result result = sender.send(msg, record.getRegId(), 5); // With 5 retries
             if (result.getMessageId() != null) {
                 log.info("Message sent to " + record.getRegId());
                 String canonicalRegId = result.getCanonicalRegistrationId();
@@ -102,7 +103,11 @@ public class MessagingEndpoint {
         return Arrays.asList(m.split(";")).get(0);
     }
 
-    private String parseMessageForIds(String m) {
+    private String parseMessageForAccountId(String m) {
         return Arrays.asList(m.split(";")).get(1);
+    }
+
+    private String parseMessageForGoalId(String m) {
+        return Arrays.asList(m.split(";")).get(2);
     }
 }

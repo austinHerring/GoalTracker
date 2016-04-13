@@ -10,6 +10,8 @@ import android.widget.LinearLayout;
 
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
+import com.austin.goaltracker.Model.Password;
+import com.firebase.client.FirebaseException;
 
 /**
  * @author Austin Herring
@@ -61,11 +63,18 @@ public class ChangePasswordPreference extends DialogPreference {
         if (positiveResult) {
             if (passwordInDB.equals(passwordOld.getText().toString())) {
                 if (passwordNew1.getText().toString().equals(passwordNew2.getText().toString())) {
-                    setPassword(passwordNew1.getText().toString());
-                    Util.resetPassword(Util.currentUser.getUsername(), passwordInDB);
-                    setSummary(Util.currentUser.getPasswordDate());
-                    ToastDisplayer.displayHint("Change Successful",
-                            ToastDisplayer.MessageType.SUCCESS, getContext());
+                    try {
+                        Password password = Util.updatePasswordForAccountOnDB(
+                                                    Util.currentUser,
+                                                    passwordNew1.getText().toString());
+                        Util.currentUser.setPassword(password);
+                        setSummary(Util.currentUser.getPasswordDate());
+                        ToastDisplayer.displayHint("Change Successful",
+                                ToastDisplayer.MessageType.SUCCESS, getContext());
+                    } catch (FirebaseException e) {
+                        ToastDisplayer.displayHint("Could not connect to database",
+                                ToastDisplayer.MessageType.FAILURE, getContext());
+                    }
                 } else {
                     ToastDisplayer.displayHint("New Passwords Do Not Match",
                             ToastDisplayer.MessageType.FAILURE, getContext());

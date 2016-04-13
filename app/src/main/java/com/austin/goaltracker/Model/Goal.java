@@ -15,7 +15,7 @@ public abstract class Goal {
     public enum Classification {COUNTDOWN, STREAK}
 
     private String goalName, task;
-    private int indexInDB;
+    private String id;
     protected Calendar dateOfOrigin;
     private Calendar dateBroken;
     protected IncrementType incrementType;
@@ -51,8 +51,8 @@ public abstract class Goal {
         return task;
     }
 
-    public int getIndex() {
-        return indexInDB;
+    public String getId() {
+        return id;
     }
 
     public Calendar getDateOfOrigin() {
@@ -105,8 +105,8 @@ public abstract class Goal {
         this.incrementType = type;
     }
 
-    public void setIndex(int index) {
-        indexInDB = index;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setBrokenDate(Calendar date) {

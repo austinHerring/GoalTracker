@@ -31,7 +31,6 @@ public class CronJobIntentService extends IntentService {
             CronJob.Builder builder = new CronJob.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
                     .setRootUrl(GoalTrackerApplication.PROJECT_ADDRESS)
-                    //.setRootUrl("http://2601:cb:8102:7bf9:bd44:b2ff:9ea6:1948:8080/_ah/admin")
                     .setApplicationName(GoalTrackerApplication.APPLICATION_NAME);
             CronJob cronJobService = builder.build();
 
@@ -40,6 +39,7 @@ public class CronJobIntentService extends IntentService {
                         intent.getStringExtra("cronKey"),
                         intent.getStringExtra("message"),
                         intent.getStringExtra("accountId"),
+                        intent.getStringExtra("goalId"),
                         intent.getStringExtra("frequency"),
                         intent.getLongExtra("nextRunTS", -1),
                         intent.getLongExtra("lastRun", -1))

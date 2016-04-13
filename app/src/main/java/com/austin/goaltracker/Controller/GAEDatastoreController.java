@@ -61,6 +61,7 @@ public class GAEDatastoreController {
         intent.putExtra("cronKey", key);
         intent.putExtra("message", goal.toNotificationMessage());
         intent.putExtra("accountId", Util.currentUser.getId());
+        intent.putExtra("goalId", goal.getId());
         intent.putExtra("frequency", frequency.toString());
         intent.putExtra("nextRunTS", calculateFirstNotificationDate(promptHour, promptMinute, isHourly));
         intent.putExtra("lastRun", determineLastRunDate(goal));

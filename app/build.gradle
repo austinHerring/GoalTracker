@@ -45,7 +45,7 @@ dependencies {
     compile files('libs/additionnal.jar')
     compile project(path: ':gcm', configuration: 'android-endpoints')
     compile 'com.firebase:firebase-client-android:2.5.1'
-    compile 'com.android.support:support-v4:19.0.+'
+    compile 'com.android.support:support-v4:23.2.1'
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'me.itangqi.waveloadingview:library:0.1.5'
     compile 'hanks.xyz:smallbang-library:0.1.2'
@@ -55,6 +55,9 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:8.4.0'
     compile 'com.google.android.gms:play-services-identity:8.4.0'
     compile 'com.google.appengine:appengine-api-1.0-sdk:1.9.18'
+    compile 'com.android.support:recyclerview-v7:23.2.1'
 }
+
+
 
 apply plugin: 'com.google.gms.google-services'

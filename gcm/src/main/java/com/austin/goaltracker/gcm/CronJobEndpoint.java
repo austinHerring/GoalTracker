@@ -40,11 +40,12 @@ public class CronJobEndpoint {
     public void persistCron(@Named("cronKey") String cronKey,
                             @Named("message") String message,
                             @Named("accountId") String accountId,
+                            @Named("goalId") String goalId,
                             @Named("frequency") String frequency,
                             @Named("nextRunTS") long nextRunTS,
                             @Named("lastRun") long lastRun)
     {
-        CronData cronData = new CronData(cronKey, message, accountId, frequency, nextRunTS, lastRun);
+        CronData cronData = new CronData(cronKey, message, accountId, goalId, frequency, nextRunTS, lastRun);
         ofy().save().entity(cronData).now(); // async without adding .now()
     }
 

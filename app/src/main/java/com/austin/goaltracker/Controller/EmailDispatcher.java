@@ -59,8 +59,13 @@ public class EmailDispatcher {
             }
         });
         ReceiveFeedTask task = new ReceiveFeedTask();
-        task.execute();
-        return null;
+        //TODO LOOK INTO WHY IT CRASHES
+        try {
+            task.execute();
+            return null;
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     class ReceiveFeedTask extends AsyncTask<String, Void, String> {
