@@ -19,13 +19,6 @@ android {
         incremental true
     }
 
-
-    dexOptions {
-        preDexLibraries true
-        javaMaxHeapSize "2g" // Use gig increments depending on needs
-        incremental true
-    }
-
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
@@ -39,11 +32,8 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/mail.jar')
-    compile files('libs/activation.jar')
-    compile files('libs/additionnal.jar')
     compile project(path: ':gcm', configuration: 'android-endpoints')
+    compile files('libs/activation.jar')
     compile 'com.firebase:firebase-client-android:2.5.1'
     compile 'com.android.support:support-v4:23.2.1'
     compile 'com.google.android.gms:play-services:8.4.0'
@@ -57,7 +47,5 @@ dependencies {
     compile 'com.google.appengine:appengine-api-1.0-sdk:1.9.18'
     compile 'com.android.support:recyclerview-v7:23.2.1'
 }
-
-
 
 apply plugin: 'com.google.gms.google-services'

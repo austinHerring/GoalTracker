@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/vB721QxJkWPVbwRHeczpEwRLGWk\"",
+ "etag": "\"H01Z-1ikbwOw463Un2bFZHenx1g/qwOJJjOWdLgi3BhTeFtXYICAODI\"",
  "discoveryVersion": "v1",
  "id": "cronJob:v1",
  "name": "cronJob",
@@ -75,7 +75,7 @@
  "methods": {
   "persistCron": {
    "id": "cronJob.persistCron",
-   "path": "persistCron/{cronKey}/{message}/{accountId}/{frequency}/{nextRunTS}/{lastRun}",
+   "path": "persistCron/{cronKey}/{message}/{accountId}/{goalId}/{frequency}/{nextRunTS}/{lastRun}",
    "httpMethod": "POST",
    "parameters": {
     "accountId": {
@@ -89,6 +89,11 @@
      "location": "path"
     },
     "frequency": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    },
+    "goalId": {
      "type": "string",
      "required": true,
      "location": "path"
@@ -115,6 +120,7 @@
     "cronKey",
     "message",
     "accountId",
+    "goalId",
     "frequency",
     "nextRunTS",
     "lastRun"

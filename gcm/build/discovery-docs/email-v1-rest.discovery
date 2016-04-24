@@ -1,0 +1,107 @@
+{
+ "kind": "discovery#restDescription",
+ "etag": "\"H01Z-1ikbwOw463Un2bFZHenx1g/hT0C6EAdZTqdHLQXvqlIqmDJqXA\"",
+ "discoveryVersion": "v1",
+ "id": "email:v1",
+ "name": "email",
+ "version": "v1",
+ "description": "This is an API",
+ "ownerDomain": "gcm.goaltracker.austin.com",
+ "ownerName": "gcm.goaltracker.austin.com",
+ "icons": {
+  "x16": "http://www.google.com/images/icons/product/search-16.gif",
+  "x32": "http://www.google.com/images/icons/product/search-32.gif"
+ },
+ "protocol": "rest",
+ "baseUrl": "https://goal-tracker-1235.appspot.com/_ah/api/email/v1/sendEmail/",
+ "basePath": "/_ah/api/email/v1/sendEmail/",
+ "rootUrl": "https://goal-tracker-1235.appspot.com/_ah/api/",
+ "servicePath": "email/v1/sendEmail/",
+ "batchPath": "batch",
+ "parameters": {
+  "alt": {
+   "type": "string",
+   "description": "Data format for the response.",
+   "default": "json",
+   "enum": [
+    "json"
+   ],
+   "enumDescriptions": [
+    "Responses with Content-Type of application/json"
+   ],
+   "location": "query"
+  },
+  "fields": {
+   "type": "string",
+   "description": "Selector specifying which fields to include in a partial response.",
+   "location": "query"
+  },
+  "key": {
+   "type": "string",
+   "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+   "location": "query"
+  },
+  "oauth_token": {
+   "type": "string",
+   "description": "OAuth 2.0 token for the current user.",
+   "location": "query"
+  },
+  "prettyPrint": {
+   "type": "boolean",
+   "description": "Returns response with indentations and line breaks.",
+   "default": "true",
+   "location": "query"
+  },
+  "quotaUser": {
+   "type": "string",
+   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "location": "query"
+  },
+  "userIp": {
+   "type": "string",
+   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "location": "query"
+  }
+ },
+ "auth": {
+  "oauth2": {
+   "scopes": {
+    "https://www.googleapis.com/auth/userinfo.email": {
+     "description": "View your email address"
+    }
+   }
+  }
+ },
+ "methods": {
+  "sendEmail": {
+   "id": "email.sendEmail",
+   "path": "{subject}/{body}/{to}",
+   "httpMethod": "POST",
+   "parameters": {
+    "body": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    },
+    "subject": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    },
+    "to": {
+     "type": "string",
+     "required": true,
+     "location": "path"
+    }
+   },
+   "parameterOrder": [
+    "subject",
+    "body",
+    "to"
+   ],
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email"
+   ]
+  }
+ }
+}

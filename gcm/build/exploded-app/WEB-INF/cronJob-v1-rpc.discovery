@@ -1,6 +1,6 @@
 {
  "kind": "discovery#rpcDescription",
- "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/vB721QxJkWPVbwRHeczpEwRLGWk\"",
+ "etag": "\"H01Z-1ikbwOw463Un2bFZHenx1g/qwOJJjOWdLgi3BhTeFtXYICAODI\"",
  "discoveryVersion": "v1",
  "id": "cronJob:v1",
  "name": "cronJob",
@@ -86,6 +86,10 @@
      "type": "string",
      "required": true
     },
+    "goalId": {
+     "type": "string",
+     "required": true
+    },
     "lastRun": {
      "type": "string",
      "required": true,
@@ -105,6 +109,7 @@
     "cronKey",
     "message",
     "accountId",
+    "goalId",
     "frequency",
     "nextRunTS",
     "lastRun"

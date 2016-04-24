@@ -17,6 +17,7 @@ public class DummyContent {
      * An array of sample (dummy) items.
      */
     public static final List<DummyItem> ITEMS = new ArrayList<DummyItem>();
+    public static int totalReminders;
 
     /**
      * A map of sample (dummy) items, by ID.

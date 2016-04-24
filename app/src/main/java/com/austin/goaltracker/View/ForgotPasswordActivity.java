@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.austin.goaltracker.Controller.EmailDispatcher;
+import com.austin.goaltracker.Controller.EmailDispatchService;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Account;
@@ -53,9 +53,9 @@ public class ForgotPasswordActivity extends Activity {
                     Account account = Util.registeredUsers.get(accountId);
                     Password password = Util.updatePasswordForAccountOnDB(account, null);
                     account.setPassword(password);
-                    NewPasswordEmail e = new NewPasswordEmail(account);
-                    EmailDispatcher dispatcher = new EmailDispatcher();
-                    dispatcher.send(e);
+                    NewPasswordEmail email = new NewPasswordEmail(account);
+                    EmailDispatchService dispatcher = new EmailDispatchService(email);
+                    dispatcher.send();
                     Intent i = new Intent(getApplicationContext(), LoginActivity.class);
                     startActivity(i);
                 } catch (FirebaseException e) {

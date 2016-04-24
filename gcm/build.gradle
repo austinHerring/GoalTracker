@@ -27,6 +27,8 @@ dependencies {
     compile 'com.googlecode.objectify:objectify:4.0b3'
     compile 'com.ganyo:gcm-server:1.0.2'
     compile 'org.apache.httpcomponents:httpclient:4.3.5'
+    compile 'javax.mail:mail:1.5.0-b01'
+    compile 'activation:activation:1.0.2'
 }
 
 appengine {

@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Austin Herring
  * @version 1.0
  *
- * A Servlet class that is called by cron.xml to check the datastaore for pending notifications.
+ * A Servlet class that is called by cron.xml to check the datastore for pending notifications.
  * Then it schedules a message task in the queue and updates the next runtime for the job
  *
  */

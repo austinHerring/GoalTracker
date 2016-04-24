@@ -244,8 +244,8 @@ public class Util {
         String id = "";
         Account accountToAdd = null;
         for (HashMap accountSnapshot : accounts.values()) {
+            id = (String)accountSnapshot.get("id");
             if (!registeredUsers.keySet().contains(id)) {
-                id = (String)accountSnapshot.get("id");
                 accountToAdd = new Account(
                         (String)accountSnapshot.get("firstname"),
                         (String)accountSnapshot.get("lastname"),

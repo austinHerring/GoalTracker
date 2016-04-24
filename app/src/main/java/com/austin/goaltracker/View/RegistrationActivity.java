@@ -8,12 +8,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.austin.goaltracker.Controller.EmailDispatcher;
+import com.austin.goaltracker.Controller.EmailDispatchService;
 import com.austin.goaltracker.Controller.GAEDatastoreController;
 import com.austin.goaltracker.Controller.LoginMediator;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
-import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.NewMemberEmail;
 import com.austin.goaltracker.R;
@@ -76,8 +75,9 @@ public class RegistrationActivity extends Activity {
                 Util.retrieveUsersToLocal(snapshot);
                 errorMessage = Util.registerUserOnDB(nF, nL, u, p, e);
                 if (errorMessage == null) {
-                    EmailDispatcher dispatcher = new EmailDispatcher();
-                    errorMessage = dispatcher.send(new NewMemberEmail(Util.currentUser));
+                    EmailDispatchService dispatcher =
+                            new EmailDispatchService(new NewMemberEmail(Util.currentUser));
+                    errorMessage = dispatcher.send();
                     if (errorMessage == null) {
                         GAEDatastoreController.registerdeviceForCurrentUser();
                         Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);

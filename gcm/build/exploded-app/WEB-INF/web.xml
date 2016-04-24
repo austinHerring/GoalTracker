@@ -35,7 +35,8 @@
             <param-value>
                 com.austin.goaltracker.gcm.CronJobEndpoint,
                 com.austin.goaltracker.gcm.RegistrationEndpoint,
-                com.austin.goaltracker.gcm.MessagingEndpoint
+                com.austin.goaltracker.gcm.MessagingEndpoint,
+                com.austin.goaltracker.gcm.EmailEndpoint
             </param-value>
         </init-param>
     </servlet>
