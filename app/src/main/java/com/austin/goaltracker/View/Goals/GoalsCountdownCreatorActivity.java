@@ -98,10 +98,10 @@ public class GoalsCountdownCreatorActivity extends Activity implements TimePicke
                     endDate.set(Calendar.MINUTE, mPromptMinute);
                     CountdownCompleterGoal newGoal = new CountdownCompleterGoal(GoalMediator.pasteGoalTitle(), type, endDate);
                     newGoal.setTask(goalTask);
-                    String cronKey = GAEDatastoreController.persistCron(newGoal, mPromptMinute, mPromptHour);
-                    newGoal.setCronJobKey(cronKey);
+                    newGoal.setCronJobKey(GAEDatastoreController.createCronKey(newGoal));
                     try {
                         Util.updateAccountGoalOnDB(account.getId(), newGoal);
+                        GAEDatastoreController.persistCron(newGoal, mPromptMinute, mPromptHour);
                         account.addGoal(newGoal.getId(), newGoal);
                         ToastDisplayer.displayHint("Goal Created",
                                 ToastDisplayer.MessageType.SUCCESS, getApplicationContext());

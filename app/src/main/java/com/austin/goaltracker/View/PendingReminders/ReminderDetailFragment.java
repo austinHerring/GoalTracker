@@ -7,8 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.PendingGoalContent;
+import com.austin.goaltracker.Model.PendingGoalNotification;
 import com.austin.goaltracker.R;
-import com.austin.goaltracker.View.PendingReminders.dummy.DummyContent;
 
 /**
  * A fragment representing a single Reminder detail screen.
@@ -26,7 +28,7 @@ public class ReminderDetailFragment extends Fragment {
     /**
      * The dummy content this fragment is presenting.
      */
-    private DummyContent.DummyItem mItem;
+    private PendingGoalNotification mItem;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -43,7 +45,7 @@ public class ReminderDetailFragment extends Fragment {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+            mItem = PendingGoalContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
         }
     }
 
@@ -54,7 +56,7 @@ public class ReminderDetailFragment extends Fragment {
 
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.reminder_detail)).setText(mItem.details);
+            ((TextView) rootView.findViewById(R.id.reminder_detail)).setText(mItem.toString());
         }
 
         return rootView;

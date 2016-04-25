@@ -195,6 +195,7 @@ public class Util {
         map.put("id", goal.getId());
         map.put("classification", goal.classification());
         map.put("name", goal.getGoalName());
+        map.put("is pending", goal.isPending());
         map.put("date start", goal.getDateOfOrigin());
         map.put("date broken", goal.getBrokenDate());
         map.put("task", goal.getTask());
@@ -273,6 +274,7 @@ public class Util {
             if (goalSnapShot.get("classification").equals("COUNTDOWN")) {
                 CountdownCompleterGoal goalToAdd = new CountdownCompleterGoal();
                 goalToAdd.setId((String) goalSnapShot.get("id"));
+                goalToAdd.setIsPending((boolean) goalSnapShot.get("is pending"));
                 goalToAdd.setName((String) goalSnapShot.get("name"));
                 goalToAdd.setTask((String) goalSnapShot.get("task"));
                 goalToAdd.setCronJobKey((String) goalSnapShot.get("cron key"));
@@ -290,6 +292,7 @@ public class Util {
             } else {
                 StreakSustainerGoal goalToAdd = new StreakSustainerGoal();
                 goalToAdd.setId((String) goalSnapShot.get("id"));
+                goalToAdd.setIsPending((boolean) goalSnapShot.get("is pending"));
                 goalToAdd.setName((String) goalSnapShot.get("name"));
                 goalToAdd.setTask((String) goalSnapShot.get("task"));
                 goalToAdd.setCronJobKey((String) goalSnapShot.get("cron key"));

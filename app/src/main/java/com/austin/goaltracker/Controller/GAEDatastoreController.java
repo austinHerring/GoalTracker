@@ -42,23 +42,14 @@ public class GAEDatastoreController {
      * @param promptMinute time to prompt the user with a reminder
      * @param promptHour time to prompt the user with a reminder
      */
-    public static String persistCron(Goal goal, int promptMinute, int promptHour) {
+    public static void persistCron(Goal goal, int promptMinute, int promptHour) {
         Goal.IncrementType frequency = goal.getIncrementType();
         boolean isHourly = frequency.equals(Goal.IncrementType.HOURLY);
-
-        // GENERATE A KEY
-        StringBuilder sb = new StringBuilder();
-        sb.append(System.currentTimeMillis());  // PART 1: APPEND TIME USER CREATED GOAL
-        sb.append(goal.hashCode());             // PART 2: APPEND THE USERS CREATED GOAL HASHCODE
-        sb.append(new Random().nextInt(10000)); // PART 3: APPEND SOME RANDOM BITS JUST IN THE CASE
-                                                //         SOMEONE CREATES THE SAME EXACT GOAL AT
-                                                //         THE SAME MILLISECOND IN TIME
-        String key = sb.toString();
 
         // Start IntentService to register this application with GCM.
         Intent intent = new Intent(GoalTrackerApplication.INSTANCE, CronJobIntentService.class);
         intent.putExtra("ACTION", "ADD");
-        intent.putExtra("cronKey", key);
+        intent.putExtra("cronKey", goal.getCronJobKey());
         intent.putExtra("message", goal.toNotificationMessage());
         intent.putExtra("accountId", Util.currentUser.getId());
         intent.putExtra("goalId", goal.getId());
@@ -66,9 +57,22 @@ public class GAEDatastoreController {
         intent.putExtra("nextRunTS", calculateFirstNotificationDate(promptHour, promptMinute, isHourly));
         intent.putExtra("lastRun", determineLastRunDate(goal));
         GoalTrackerApplication.INSTANCE.startService(intent);
-
         Log.info("ATTEMPT START Cron Job Intent Service");
-        return key;
+    }
+
+    /**
+     * Create a key for a goals cron service
+     *
+     * @param goal the goal to create a cron for
+     */
+    public static String createCronKey(Goal goal) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(System.currentTimeMillis());  // PART 1: APPEND TIME USER CREATED GOAL
+        sb.append(goal.hashCode());             // PART 2: APPEND THE USERS CREATED GOAL HASHCODE
+        sb.append(new Random().nextInt(10000)); // PART 3: APPEND SOME RANDOM BITS JUST IN THE CASE
+        //         SOMEONE CREATES THE SAME EXACT GOAL AT
+        //         THE SAME MILLISECOND IN TIME
+        return sb.toString();
     }
 
     /**

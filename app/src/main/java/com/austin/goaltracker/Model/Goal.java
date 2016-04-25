@@ -22,9 +22,11 @@ public abstract class Goal {
     private ArrayList<Account> supporters;
     private Classification classification;
     private String cronJobKey;
+    private boolean isPending;
 
     Goal(String name, IncrementType type, Classification c) {
         goalName = name;
+        isPending = false;
         incrementType = type;
         dateOfOrigin = Calendar.getInstance();
         classification = c;
@@ -55,6 +57,10 @@ public abstract class Goal {
         return id;
     }
 
+    public boolean isPending() {
+        return isPending;
+    }
+
     public Calendar getDateOfOrigin() {
         //return dateOfOrigin.get(Calendar.YEAR) + "," + dateOfOrigin.get(Calendar.MONTH) + "," + dateOfOrigin.get(Calendar.DAY_OF_MONTH);
         return dateOfOrigin;
@@ -77,8 +83,6 @@ public abstract class Goal {
         SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy");
         return "Was Established:\n" + df.format(dateOfOrigin.getTime());
     }
-
-
 
     public String brokenDateToString() {
         if (dateBroken == null) {
@@ -117,12 +121,15 @@ public abstract class Goal {
         dateOfOrigin = date;
     }
 
+    public void setIsPending(boolean isPending) {
+        this.isPending = isPending;
+    }
+
     public void setCronJobKey(String key) {
         cronJobKey = key;
     }
 
     public String toNotificationMessage() {
-        //TODO PREVENT SEMICOLONS FOR PARSING
         String str = goalName +": Did you make progress ";
         if (incrementType == IncrementType.HOURLY) {
             return str + "last hour?";

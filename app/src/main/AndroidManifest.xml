@@ -36,6 +36,7 @@
         tools:replace="android:icon" >
         <activity
             android:name=".View.Goals.GoalsBaseActivity"
+            android:theme="@style/AppThemePurpleGoalsBase"
             android:label="@string/title_activity_goals" />
         <activity
             android:name=".View.LoginActivity"

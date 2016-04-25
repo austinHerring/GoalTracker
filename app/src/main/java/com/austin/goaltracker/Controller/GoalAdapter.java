@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,6 +18,7 @@ import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.austin.goaltracker.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Austin Herring
@@ -24,9 +27,10 @@ import java.util.ArrayList;
  * List adapter for the Goals activity. Also sets on click listeners for each type of goal
  * in the list so that the proper fragment displays
  */
-public class GoalAdapter extends ArrayAdapter<Goal> {
+public class GoalAdapter extends ArrayAdapter<Goal> implements Filterable {
     Activity activity;
-    private ArrayList<Goal> listOfGoals;
+    private ArrayList<Goal> allListOfGoals;
+    private ArrayList<Goal> displayedListOfGoals;
     private static LayoutInflater inflater = null;
     // Colors used for the list of goals
     private int STREAK_RED;
@@ -34,11 +38,12 @@ public class GoalAdapter extends ArrayAdapter<Goal> {
     private int BLUE_BACKGROUND;
     private int RED_BACKGROUND;
 
-    public GoalAdapter (Activity activity, int textViewResourceId,ArrayList<Goal> goals) {
+    public GoalAdapter (Activity activity, int textViewResourceId, ArrayList<Goal> goals) {
         super(activity, textViewResourceId, goals);
         try {
             this.activity = activity;
-            listOfGoals = goals;
+            displayedListOfGoals = goals;
+            allListOfGoals = goals;
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             STREAK_RED = activity.getResources().getColor(R.color.text2);
             COUNTDOWN_BLUE = activity.getResources().getColor(R.color.text3);
@@ -52,12 +57,16 @@ public class GoalAdapter extends ArrayAdapter<Goal> {
 
     @Override
     public int getCount() {
-        return listOfGoals.size();
+        return displayedListOfGoals.size();
     }
 
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    public Goal getItemFromFilteredList(int position) {
+        return displayedListOfGoals.get(position);
     }
 
     public static class ViewHolder {
@@ -88,17 +97,17 @@ public class GoalAdapter extends ArrayAdapter<Goal> {
                 holder = (ViewHolder) v.getTag();
             }
 
-            holder.display_name.setText(listOfGoals.get(position).getGoalName());
+            holder.display_name.setText(displayedListOfGoals.get(position).getGoalName());
             //holder.display_name.setSelected(true);
-            if (listOfGoals.get(position).classification().equals(Goal.Classification.COUNTDOWN)) {
-                holder.display_info.setText(((CountdownCompleterGoal) listOfGoals.get(position)).toBasicInfo());
+            if (displayedListOfGoals.get(position).classification().equals(Goal.Classification.COUNTDOWN)) {
+                holder.display_info.setText(((CountdownCompleterGoal) displayedListOfGoals.get(position)).toBasicInfo());
                 v.setBackgroundColor(BLUE_BACKGROUND);
                 holder.display_name.setTextColor(COUNTDOWN_BLUE);
                 holder.display_info.setTextColor(COUNTDOWN_BLUE);
                 holder.display_icon.setImageResource(R.drawable.countdown_flag_small);
 
             } else {
-                holder.display_info.setText(((StreakSustainerGoal) listOfGoals.get(position)).toBasicInfo());
+                holder.display_info.setText(((StreakSustainerGoal) displayedListOfGoals.get(position)).toBasicInfo());
                 v.setBackgroundColor(RED_BACKGROUND);
                 holder.display_name.setTextColor(STREAK_RED);
                 holder.display_info.setTextColor(STREAK_RED);
@@ -109,5 +118,44 @@ public class GoalAdapter extends ArrayAdapter<Goal> {
             Log.e("GoalAdapter", "Error constructing");
         }
         return v;
+    }
+
+    @Override
+    public Filter getFilter() {
+        Filter filter = new Filter() {
+
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void publishResults(CharSequence constraint,FilterResults results) {
+
+                displayedListOfGoals = (ArrayList<Goal>) results.values; // has the filtered values
+                notifyDataSetChanged();  // notifies the data with new filtered values
+            }
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                FilterResults results = new FilterResults();        // Holds the results of a filtering operation in values
+                List<Goal> FilteredArrList = new ArrayList<>();
+
+                if (constraint == null || constraint.length() == 0) {
+                    results.count = allListOfGoals.size();
+                    results.values = allListOfGoals;
+
+                } else {
+                    constraint = constraint.toString();
+                    for (int i = 0; i < allListOfGoals.size(); i++) {
+                        Goal data = allListOfGoals.get(i);
+                        if (!(data.getId().equals(constraint))) {
+                            FilteredArrList.add(data);
+                        }
+                    }
+                    // set the Filtered result to return
+                    results.count = FilteredArrList.size();
+                    results.values = FilteredArrList;
+                }
+                return results;
+            }
+        };
+        return filter;
     }
 }

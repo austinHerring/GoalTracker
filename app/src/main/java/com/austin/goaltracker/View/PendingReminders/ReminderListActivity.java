@@ -7,14 +7,18 @@ import android.support.annotation.NonNull;
 import android.app.Activity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Slide;
+import android.transition.Transition;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.PendingGoalContent;
+import com.austin.goaltracker.Model.PendingGoalNotification;
 import com.austin.goaltracker.R;
-
-import com.austin.goaltracker.View.PendingReminders.dummy.DummyContent;
 
 import java.util.List;
 
@@ -38,6 +42,7 @@ public class ReminderListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder_list);
+        setupWindowAnimations();
 
         View recyclerView = findViewById(R.id.reminder_list);
         assert recyclerView != null;
@@ -53,15 +58,15 @@ public class ReminderListActivity extends Activity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(PendingGoalContent.GOALS));
     }
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final List<DummyContent.DummyItem> mValues;
+        private final List<PendingGoalNotification> mValues;
 
-        public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items) {
+        public SimpleItemRecyclerViewAdapter(List<PendingGoalNotification> items) {
             mValues = items;
         }
 
@@ -75,15 +80,15 @@ public class ReminderListActivity extends Activity {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            holder.mIdView.setText(mValues.get(position).getId());
+            holder.mContentView.setText(mValues.get(position).toString());
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mTwoPane) {
                         Bundle arguments = new Bundle();
-                        arguments.putString(ReminderDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        arguments.putString(ReminderDetailFragment.ARG_ITEM_ID, holder.mItem.getId());
                         ReminderDetailFragment fragment = new ReminderDetailFragment();
                         fragment.setArguments(arguments);
                         getFragmentManager().beginTransaction()
@@ -92,7 +97,7 @@ public class ReminderListActivity extends Activity {
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, ReminderDetailActivity.class);
-                        intent.putExtra(ReminderDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        intent.putExtra(ReminderDetailFragment.ARG_ITEM_ID, holder.mItem.getId());
 
                         context.startActivity(intent);
                     }
@@ -109,7 +114,7 @@ public class ReminderListActivity extends Activity {
             public final View mView;
             public final TextView mIdView;
             public final TextView mContentView;
-            public DummyContent.DummyItem mItem;
+            public PendingGoalNotification mItem;
 
             public ViewHolder(View view) {
                 super(view);
@@ -123,5 +128,14 @@ public class ReminderListActivity extends Activity {
                 return super.toString() + " '" + mContentView.getText() + "'";
             }
         }
+    }
+
+    private void setupWindowAnimations() {
+        Transition slideIn = new Slide(Gravity.TOP);
+        slideIn.setDuration(600);
+        getWindow().setEnterTransition(slideIn);
+        Transition slideOut = new Slide(Gravity.TOP);
+        slideOut.setDuration(600);
+        getWindow().setExitTransition(slideOut);
     }
 }

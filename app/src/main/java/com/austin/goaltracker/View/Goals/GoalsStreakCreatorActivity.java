@@ -74,10 +74,10 @@ public class GoalsStreakCreatorActivity extends Activity implements TimePickerDi
                     newGoal.setTask(goalTask);
                     newGoal.setCheatNumber(skipNumber);
                     newGoal.setCheatsRemaining(skipNumber);
-                    String cronKey = GAEDatastoreController.persistCron(newGoal, mPromptMinute, mPromptHour);
-                    newGoal.setCronJobKey(cronKey);
+                    newGoal.setCronJobKey(GAEDatastoreController.createCronKey(newGoal));
                     try {
                         Util.updateAccountGoalOnDB(account.getId(), newGoal);
+                        GAEDatastoreController.persistCron(newGoal, mPromptMinute, mPromptHour);
                         account.addGoal(newGoal.getId(), newGoal);
                         ToastDisplayer.displayHint("Goal Created",
                                 ToastDisplayer.MessageType.SUCCESS, getApplicationContext());

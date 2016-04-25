@@ -30,7 +30,6 @@ public class GCMListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         String message = data.getString("message");
         String accountId = data.getString("accountId");
-        //TODO Create a a GoalReminderItem from the ids
         //TODO Store this in the Firebase Account Info
         String goalId = data.getString("goalId");
         Log.d(TAG, "Message: " + message);
