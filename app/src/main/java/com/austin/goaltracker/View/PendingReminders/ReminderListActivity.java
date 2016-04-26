@@ -132,10 +132,7 @@ public class ReminderListActivity extends Activity {
 
     private void setupWindowAnimations() {
         Transition slideIn = new Slide(Gravity.TOP);
-        slideIn.setDuration(600);
+        slideIn.setDuration(1000);
         getWindow().setEnterTransition(slideIn);
-        Transition slideOut = new Slide(Gravity.TOP);
-        slideOut.setDuration(600);
-        getWindow().setExitTransition(slideOut);
     }
 }

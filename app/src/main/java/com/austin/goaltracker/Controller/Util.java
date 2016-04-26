@@ -5,6 +5,8 @@ import com.austin.goaltracker.Model.Account;
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.Model.Password;
+import com.austin.goaltracker.Model.PendingGoalContent;
+import com.austin.goaltracker.Model.PendingGoalNotification;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -13,6 +15,7 @@ import com.firebase.client.FirebaseException;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -138,6 +141,36 @@ public class Util {
     }
 
     /**
+     * Updates a pending goal notification for an account on the database.
+     *
+     * @param accountId account update a goal for
+     * @param notification the pending goal notification object itself to persist
+     */
+    public static void updatePendingGoalNotificationOnDB(String accountId, PendingGoalNotification notification) throws FirebaseException {
+        Firebase accountGoalsRef = db.child("accounts").child(accountId).child("pending goal notifications");
+        String goalId = notification.getId();
+        Firebase row;
+        if (goalId == null) {
+            row = accountGoalsRef.push();
+            notification.setId(row.getKey());
+        } else {
+            row = accountGoalsRef.child(goalId);
+        }
+        HashMap<String,Object> newGoalAsEntry = generatePendingGoalNotificationMappingForDB(notification);
+        row.setValue(newGoalAsEntry, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    System.out.println("Data could not be saved. " + firebaseError.getMessage());
+                    throw new FirebaseException(firebaseError.getMessage());
+                } else {
+                    System.out.println("Data saved successfully.");
+                }
+            }
+        });
+    }
+
+    /**
      * Updates a password for an account on the database.
      *
      * @param account account reset a password for
@@ -165,6 +198,19 @@ public class Util {
         } else {
             throw new FirebaseException("This Account Does Not Exist");
         }
+    }
+
+
+    /**
+     * Accounts are represented as hashmaps to access particular data
+     *
+     * @param notification A pending goal notification to generate a HashMap for.
+     * @return The HashMap.
+     */
+    private static HashMap<String, Object> generatePendingGoalNotificationMappingForDB(PendingGoalNotification notification) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("id", notification.getId());
+        return map;
     }
 
     /**
@@ -308,6 +354,21 @@ public class Util {
             }
         }
         return aggregatedGoals;
+    }
+
+    /**
+     * Loops through the pending goals and fills the static content
+     *
+     * @param accountSnapshot the account given in from DB used to generate a hashmap
+     */
+    //TODO implement this method
+    public static HashMap<String, Goal> retrievePendingGoalContentToLocal(HashMap accountSnapshot) {
+        HashMap<String, Goal> pendingContent = new HashMap<>();
+        HashMap<String, HashMap<String,Object>> goalsSnapShots  = (HashMap < String, HashMap < String, Object >>) accountSnapshot.get("pending goal notifications");
+        for(HashMap<String, Object> pendingSnapShot : goalsSnapShots.values()) {
+            PendingGoalContent.ITEM_MAP.put("TODO", new PendingGoalNotification("TODO", new GregorianCalendar()));
+        }
+        return pendingContent;
     }
 
     /**

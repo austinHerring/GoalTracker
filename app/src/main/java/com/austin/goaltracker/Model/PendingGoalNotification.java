@@ -10,6 +10,11 @@ public class PendingGoalNotification {
     private String associatedGoalId;
     private Calendar dateTimeNotified;
 
+    public PendingGoalNotification(String associatedGoalId, Calendar dateTimeNotified) {
+        this.associatedGoalId = associatedGoalId;
+        this.dateTimeNotified = dateTimeNotified;
+    }
+
     public String getAssociatedGoalId() {
         return associatedGoalId;
     }

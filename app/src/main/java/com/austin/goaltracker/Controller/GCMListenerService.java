@@ -9,11 +9,21 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import com.austin.goaltracker.Model.GoalTrackerApplication;
+import com.austin.goaltracker.Model.PendingGoalNotification;
 import com.austin.goaltracker.R;
 
 import com.austin.goaltracker.View.LoginActivity;
 import com.austin.goaltracker.View.PendingReminders.ReminderListActivity;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.android.gms.gcm.GcmListenerService;
+
+import java.util.GregorianCalendar;
+import java.util.logging.Logger;
 
 public class GCMListenerService extends GcmListenerService {
 
@@ -29,12 +39,25 @@ public class GCMListenerService extends GcmListenerService {
     @Override
     public void onMessageReceived(String from, Bundle data) {
         String message = data.getString("message");
-        String accountId = data.getString("accountId");
-        //TODO Store this in the Firebase Account Info
-        String goalId = data.getString("goalId");
-        Log.d(TAG, "Message: " + message);
-        Log.d(TAG, "accountId: " + accountId);
-        Log.d(TAG, "goalId: " + goalId);
+        final String accountId = data.getString("accountId");
+        final String goalId = data.getString("goalId");
+
+        Firebase queriedGoalRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+                .child("accounts").child(accountId)
+                .child("goals").child(goalId);
+        queriedGoalRef.addListenerForSingleValueEvent(new ValueEventListener() {
+             @Override
+             public void onDataChange(DataSnapshot snapshot) {
+                 PendingGoalNotification notification = new PendingGoalNotification(goalId, new GregorianCalendar());
+                 Util.updatePendingGoalNotificationOnDB(accountId, notification);
+             }
+
+              @Override
+              public void onCancelled(FirebaseError firebaseError) {
+                  Log.i(TAG, "Could not query the Firebase");
+              }
+          }
+        );
         sendNotification(message);
     }
 

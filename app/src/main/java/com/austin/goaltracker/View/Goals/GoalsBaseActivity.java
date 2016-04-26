@@ -7,7 +7,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Fade;
+import android.transition.Slide;
 import android.transition.Transition;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -97,7 +99,8 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
         buttonPending.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), ReminderListActivity.class);
-                startActivity(i);
+                //startActivity(i);
+                //TODO Fix the transition. Buggy right now
                 startActivity(i, ActivityOptions.makeSceneTransitionAnimation(GoalsBaseActivity.this).toBundle());
             }
         });
@@ -167,8 +170,11 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
     }
 
     private void setupWindowAnimations() {
-        getWindow().setAllowEnterTransitionOverlap(false);
-        Transition fade = new Fade();
-        getWindow().setExitTransition(fade);
+//        getWindow().setAllowEnterTransitionOverlap(false);
+//        Transition fade = new Fade();
+//        getWindow().setExitTransition(fade);
+        Transition slideIn = new Slide(Gravity.BOTTOM);
+        slideIn.setDuration(1000);
+        getWindow().setExitTransition(slideIn);
     }
 }

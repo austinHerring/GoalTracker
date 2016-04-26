@@ -1,5 +1,7 @@
 package com.austin.goaltracker.View.Goals;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -90,6 +92,7 @@ public class GoalsStreakGraphicFragment extends Fragment {
             rootView.findViewById(R.id.goal_cheat_ratio).setVisibility(View.GONE);
         } else {
             ((ProgressBar) rootView.findViewById(R.id.remainingCheats)).setProgress((int)((double)mGoalCheatsremaining / (double)mGoalCheatNumber * 100));
+            ((ProgressBar) rootView.findViewById(R.id.remainingCheats)).getProgressDrawable().setColorFilter(getResources().getColor(R.color.primaryP), android.graphics.PorterDuff.Mode.SRC_IN);
             ((TextView) rootView.findViewById(R.id.goal_cheat_ratio)).setText(mGoalCheatsremaining + "/" + mGoalCheatNumber);
         }
         ((TextView) rootView.findViewById(R.id.streak_number)).setText(mGoalStreak);

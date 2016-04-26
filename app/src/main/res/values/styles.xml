@@ -86,19 +86,10 @@
         <!--   Other colors -->
         <item name="android:textColorSecondary">@color/text3</item>
         <item name="android:textColorTertiary">@color/text2</item>
-        <!--   Progress Bar Style -->
-        <item name="android:progressBarStyle">@style/PurpleProgressBar</item>
     </style>
 
     <style name="PurpleActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
         <item name="background">@color/primaryP</item>
-    </style>
-
-    <style name="PurpleProgressBar" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
-        <item name="android:colorAccent">@color/primaryP</item>
-        <item name="android:color">@color/primaryP</item>
-        <item name="android:colorPrimary">@color/primaryP</item>
-        <item name="android:textColor">@color/primaryP</item>
     </style>
 
     <style name="DatepickerStyle" parent="android:Theme.Material.Light.Dialog">
