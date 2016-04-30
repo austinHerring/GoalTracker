@@ -54,8 +54,8 @@ public class GAEDatastoreController {
         intent.putExtra("accountId", Util.currentUser.getId());
         intent.putExtra("goalId", goal.getId());
         intent.putExtra("frequency", frequency.toString());
-        intent.putExtra("nextRunTS", calculateFirstNotificationDate(promptHour, promptMinute, isHourly));
-        intent.putExtra("lastRun", determineLastRunDate(goal));
+        intent.putExtra("nextRunTS", calculateFirstNotificationDate(promptHour, promptMinute, isHourly) / 100000 * 100000);
+        intent.putExtra("lastRun", determineLastRunDate(goal) / 100000 * 100000);
         GoalTrackerApplication.INSTANCE.startService(intent);
         Log.info("ATTEMPT START Cron Job Intent Service");
     }

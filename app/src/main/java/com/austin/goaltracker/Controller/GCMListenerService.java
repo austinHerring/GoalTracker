@@ -8,26 +8,22 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.austin.goaltracker.Model.GoalTrackerApplication;
-import com.austin.goaltracker.Model.PendingGoalNotification;
 import com.austin.goaltracker.R;
 
 import com.austin.goaltracker.View.LoginActivity;
 import com.austin.goaltracker.View.PendingReminders.ReminderListActivity;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.google.android.gms.gcm.GcmListenerService;
 
-import java.util.GregorianCalendar;
-import java.util.logging.Logger;
-
+/**
+ * @author Austin Herring
+ * @version 1.0
+ *
+ * Service called when GAE issues a push notification to a device. This then formats the data to
+ * display and starts a service to add the pending notification to the firebase
+ */
 public class GCMListenerService extends GcmListenerService {
-
-    private static final String TAG = "MyGcmListenerService";
 
     /**
      * Called when message is received.
@@ -38,26 +34,15 @@ public class GCMListenerService extends GcmListenerService {
      */
     @Override
     public void onMessageReceived(String from, Bundle data) {
+
+        // TODO THIS CRASHES WHEN PHONE TURNS ON
+        Intent intent = new Intent(GoalTrackerApplication.INSTANCE, PendingNotificationIntentService.class);
+        intent.putExtra("accountId",data.getString("accountId"));
+        intent.putExtra("goalId", data.getString("goalId"));
+        intent.putExtra("dateTimeNotified", Long.parseLong(data.getString("dateTimeNotified")));
+        GoalTrackerApplication.INSTANCE.startService(intent);
+
         String message = data.getString("message");
-        final String accountId = data.getString("accountId");
-        final String goalId = data.getString("goalId");
-
-        Firebase queriedGoalRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
-                .child("accounts").child(accountId)
-                .child("goals").child(goalId);
-        queriedGoalRef.addListenerForSingleValueEvent(new ValueEventListener() {
-             @Override
-             public void onDataChange(DataSnapshot snapshot) {
-                 PendingGoalNotification notification = new PendingGoalNotification(goalId, new GregorianCalendar());
-                 Util.updatePendingGoalNotificationOnDB(accountId, notification);
-             }
-
-              @Override
-              public void onCancelled(FirebaseError firebaseError) {
-                  Log.i(TAG, "Could not query the Firebase");
-              }
-          }
-        );
         sendNotification(message);
     }
 
@@ -89,6 +74,8 @@ public class GCMListenerService extends GcmListenerService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(GoalTrackerApplication.notificationId++, notificationBuilder.build());
     }
+
+
 }

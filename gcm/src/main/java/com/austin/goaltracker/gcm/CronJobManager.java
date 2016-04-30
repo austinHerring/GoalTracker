@@ -1,5 +1,11 @@
 package com.austin.goaltracker.gcm;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.FirebaseException;
+import com.firebase.client.ValueEventListener;
+import com.google.appengine.api.ThreadManager;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -15,6 +21,7 @@ import static com.google.appengine.api.taskqueue.TaskOptions.Builder.*;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -55,7 +62,7 @@ public class CronJobManager extends HttpServlet {
     }
 
     private void processJob(Entity job) {
-        CronData cronData = new CronData(job);
+        final CronData cronData = new CronData(job);
         DatastoreService datastore = DatastoreServiceFactory
                 .getDatastoreService();
 
@@ -63,9 +70,8 @@ public class CronJobManager extends HttpServlet {
         Log.info("PROCESSING A JOB FOR CRON KEY: " + key);
 
         // ADD SENDING MESSAGE TO QUEUE
-        String rawMessage = constructRawMessage(cronData);
         Queue queue = QueueFactory.getDefaultQueue();
-        queue.add(withUrl("/sender").param("rawMessage", rawMessage));
+        queue.add(withUrl("/sender").param("rawMessage", constructRawMessage(cronData)));
 
         // UPDATE NEXT RUN DATE OR DELETE IF GOAL IS DONE
         String frequency = cronData.getFrequency();
@@ -106,6 +112,7 @@ public class CronJobManager extends HttpServlet {
     }
 
     private String constructRawMessage(CronData cronData) {
-        return cronData.getMessage() + ";" + cronData.getAccountId() + ";" + cronData.getGoalId();
+        return cronData.getMessage() + ";" + cronData.getAccountId() + ";" + cronData.getGoalId() + ";" + cronData.getNextRunTS();
     }
+
 }

@@ -3,7 +3,8 @@
     <item
         android:title="Pending Goals"
         android:id="@+id/pending_goals"
-        compat:showAsAction="ifRoom" />
+        compat:showAsAction="ifRoom"
+        android:visible="false"/>
     <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"

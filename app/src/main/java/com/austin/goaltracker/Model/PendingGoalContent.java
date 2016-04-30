@@ -23,7 +23,7 @@ public class PendingGoalContent {
      */
     public static final Map<String, PendingGoalNotification> ITEM_MAP = new HashMap<>();
 
-    private static void addItem(PendingGoalNotification item) {
+    public static void addItem(PendingGoalNotification item) {
         GOALS.add(item);
         ITEM_MAP.put(item.getId(), item);
     }

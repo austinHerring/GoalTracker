@@ -1,10 +1,14 @@
 package com.austin.goaltracker.View.PendingReminders;
 
+import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.DataSetObserver;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.app.Activity;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
@@ -13,12 +17,21 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Controller.PendingNotificationListAdapter;
+import com.austin.goaltracker.Controller.ToastDisplayer;
+import com.austin.goaltracker.Controller.Util;
+import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.PendingGoalContent;
 import com.austin.goaltracker.Model.PendingGoalNotification;
 import com.austin.goaltracker.R;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import java.util.List;
 
@@ -30,31 +43,43 @@ import java.util.List;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class ReminderListActivity extends Activity {
+public class ReminderListActivity extends ListActivity {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
     private boolean mTwoPane;
+    private PendingNotificationListAdapter mListAdapter;
+    private Firebase mFirebaseListRef;
+    private ValueEventListener mConnectedListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder_list);
         setupWindowAnimations();
+        mFirebaseListRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts")
+                .child((Util.currentUser.getId())).child("pending goal notifications");
 
-        View recyclerView = findViewById(R.id.reminder_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
 
-        if (findViewById(R.id.reminder_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
-            mTwoPane = true;
-        }
+//        // Show the Up button in the action bar.
+//        ActionBar actionBar = getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.setDisplayHomeAsUpEnabled(true);
+//        }
+
+//        View recyclerView = findViewById(R.id.reminder_list);
+//        assert recyclerView != null;
+//        setupRecyclerView((RecyclerView) recyclerView);
+//
+//        if (findViewById(R.id.reminder_detail_container) != null) {
+//            // The detail container view will be present only in the
+//            // large-screen layouts (res/values-w900dp).
+//            // If this view is present, then the
+//            // activity should be in two-pane mode.
+//            mTwoPane = true;
+//        }
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -119,8 +144,8 @@ public class ReminderListActivity extends Activity {
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
-                mIdView = (TextView) view.findViewById(R.id.id);
-                mContentView = (TextView) view.findViewById(R.id.content);
+                mIdView = (TextView) view.findViewById(R.id.idTEST);
+                mContentView = (TextView) view.findViewById(R.id.contentTEST);
             }
 
             @Override
@@ -134,5 +159,44 @@ public class ReminderListActivity extends Activity {
         Transition slideIn = new Slide(Gravity.TOP);
         slideIn.setDuration(1000);
         getWindow().setEnterTransition(slideIn);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        final ListView listView = getListView();
+        mListAdapter = new PendingNotificationListAdapter(mFirebaseListRef.limit(50), this, R.layout.reminder_list_content);
+        listView.setAdapter(mListAdapter);
+        mListAdapter.registerDataSetObserver(new DataSetObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                listView.setSelection(mListAdapter.getCount() - 1);
+            }
+        });
+
+        // Finally, a little indication of connection status
+        mConnectedListener = mFirebaseListRef.getRoot().child(".info/connected").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean connected = (Boolean) dataSnapshot.getValue();
+                if (!connected) {
+                    ToastDisplayer.displayHint("Could not connect to Database",
+                            ToastDisplayer.MessageType.FAILURE, getApplicationContext());
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mFirebaseListRef.getRoot().child(".info/connected").removeEventListener(mConnectedListener);
+        mListAdapter.cleanup();
     }
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/reminder_list"
+    android:id="@id/android:list"
     android:name="com.austin.goaltracker.View.PendingReminders.ReminderListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,4 +10,6 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.austin.goaltracker.View.PendingReminders.ReminderListActivity"
-    tools:listitem="@layout/reminder_list_content" />
+    tools:listitem="@layout/reminder_list_content">
+
+</ListView>

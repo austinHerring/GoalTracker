@@ -33,7 +33,6 @@ android {
 
 dependencies {
     compile project(path: ':gcm', configuration: 'android-endpoints')
-    compile files('libs/activation.jar')
     compile 'com.firebase:firebase-client-android:2.5.1'
     compile 'com.android.support:support-v4:23.2.1'
     compile 'com.google.android.gms:play-services:8.4.0'
@@ -46,6 +45,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-identity:8.4.0'
     compile 'com.google.appengine:appengine-api-1.0-sdk:1.9.18'
     compile 'com.android.support:recyclerview-v7:23.2.1'
+    compile "com.daimajia.swipelayout:library:1.2.0@aar"
 }
 
 apply plugin: 'com.google.gms.google-services'

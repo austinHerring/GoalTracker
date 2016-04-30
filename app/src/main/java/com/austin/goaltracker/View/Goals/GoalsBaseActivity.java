@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.view.Gravity;
@@ -18,8 +17,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import com.austin.goaltracker.Controller.BaseActivityAdapter;
-import com.austin.goaltracker.Controller.GoalAdapter;
+import com.austin.goaltracker.Controller.BaseActivitySelectorAdapter;
+import com.austin.goaltracker.Controller.GoalListAdapter;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
@@ -31,6 +30,12 @@ import com.austin.goaltracker.View.Friends.FriendsBaseActivityListActivity;
 import com.austin.goaltracker.View.LoginActivity;
 import com.austin.goaltracker.View.PendingReminders.ReminderListActivity;
 import com.austin.goaltracker.View.SettingsActivity;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+
+import java.util.HashMap;
 
 
 public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -42,18 +47,19 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
     private static Button buttonPending;
     private static Button buttonNewGoal;
     private static int mPendingCount = 0;
-    private GoalAdapter goalAdapter;
+    private GoalListAdapter goalListAdapter;
+    private Firebase mFirebaseRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_goals_base);
         GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
-        setPendingGoalsCountInActionBar();
         setupWindowAnimations();
+        setUpNotificationCountWithFirebaseListener();
 
         spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
-        spinner.setAdapter(new BaseActivityAdapter(this, R.layout.layout_spinner_dropdown, activities));
+        spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown, activities));
         spinner.setOnItemSelectedListener(this);
 
         buttonNewGoal = (Button) findViewById(R.id.buttonNewGoal);
@@ -65,14 +71,14 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
         });
 
         listOfGoals = (ListView) findViewById(R.id.listOfGoals);
-        goalAdapter = new GoalAdapter(this, android.R.layout.simple_list_item_1, Util.currentUser.goalsToList());
-        listOfGoals.setAdapter(goalAdapter);
+        goalListAdapter = new GoalListAdapter(this, android.R.layout.simple_list_item_1, Util.currentUser.goalsToList());
+        listOfGoals.setAdapter(goalListAdapter);
         listOfGoals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Pulling from the visible items, not the entire list
-                Goal listItem =  ((GoalAdapter)parent.getAdapter()).getItemFromFilteredList(position);
-                goalAdapter.getFilter().filter(listItem.getId());
+                Goal listItem =  ((GoalListAdapter)parent.getAdapter()).getItemFromFilteredList(position);
+                goalListAdapter.getFilter().filter(listItem.getId());
 
                 if (listItem.classification().equals(Goal.Classification.COUNTDOWN)) {
                     GoalCountdownGraphicFragment fragment = GoalCountdownGraphicFragment.newInstance((CountdownCompleterGoal)listItem);
@@ -92,18 +98,21 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
         getMenuInflater().inflate(R.menu.menu_goals_base, menu);
         setupWindowAnimations();
 
-        MenuItem item = menu.findItem(R.id.pending_goals);
-        MenuItemCompat.setActionView(item, R.layout.feed_update_count);
-        buttonPending = (Button) MenuItemCompat.getActionView(item);
-        buttonPending.setText(String.valueOf(mPendingCount));
-        buttonPending.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), ReminderListActivity.class);
-                //startActivity(i);
-                //TODO Fix the transition. Buggy right now
-                startActivity(i, ActivityOptions.makeSceneTransitionAnimation(GoalsBaseActivity.this).toBundle());
-            }
-        });
+        MenuItem countItem = menu.findItem(R.id.pending_goals);
+        MenuItemCompat.setActionView(countItem, R.layout.feed_update_count);
+        if (mPendingCount > 0) {
+            countItem.setVisible(true);
+            buttonPending = (Button) MenuItemCompat.getActionView(countItem);
+            buttonPending.setText(String.valueOf(mPendingCount));
+            buttonPending.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Intent i = new Intent(getApplicationContext(), ReminderListActivity.class);
+                    startActivity(i, ActivityOptions.makeSceneTransitionAnimation(GoalsBaseActivity.this).toBundle());
+                }
+            });
+        } else {
+            countItem.setVisible(false);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -164,8 +173,8 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
         super.onPause();
     }
 
-    private void setPendingGoalsCountInActionBar() {
-        mPendingCount = 0;
+    private void setPendingGoalsCountInActionBar(int count) {
+        mPendingCount = count;
         invalidateOptionsMenu();
     }
 
@@ -176,5 +185,27 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
         Transition slideIn = new Slide(Gravity.BOTTOM);
         slideIn.setDuration(1000);
         getWindow().setExitTransition(slideIn);
+    }
+
+    private void setUpNotificationCountWithFirebaseListener() {
+        mFirebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+                .child("accounts")
+                .child(Util.currentUser.getId())
+                .child("pending goal notifications");
+        mFirebaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.getValue() == null) {
+                    setPendingGoalsCountInActionBar(0);
+                } else {
+                    setPendingGoalsCountInActionBar(((HashMap<String, Object>) snapshot.getValue()).size());
+                }
+
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
     }
 }

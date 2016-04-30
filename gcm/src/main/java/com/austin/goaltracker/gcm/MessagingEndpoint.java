@@ -58,7 +58,6 @@ public class MessagingEndpoint {
 
         String message = parseMessageForNote(rawMessage);
         String accountId = parseMessageForAccountId(rawMessage);
-        String goalId = parseMessageForGoalId(rawMessage);
         // crop longer messages
         if (message.length() > 1000) {
             message = message.substring(0, 1000) + "[...]";
@@ -67,7 +66,8 @@ public class MessagingEndpoint {
         Message msg = new Message.Builder()
                 .addData("message", message)
                 .addData("accountId", accountId)
-                .addData("goalId", goalId)
+                .addData("goalId", parseMessageForGoalId(rawMessage))
+                .addData("dateTimeNotified", parseMessageForDateTimeNotified(rawMessage))
                 .build();
 
         // GETS THE REGISTRATION RECORDS FOR A USER ACCOUNT
@@ -109,5 +109,9 @@ public class MessagingEndpoint {
 
     private String parseMessageForGoalId(String m) {
         return Arrays.asList(m.split(";")).get(2);
+    }
+
+    private String parseMessageForDateTimeNotified(String m) {
+        return Arrays.asList(m.split(";")).get(3);
     }
 }

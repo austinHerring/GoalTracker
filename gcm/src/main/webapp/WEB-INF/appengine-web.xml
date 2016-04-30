@@ -5,7 +5,6 @@
     <threadsafe>true</threadsafe>
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
-
         <property name="gcm.api.key" value="AIzaSyBTFtmvaWeFZWktcKdJA4DO1ye14Ryw9xI"/>
     </system-properties>
 </appengine-web-app>

@@ -8,23 +8,34 @@ import java.util.Calendar;
 public class PendingGoalNotification {
     private String id;
     private String associatedGoalId;
-    private Calendar dateTimeNotified;
+    private long dateTimeNotified;
+    private String name;
 
-    public PendingGoalNotification(String associatedGoalId, Calendar dateTimeNotified) {
+    // Required default constructor for Firebase object mapping
+    @SuppressWarnings("unused")
+    private PendingGoalNotification() {
+    }
+
+    public PendingGoalNotification(String associatedGoalId, long dateTimeNotified, String name) {
         this.associatedGoalId = associatedGoalId;
         this.dateTimeNotified = dateTimeNotified;
+        this.name = name;
     }
 
     public String getAssociatedGoalId() {
         return associatedGoalId;
     }
 
-    public Calendar getDateTimeNotified() {
+    public long getDateTimeNotified() {
         return dateTimeNotified;
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setId(String id) {
@@ -35,7 +46,7 @@ public class PendingGoalNotification {
         this.associatedGoalId = associatedGoalId;
     }
 
-    public void setDateTimeNotified(Calendar dateTimeNotified) {
+    public void setDateTimeNotified(long dateTimeNotified) {
         this.dateTimeNotified = dateTimeNotified;
     }
 }

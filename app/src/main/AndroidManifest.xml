@@ -125,6 +125,9 @@
         </receiver>
 
         <service
+            android:name=".Controller.PendingNotificationIntentService"
+            android:exported="false" />
+        <service
             android:name=".Controller.RegistrationIntentService"
             android:exported="false" />
         <service

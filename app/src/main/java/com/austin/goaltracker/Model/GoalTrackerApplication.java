@@ -29,6 +29,8 @@ public class GoalTrackerApplication extends Application {
     public BroadcastReceiver mRegistrationBroadcastReceiver;
     private Activity mCurrentActivity = null;
     static Logger Log = Logger.getLogger(GoalTrackerApplication.class.getName());
+    public static int notificationId = 0;
+    public static int NOTIFICATION_COUNT = 0;
 
     public void onCreate(){
         super.onCreate();
