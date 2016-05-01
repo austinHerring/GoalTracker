@@ -16,6 +16,11 @@
     <color name="spinner_background">#61bc6fff</color>
     <color name="spinner_background2">#24b058ff</color>
     <color name="spinner_in_use">#bdb8c2</color>
-    <color name="goal_list_blue_background">#a68069ff</color>
-    <color name="goal_list_red_background">#7bee0893</color>
+    <color name="goal_list_blue_background">#a392ff</color>
+    <color name="goal_list_red_background">#e48fc2</color>
+    <color name="standard_list_content">#c790ff</color>
+    <color name="positive_action">#02ff78</color>
+    <color name="negative_action">#ff4952</color>
+    <color name="positive_action_pressed">#00ac50</color>
+    <color name="negative_action_pressed">#b62f36</color>
 </resources>

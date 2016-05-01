@@ -13,7 +13,7 @@ import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.R;
 
 import com.austin.goaltracker.View.LoginActivity;
-import com.austin.goaltracker.View.PendingReminders.ReminderListActivity;
+import com.austin.goaltracker.View.ReminderListActivity;
 import com.google.android.gms.gcm.GcmListenerService;
 
 /**

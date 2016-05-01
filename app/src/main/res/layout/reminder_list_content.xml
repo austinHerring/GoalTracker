@@ -1,20 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+<com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent" android:layout_height="70dp">
+<!-- Bottom View Start-->
+<LinearLayout
+    android:id="@+id/bottom_wrapper"
+    android:layout_width="160dp"
+    android:weightSum="1"
+    android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/idTEST"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem" />
+    <Button
+        android:id="@+id/negativeResponse"
+        android:layout_height="match_parent"
+        android:layout_weight=".5"
+        android:layout_width="0dip"
+        android:background="@drawable/x_icon_selector"
+        />
+    <Button
+        android:id="@+id/positiveResponse"
+        android:layout_height="match_parent"
+        android:layout_weight=".5"
+        android:layout_width="0dip"
+        android:background="@drawable/checkmark_selector"/>
+</LinearLayout>
+<!-- Bottom View End-->
+
+<!-- Surface View Start -->
+<LinearLayout
+    android:background="@color/standard_list_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
 
     <TextView
-        android:id="@+id/contentTEST"
-        android:layout_width="wrap_content"
+        android:id="@+id/timeStamp"
+        android:layout_weight=".20"
+        android:layout_width="0dip"
+        android:textSize="15sp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:textColor="@color/primaryW"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/message"
+        android:layout_weight=".65"
+        android:layout_width="0dip"
+        android:textSize="15sp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/primaryW"/>
+
+    <TextView
+        android:id="@+id/numericalInfo"
+        android:layout_weight=".15"
+        android:layout_width="0dip"
+        android:textSize="15sp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/primaryW"
+        android:gravity="center"/>
 </LinearLayout>
+<!-- Surface View End -->
+</com.daimajia.swipe.SwipeLayout>

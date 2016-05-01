@@ -47,7 +47,7 @@ public abstract class FirebaseListAdapter<T> extends BaseAdapter {
         mInflater = activity.getLayoutInflater();
         mModels = new ArrayList<>();
         mKeys = new ArrayList<>();
-        // Look for all child events. We will then map them to our own internal ArrayList, which backs ListView
+        // Look for all child events then map them to the ArrayList, which backs the ListView
         mListener = this.mRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
@@ -76,7 +76,7 @@ public abstract class FirebaseListAdapter<T> extends BaseAdapter {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                // One of the mModels changed. Replace it in our list and name mapping
+                // One of the mModels changed. Replace it in the list and name mapping
                 String key = dataSnapshot.getKey();
                 T newModel = dataSnapshot.getValue(FirebaseListAdapter.this.mModelClass);
                 int index = mKeys.indexOf(key);
@@ -102,7 +102,7 @@ public abstract class FirebaseListAdapter<T> extends BaseAdapter {
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
 
-                // A model changed position in the list. Update our list accordingly
+                // A model changed position in the list. Update the list accordingly
                 String key = dataSnapshot.getKey();
                 T newModel = dataSnapshot.getValue(FirebaseListAdapter.this.mModelClass);
                 int index = mKeys.indexOf(key);

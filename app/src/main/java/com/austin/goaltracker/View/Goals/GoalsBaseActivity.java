@@ -28,7 +28,7 @@ import com.austin.goaltracker.R;
 
 import com.austin.goaltracker.View.Friends.FriendsBaseActivityListActivity;
 import com.austin.goaltracker.View.LoginActivity;
-import com.austin.goaltracker.View.PendingReminders.ReminderListActivity;
+import com.austin.goaltracker.View.ReminderListActivity;
 import com.austin.goaltracker.View.SettingsActivity;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;

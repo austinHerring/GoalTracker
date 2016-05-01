@@ -7,15 +7,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.austin.goaltracker.R;
+import com.daimajia.swipe.SwipeLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,14 +105,16 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
             //holder.display_name.setSelected(true);
             if (displayedListOfGoals.get(position).classification().equals(Goal.Classification.COUNTDOWN)) {
                 holder.display_info.setText(((CountdownCompleterGoal) displayedListOfGoals.get(position)).toBasicInfo());
-                v.setBackgroundColor(BLUE_BACKGROUND);
+                v.findViewById(R.id.goal_row_layout).setBackgroundColor(BLUE_BACKGROUND);
+                //v.setBackgroundColor(BLUE_BACKGROUND);
                 holder.display_name.setTextColor(COUNTDOWN_BLUE);
                 holder.display_info.setTextColor(COUNTDOWN_BLUE);
                 holder.display_icon.setImageResource(R.drawable.countdown_flag_small);
 
             } else {
                 holder.display_info.setText(((StreakSustainerGoal) displayedListOfGoals.get(position)).toBasicInfo());
-                v.setBackgroundColor(RED_BACKGROUND);
+                v.findViewById(R.id.goal_row_layout).setBackgroundColor(RED_BACKGROUND);
+                //v.setBackgroundColor(RED_BACKGROUND);
                 holder.display_name.setTextColor(STREAK_RED);
                 holder.display_info.setTextColor(STREAK_RED);
                 holder.display_icon.setImageResource(R.drawable.streak_flame_small);
@@ -117,6 +123,19 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
         } catch (Exception e) {
             Log.e("GoalListAdapter", "Error constructing");
         }
+
+        SwipeLayout swipeLayout =  (SwipeLayout) v;
+        swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
+        swipeLayout.addDrag(SwipeLayout.DragEdge.Left, v.findViewById(R.id.bottom_wrapper));
+
+        Button trash = (Button) v.findViewById(R.id.trash_action);
+        trash.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                ToastDisplayer.displayHint("TODO: DELETE GOAL",
+                        ToastDisplayer.MessageType.FAILURE, GoalTrackerApplication.INSTANCE);
+            }
+        });
+
         return v;
     }
 

@@ -145,15 +145,15 @@
         </service>
 
         <activity
-            android:name=".View.PendingReminders.ReminderListActivity"
+            android:name=".View.ReminderListActivity"
             android:label="@string/title_reminder_list"></activity>
         <activity
             android:name=".View.PendingReminders.ReminderDetailActivity"
             android:label="@string/title_reminder_detail"
-            android:parentActivityName=".View.PendingReminders.ReminderListActivity">
+            android:parentActivityName=".View.ReminderListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.austin.goaltracker.View.PendingReminders.ReminderListActivity" />
+                android:value=".View.ReminderListActivity" />
         </activity>
     </application>
 

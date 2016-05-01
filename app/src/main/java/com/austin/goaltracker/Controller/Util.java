@@ -5,8 +5,6 @@ import com.austin.goaltracker.Model.Account;
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.Model.Password;
-import com.austin.goaltracker.Model.PendingGoalContent;
-import com.austin.goaltracker.Model.PendingGoalNotification;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -15,7 +13,6 @@ import com.firebase.client.FirebaseException;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
