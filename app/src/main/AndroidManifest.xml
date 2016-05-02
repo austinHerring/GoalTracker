@@ -36,7 +36,7 @@
         tools:replace="android:icon" >
         <activity
             android:name=".View.Goals.GoalsBaseActivity"
-            android:theme="@style/AppThemePurpleGoalsBase"
+            android:theme="@style/AppThemePurpleAppCompat"
             android:label="@string/title_activity_goals" />
         <activity
             android:name=".View.LoginActivity"
@@ -150,7 +150,8 @@
 
         <activity
             android:name=".View.ReminderListActivity"
-            android:label="@string/title_reminder_list" />
+            android:label="@string/title_reminder_list"
+            android:theme="@style/AppThemePurpleAppCompat" />
     </application>
 
 </manifest>

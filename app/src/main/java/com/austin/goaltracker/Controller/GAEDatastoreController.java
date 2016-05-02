@@ -4,7 +4,9 @@ import android.content.Intent;
 
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.GoalClassification;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
+import com.austin.goaltracker.Model.IncrementType;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -43,10 +45,9 @@ public class GAEDatastoreController {
      * @param promptHour time to prompt the user with a reminder
      */
     public static void persistCron(Goal goal, int promptMinute, int promptHour) {
-        Goal.IncrementType frequency = goal.getIncrementType();
-        boolean isHourly = frequency.equals(Goal.IncrementType.HOURLY);
+        IncrementType frequency = goal.getIncrementType();
+        boolean isHourly = frequency.equals(IncrementType.HOURLY);
 
-        // Start IntentService to register this application with GCM.
         Intent intent = new Intent(GoalTrackerApplication.INSTANCE, CronJobIntentService.class);
         intent.putExtra("ACTION", "ADD");
         intent.putExtra("cronKey", goal.getCronJobKey());
@@ -55,9 +56,20 @@ public class GAEDatastoreController {
         intent.putExtra("goalId", goal.getId());
         intent.putExtra("frequency", frequency.toString());
         intent.putExtra("nextRunTS", calculateFirstNotificationDate(promptHour, promptMinute, isHourly) / 100000 * 100000);
-        intent.putExtra("lastRun", determineLastRunDate(goal) / 100000 * 100000);
+        intent.putExtra("lastRun", determineLastRunDate(goal));
         GoalTrackerApplication.INSTANCE.startService(intent);
-        Log.info("ATTEMPT START Cron Job Intent Service");
+    }
+
+    /**
+     * Loops through the goals for an account and converts it from DB to Object
+     *
+     * @param goal the goal to create prompting for
+     */
+    public static void removeCron(Goal goal) {
+        Intent intent = new Intent(GoalTrackerApplication.INSTANCE, CronJobIntentService.class);
+        intent.putExtra("ACTION", "REMOVE");
+        intent.putExtra("cronKey", goal.getCronJobKey());
+        GoalTrackerApplication.INSTANCE.startService(intent);
     }
 
     /**
@@ -102,11 +114,11 @@ public class GAEDatastoreController {
      * and -1 for Streak Goals
      */
     private static long determineLastRunDate(Goal goal) {
-        if (goal.classification().equals(Goal.Classification.STREAK)) {
+        if (goal.classification().equals(GoalClassification.STREAK)) {
             return -1;
         } else {
             CountdownCompleterGoal g = (CountdownCompleterGoal) goal;
-            return g.getDateDesiredFinish().getTimeInMillis();
+            return g.getDateDesiredFinish().getTimeInMillis() / 100000 * 100000;
         }
     }
     /**

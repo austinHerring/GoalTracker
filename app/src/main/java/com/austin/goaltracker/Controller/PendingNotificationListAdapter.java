@@ -1,19 +1,26 @@
 package com.austin.goaltracker.Controller;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.GoalClassification;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
+import com.austin.goaltracker.Model.IncrementType;
 import com.austin.goaltracker.Model.PendingGoalNotification;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.daimajia.swipe.SwipeLayout;
+import com.firebase.client.Firebase;
 import com.firebase.client.Query;
 import com.austin.goaltracker.R;
 
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -38,12 +45,12 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
      * @param view A view instance corresponding to the layout passed to the constructor.
      */
     @Override
-    protected void populateView(final View view, PendingGoalNotification pendingGoalNotification) {
+    protected void populateView(final View view, final PendingGoalNotification pendingGoalNotification) {
         SwipeLayout swipeLayout =  (SwipeLayout) view;
         swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         swipeLayout.addDrag(SwipeLayout.DragEdge.Left, view.findViewById(R.id.bottom_wrapper));
 
-        long timeStamp = pendingGoalNotification.getDateTimeNotified();
+        final long timeStamp = pendingGoalNotification.getDateTimeNotified();
         ((TextView) view.findViewById(R.id.timeStamp)).setText(getNotificationTime(timeStamp));
 
         String message = getNotificatoinMessage(pendingGoalNotification.getAssociatedGoalId());
@@ -55,16 +62,47 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
         positiveResponse = (Button) view.findViewById(R.id.positiveResponse);
         positiveResponse.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ToastDisplayer.displayHint("POSITIVE",
-                        ToastDisplayer.MessageType.SUCCESS, GoalTrackerApplication.INSTANCE);
+                Goal goal = getGoalFromId(pendingGoalNotification.getAssociatedGoalId());
+                if (goal.classification().equals(GoalClassification.COUNTDOWN)) {
+                    CountdownCompleterGoal cGoal = (CountdownCompleterGoal) goal;
+                    cGoal.update();
+                    if (cGoal.getPercentProgress() >= 100) {
+                        // The goal was completed, flag it as termineted and notify user
+                        //TODO update style
+                        notifyUserCompletion(view.getContext(), goal);
+                        cGoal.setIsTerminated(true);
+                    }
+                    Util.updateAccountGoalOnDB(Util.currentUser.getId(), cGoal);
+                } else {
+                    StreakSustainerGoal sGoal = (StreakSustainerGoal) goal;
+                    sGoal.update();
+                    Util.updateAccountGoalOnDB(Util.currentUser.getId(), sGoal);
+                }
+                Util.removePendingGoalNotificationFromDB(pendingGoalNotification.getId());
             }
         });
 
         negativeResponse = (Button) view.findViewById(R.id.negativeResponse);
         negativeResponse.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ToastDisplayer.displayHint("NEGATIVE",
-                        ToastDisplayer.MessageType.FAILURE, GoalTrackerApplication.INSTANCE);
+                Goal goal = getGoalFromId(pendingGoalNotification.getAssociatedGoalId());
+                if (goal.classification().equals(GoalClassification.COUNTDOWN)) {
+                    CountdownCompleterGoal cGoal = (CountdownCompleterGoal) goal;
+                    cGoal.setIsTerminated(true);
+                    Util.updateAccountGoalOnDB(Util.currentUser.getId(), cGoal);
+                    GAEDatastoreController.removeCron(Util.currentUser.getGoals().get(pendingGoalNotification.getAssociatedGoalId()));
+                } else {
+                    StreakSustainerGoal sGoal = (StreakSustainerGoal) goal;
+                    if (sGoal.updateCheatNumber()) {
+                        // The goal ran out of cheats, notify user and flag as terminated
+                        sGoal.setIsTerminated(true);
+                        Util.updateAccountGoalOnDB(Util.currentUser.getId(), sGoal);
+                        GAEDatastoreController.removeCron(Util.currentUser.getGoals().get(pendingGoalNotification.getAssociatedGoalId()));
+                    } else {
+                        Util.removePendingGoalNotificationFromDB(pendingGoalNotification.getId());
+                    }
+                }
+                notifyUserTermination(view.getContext(), goal);
             }
         });
     }
@@ -76,22 +114,67 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
         return format.format(calendar.getTime());
     }
 
+    private void notifyUserCompletion(Context context, Goal goal) {
+        SimpleDateFormat format = new SimpleDateFormat("MMMM, dd h:mm a");
+        String date = format.format(goal.getDateOfOrigin().getTime());
+        AlertDialog.Builder alert = new AlertDialog.Builder (context);
+        alert.setTitle("Conratulations!");
+        String message = "You just finished your the goal to " + goal.getGoalName()
+                + " that you started " + date + ".\n\nYou'll be able to view this " +
+                "in 'History' along with the other completed goals.\n\nHappy Goal Tracking!";
+        alert.setMessage (message);
+        Dialog dialog = alert.create();
+        dialog.show();
+    }
+
+    private void notifyUserTermination(Context context, Goal goal) {
+        GoalClassification type  = goal.classification();
+        AlertDialog.Builder alert = new AlertDialog.Builder (context);
+
+        String message;
+        if (type == GoalClassification.COUNTDOWN) {
+            alert.setTitle("Goal Ended");
+            message = "We're sorry to see that you're quiting your goal to " + goal.getGoalName() +
+                    ".\nYou will be able to look at the details in 'History'";
+
+        } else {
+            int cheatsRemaining = ((StreakSustainerGoal) goal).getCheatsRemaining();
+
+            if (cheatsRemaining < 0) {
+                alert.setTitle("Goal Ended");
+                long streak = ((StreakSustainerGoal) goal).getStreak();
+                message = "Your goal to " + goal.getGoalName() + " stopped at a streak of " +
+                        streak + ". You had a great run!.\n\nYou will be able to look at the " +
+                        "details in 'History'";
+
+            } else {
+                alert.setTitle("Using a cheat!");
+                message = "You just used a cheat so your streak won't stop.\n\n There are "
+                    + cheatsRemaining + " cheats remaining. Keep it up!";
+            }
+        }
+        alert.setMessage (message);
+
+        Dialog dialog = alert.create();
+        dialog.show();
+    }
+
     private String getNotificatoinMessage(String goalId) {
         Goal goal = getGoalFromId(goalId);
-        Goal.IncrementType type = goal.getIncrementType();
+        IncrementType type = goal.getIncrementType();
         String message = "Did you " + goal.getTask() + " during the last ";
 
-        if (type == Goal.IncrementType.HOURLY) {
+        if (type == IncrementType.HOURLY) {
             return message + "hour?";
-        } else if (type == Goal.IncrementType.DAILY) {
+        } else if (type == IncrementType.DAILY) {
             return message + "day?";
-        } else if (type == Goal.IncrementType.BIDAILY) {
+        } else if (type == IncrementType.BIDAILY) {
             return message + "two days?";
-        } else if (type == Goal.IncrementType.WEEKLY) {
+        } else if (type == IncrementType.WEEKLY) {
             return message + "week?";
-        } else if (type == Goal.IncrementType.BIWEEKLY) {
+        } else if (type == IncrementType.BIWEEKLY) {
             return message + "two weeks?";
-        }  else if (type == Goal.IncrementType.MONTHLY) {
+        }  else if (type == IncrementType.MONTHLY) {
             return message + "month?";
         } else {
             return message + "year?";
@@ -100,21 +183,21 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
 
     private String getNotificatoinInfo(String goalId) {
         Goal goal = getGoalFromId(goalId);
-        if (goal.classification().equals(Goal.Classification.STREAK)) {
+        if (goal.classification().equals(GoalClassification.STREAK)) {
             StreakSustainerGoal sGoal = (StreakSustainerGoal) goal;
-            Goal.IncrementType type = sGoal.getIncrementType();
+            IncrementType type = sGoal.getIncrementType();
             String message = sGoal.getStreak() + "\n";
-            if (type == Goal.IncrementType.HOURLY) {
+            if (type == IncrementType.HOURLY) {
                 return message + "hours";
-            } else if (type == Goal.IncrementType.DAILY) {
+            } else if (type == IncrementType.DAILY) {
                 return message + "days";
-            } else if (type == Goal.IncrementType.BIDAILY) {
+            } else if (type == IncrementType.BIDAILY) {
                 return message + "bi-days";
-            } else if (type == Goal.IncrementType.WEEKLY) {
+            } else if (type == IncrementType.WEEKLY) {
                 return message + "weeks";
-            } else if (type == Goal.IncrementType.BIWEEKLY) {
+            } else if (type == IncrementType.BIWEEKLY) {
                 return message + "bi-weeks";
-            }  else if (type == Goal.IncrementType.MONTHLY) {
+            }  else if (type == IncrementType.MONTHLY) {
                 return message + "months";
             } else {
                 return message + "years";

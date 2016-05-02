@@ -11,28 +11,27 @@ import java.util.Calendar;
  * Abstract class for a Goal to track
  */
 public abstract class Goal {
-    public enum IncrementType {YEARLY, MONTHLY, BIWEEKLY, WEEKLY, BIDAILY, DAILY, HOURLY}
-    public enum Classification {COUNTDOWN, STREAK}
 
     private String goalName, task;
     private String id;
     protected Calendar dateOfOrigin;
     private Calendar dateBroken;
     protected IncrementType incrementType;
-    private ArrayList<Account> supporters;
-    private Classification classification;
+    //private ArrayList<Account> supporters;
+    private GoalClassification classification;
     private String cronJobKey;
-    private boolean isPending;
+    private boolean isTerminated;
 
-    Goal(String name, IncrementType type, Classification c) {
+    Goal(String name, IncrementType type, GoalClassification c) {
         goalName = name;
-        isPending = false;
+        isTerminated = false;
         incrementType = type;
         dateOfOrigin = Calendar.getInstance();
         classification = c;
+        isTerminated = false;
     }
 
-    Goal(Classification c) {
+    Goal(GoalClassification c) {
         classification = c;
     }
 
@@ -41,7 +40,7 @@ public abstract class Goal {
         dateBroken = date;
     }
 
-    public Classification classification() {
+    public GoalClassification classification() {
         return classification;
     }
 
@@ -57,18 +56,16 @@ public abstract class Goal {
         return id;
     }
 
-    public boolean isPending() {
-        return isPending;
+    public boolean isTerminated() {
+        return isTerminated;
     }
 
     public Calendar getDateOfOrigin() {
-        //return dateOfOrigin.get(Calendar.YEAR) + "," + dateOfOrigin.get(Calendar.MONTH) + "," + dateOfOrigin.get(Calendar.DAY_OF_MONTH);
         return dateOfOrigin;
     }
 
     public Calendar getBrokenDate() {
         if (dateBroken != null) {
-            //return dateBroken.get(Calendar.YEAR) + "," + dateBroken.get(Calendar.MONTH) + "," + dateBroken.get(Calendar.DAY_OF_MONTH);
             return dateBroken;
         } else {
             return null;
@@ -121,8 +118,8 @@ public abstract class Goal {
         dateOfOrigin = date;
     }
 
-    public void setIsPending(boolean isPending) {
-        this.isPending = isPending;
+    public void setIsTerminated(boolean isTerminated) {
+        this.isTerminated = isTerminated;
     }
 
     public void setCronJobKey(String key) {

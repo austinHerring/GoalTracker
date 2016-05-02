@@ -26,6 +26,7 @@ import com.austin.goaltracker.Model.Account;
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
+import com.austin.goaltracker.Model.IncrementType;
 import com.austin.goaltracker.R;
 import com.firebase.client.FirebaseException;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
@@ -40,7 +41,7 @@ public class GoalsCountdownCreatorActivity extends Activity implements TimePicke
     int year_x, month_x, day_x;
     static final int DIALOG_ID = 0;
     String goalTask;
-    Goal.IncrementType type;
+    IncrementType type;
     Button setButtonDate;
     TextView dateFinish;
     int mPromptMinute;

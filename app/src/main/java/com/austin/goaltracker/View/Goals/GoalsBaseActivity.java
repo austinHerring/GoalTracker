@@ -22,6 +22,7 @@ import com.austin.goaltracker.Controller.GoalListAdapter;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.GoalClassification;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.austin.goaltracker.R;
@@ -71,7 +72,7 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
         });
 
         listOfGoals = (ListView) findViewById(R.id.listOfGoals);
-        goalListAdapter = new GoalListAdapter(this, android.R.layout.simple_list_item_1, Util.currentUser.goalsToList());
+        goalListAdapter = new GoalListAdapter(this, android.R.layout.simple_list_item_1, Util.currentUser.activeGoalsToList());
         listOfGoals.setAdapter(goalListAdapter);
         listOfGoals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -80,7 +81,7 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
                 Goal listItem =  ((GoalListAdapter)parent.getAdapter()).getItemFromFilteredList(position);
                 goalListAdapter.getFilter().filter(listItem.getId());
 
-                if (listItem.classification().equals(Goal.Classification.COUNTDOWN)) {
+                if (listItem.classification().equals(GoalClassification.COUNTDOWN)) {
                     GoalCountdownGraphicFragment fragment = GoalCountdownGraphicFragment.newInstance((CountdownCompleterGoal)listItem);
                     getFragmentManager().beginTransaction().replace(R.id.goal_graphic, fragment).commit();
                 } else {

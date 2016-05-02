@@ -111,8 +111,15 @@ public class Account {
         goals.put(id, goal);
     }
 
-    public ArrayList<Goal> goalsToList() {
-        return new ArrayList<>(goals.values());
+    public ArrayList<Goal> activeGoalsToList() {
+        List<Goal> listOfAllGoals = new ArrayList<>(goals.values());
+        ArrayList<Goal> activeGoals = new ArrayList<>();
+        for (Goal goal : listOfAllGoals) {
+            if (!goal.isTerminated()) {
+                activeGoals.add(goal);
+            }
+        }
+        return activeGoals;
     }
 
     /**

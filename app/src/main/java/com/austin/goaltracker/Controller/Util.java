@@ -1,15 +1,21 @@
 package com.austin.goaltracker.Controller;
 
+import android.util.Log;
+
 import com.austin.goaltracker.Model.Account;
 
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.GoalClassification;
+import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.Password;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.FirebaseException;
+import com.google.appengine.api.datastore.Query;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 
@@ -195,13 +201,13 @@ public class Util {
         map.put("id", goal.getId());
         map.put("classification", goal.classification());
         map.put("name", goal.getGoalName());
-        map.put("is pending", goal.isPending());
+        map.put("isTerminated", goal.isTerminated());
         map.put("date start", goal.getDateOfOrigin());
         map.put("date broken", goal.getBrokenDate());
         map.put("task", goal.getTask());
         map.put("frequency", goal.getIncrementType());
         map.put("cron key", goal.getCronJobKey());
-        if (goal.classification().equals(Goal.Classification.COUNTDOWN)) {
+        if (goal.classification().equals(GoalClassification.COUNTDOWN)) {
             map.put("date end", ((CountdownCompleterGoal) goal).getDateDesiredFinish());
             map.put("percent progress", ((CountdownCompleterGoal) goal).getPercentProgress());
             map.put("remaining checkpoints", ((CountdownCompleterGoal) goal).getRemainingCheckpoints());
@@ -274,7 +280,7 @@ public class Util {
             if (goalSnapShot.get("classification").equals("COUNTDOWN")) {
                 CountdownCompleterGoal goalToAdd = new CountdownCompleterGoal();
                 goalToAdd.setId((String) goalSnapShot.get("id"));
-                goalToAdd.setIsPending((boolean) goalSnapShot.get("is pending"));
+                goalToAdd.setIsTerminated((boolean) goalSnapShot.get("isTerminated"));
                 goalToAdd.setName((String) goalSnapShot.get("name"));
                 goalToAdd.setTask((String) goalSnapShot.get("task"));
                 goalToAdd.setCronJobKey((String) goalSnapShot.get("cron key"));
@@ -292,7 +298,7 @@ public class Util {
             } else {
                 StreakSustainerGoal goalToAdd = new StreakSustainerGoal();
                 goalToAdd.setId((String) goalSnapShot.get("id"));
-                goalToAdd.setIsPending((boolean) goalSnapShot.get("is pending"));
+                goalToAdd.setIsTerminated((boolean) goalSnapShot.get("isTerminated"));
                 goalToAdd.setName((String) goalSnapShot.get("name"));
                 goalToAdd.setTask((String) goalSnapShot.get("task"));
                 goalToAdd.setCronJobKey((String) goalSnapShot.get("cron key"));
@@ -311,12 +317,57 @@ public class Util {
     }
 
     /**
-     * gets password object from the hashmap returned from firebase
+     * Gets password object from the hashmap returned from firebase
      *
      * @param accountSnapshot firebase snapshot of data
      */
     private static Password retrieveUserPasswordToLocal(HashMap accountSnapshot) {
         HashMap<String, String> map = (HashMap<String, String>) accountSnapshot.get("password object");
         return new Password(map.get("password"), map.get("date last changed"));
+    }
+
+
+    /**
+     * Remove pending goal notification from Firebase
+     *
+     * @param notificationId Id of the notification to remove
+     */
+    public static void removePendingGoalNotificationFromDB(String notificationId) {
+        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+                .child("accounts")
+                .child(currentUser.getId())
+                .child("pending goal notifications")
+                .child(notificationId);
+        firebaseRef.removeValue();
+    }
+
+    /**
+     * Remove goal from Firebase and GAE. Makes sure to remove associated pending
+     * notifications as well
+     *
+     * @param goalId Id of the goal to remove
+     */
+    public static void removeGoalFromDB(String goalId) {
+        removeAssociatedPendingGoalNotificationsFromDB(goalId);
+        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+                .child("accounts")
+                .child(currentUser.getId())
+                .child("goals")
+                .child(goalId);
+        firebaseRef.removeValue();
+    }
+
+    /**
+     * Remove all pending notification that share the same goal parent
+     *
+     * @param goalId Id of the goal to remove pending notification associated with it
+     */
+    private static void removeAssociatedPendingGoalNotificationsFromDB(String goalId) {
+        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+                .child("accounts")
+                .child(currentUser.getId())
+                .child("pending goal notifications");
+        com.firebase.client.Query queryRef = firebaseRef.orderByChild("associatedGoalId").equalTo(goalId);
+        queryRef.getRef().removeValue();
     }
 }

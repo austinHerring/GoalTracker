@@ -13,16 +13,21 @@ public class StreakSustainerGoal extends Goal {
     int cheatsRemaining;
     int streak;
 
-    public StreakSustainerGoal(String goalName, Goal.IncrementType type) {
-        super(goalName, type, Classification.STREAK);
+    public StreakSustainerGoal(String goalName, IncrementType type) {
+        super(goalName, type, GoalClassification.STREAK);
     }
 
     public StreakSustainerGoal() {
-        super(Classification.STREAK);
+        super(GoalClassification.STREAK);
     }
 
     public void update() {
         streak++;
+    }
+
+    public boolean updateCheatNumber() {
+        cheatNumber--;
+        return cheatNumber < 0;
     }
 
     public int getStreak() {

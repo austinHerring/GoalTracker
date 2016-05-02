@@ -16,13 +16,16 @@ import android.widget.TextView;
 
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.GoalClassification;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.austin.goaltracker.R;
 import com.daimajia.swipe.SwipeLayout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * @author Austin Herring
@@ -33,7 +36,7 @@ import java.util.List;
  */
 public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
     Activity activity;
-    private ArrayList<Goal> allListOfGoals;
+    private ArrayList<Goal> allListOfActiveGoals;
     private ArrayList<Goal> displayedListOfGoals;
     private static LayoutInflater inflater = null;
     // Colors used for the list of goals
@@ -47,7 +50,7 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
         try {
             this.activity = activity;
             displayedListOfGoals = goals;
-            allListOfGoals = goals;
+            allListOfActiveGoals = goals;
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             STREAK_RED = activity.getResources().getColor(R.color.text2);
             COUNTDOWN_BLUE = activity.getResources().getColor(R.color.text3);
@@ -88,6 +91,7 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         final ViewHolder holder;
+        final Goal goal= displayedListOfGoals.get(position);
         try {
             if (convertView == null) {
                 v = inflater.inflate(R.layout.layout_row, null);
@@ -101,20 +105,17 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
                 holder = (ViewHolder) v.getTag();
             }
 
-            holder.display_name.setText(displayedListOfGoals.get(position).getGoalName());
-            //holder.display_name.setSelected(true);
-            if (displayedListOfGoals.get(position).classification().equals(Goal.Classification.COUNTDOWN)) {
-                holder.display_info.setText(((CountdownCompleterGoal) displayedListOfGoals.get(position)).toBasicInfo());
+            holder.display_name.setText(goal.getGoalName());
+            if (goal.classification().equals(GoalClassification.COUNTDOWN)) {
+                holder.display_info.setText(((CountdownCompleterGoal) goal).toBasicInfo());
                 v.findViewById(R.id.goal_row_layout).setBackgroundColor(BLUE_BACKGROUND);
-                //v.setBackgroundColor(BLUE_BACKGROUND);
                 holder.display_name.setTextColor(COUNTDOWN_BLUE);
                 holder.display_info.setTextColor(COUNTDOWN_BLUE);
                 holder.display_icon.setImageResource(R.drawable.countdown_flag_small);
 
             } else {
-                holder.display_info.setText(((StreakSustainerGoal) displayedListOfGoals.get(position)).toBasicInfo());
+                holder.display_info.setText(((StreakSustainerGoal) goal).toBasicInfo());
                 v.findViewById(R.id.goal_row_layout).setBackgroundColor(RED_BACKGROUND);
-                //v.setBackgroundColor(RED_BACKGROUND);
                 holder.display_name.setTextColor(STREAK_RED);
                 holder.display_info.setTextColor(STREAK_RED);
                 holder.display_icon.setImageResource(R.drawable.streak_flame_small);
@@ -131,8 +132,9 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
         Button trash = (Button) v.findViewById(R.id.trash_action);
         trash.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ToastDisplayer.displayHint("TODO: DELETE GOAL",
-                        ToastDisplayer.MessageType.FAILURE, GoalTrackerApplication.INSTANCE);
+                destroyGoal(goal);
+                ToastDisplayer.displayHint("Goal Removed",
+                        ToastDisplayer.MessageType.SUCCESS, GoalTrackerApplication.INSTANCE);
             }
         });
 
@@ -157,13 +159,13 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
                 List<Goal> FilteredArrList = new ArrayList<>();
 
                 if (constraint == null || constraint.length() == 0) {
-                    results.count = allListOfGoals.size();
-                    results.values = allListOfGoals;
+                    results.count = allListOfActiveGoals.size();
+                    results.values = allListOfActiveGoals;
 
                 } else {
                     constraint = constraint.toString();
-                    for (int i = 0; i < allListOfGoals.size(); i++) {
-                        Goal data = allListOfGoals.get(i);
+                    for (int i = 0; i < allListOfActiveGoals.size(); i++) {
+                        Goal data = allListOfActiveGoals.get(i);
                         if (!(data.getId().equals(constraint))) {
                             FilteredArrList.add(data);
                         }
@@ -176,5 +178,18 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
             }
         };
         return filter;
+    }
+
+    private void destroyGoal(Goal goal) {
+        // REMOVE TRACES FROM GAE
+        GAEDatastoreController.removeCron(goal);
+
+        // REMOVE TRACES FROM FIREBASE
+        Util.removeGoalFromDB(goal.getId());
+
+        // REMOVE TRACES LOCALLY
+        //TODO Look into binding
+        HashMap<String, Goal> goals = Util.currentUser.getGoals();
+        goals.remove(goal.getId());
     }
 }

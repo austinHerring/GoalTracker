@@ -16,12 +16,6 @@ public class PendingGoalNotification {
     private PendingGoalNotification() {
     }
 
-    public PendingGoalNotification(String associatedGoalId, long dateTimeNotified, String name) {
-        this.associatedGoalId = associatedGoalId;
-        this.dateTimeNotified = dateTimeNotified;
-        this.name = name;
-    }
-
     public String getAssociatedGoalId() {
         return associatedGoalId;
     }

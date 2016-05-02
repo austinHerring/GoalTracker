@@ -20,8 +20,8 @@ public class CountdownCompleterGoal extends Goal {
     private int percentProgress;
     private String unitsRemainingString;
 
-    public CountdownCompleterGoal(String goalName, Goal.IncrementType type, Calendar dateDesiredFinish) {
-        super(goalName, type, Classification.COUNTDOWN);
+    public CountdownCompleterGoal(String goalName, IncrementType type, Calendar dateDesiredFinish) {
+        super(goalName, type, GoalClassification.COUNTDOWN);
         this.dateDesiredFinish = dateDesiredFinish;
         totalCheckpoints = calculateRemainingCheckpoints();
         remainingCheckpoints = totalCheckpoints;
@@ -30,13 +30,14 @@ public class CountdownCompleterGoal extends Goal {
     }
 
     public CountdownCompleterGoal() {
-        super(Classification.COUNTDOWN);
+        super(GoalClassification.COUNTDOWN);
     }
 
     public void update() {
         remainingCheckpoints--;
-        percentProgress = (int)((totalCheckpoints - remainingCheckpoints) / totalCheckpoints * 100);
+        percentProgress = (int) ((double)(totalCheckpoints - remainingCheckpoints) / totalCheckpoints * 100);
     }
+
 
     private long calculateRemainingCheckpoints() {
         long checkpointDiff = 0;
@@ -48,7 +49,7 @@ public class CountdownCompleterGoal extends Goal {
 
         if (incrementType.equals(IncrementType.HOURLY)) {
             while (start.before(dateDesiredFinish)) {
-                start.add(Calendar.HOUR_OF_DAY, 1);
+                start.add(Calendar.HOUR, 1);
                 checkpointDiff++;
             }
         } else if (incrementType.equals(IncrementType.DAILY)) {
@@ -76,13 +77,11 @@ public class CountdownCompleterGoal extends Goal {
                 start.add(Calendar.MONTH, 1);
                 checkpointDiff++;
             }
-        } else if (incrementType.equals(IncrementType.YEARLY)) {
+        } else {
             while (start.before(dateDesiredFinish)) {
                 start.add(Calendar.YEAR, 1);
                 checkpointDiff++;
             }
-        } else {
-            //TODO: implement custom
         }
         return checkpointDiff;
     }
@@ -97,7 +96,6 @@ public class CountdownCompleterGoal extends Goal {
         return "To Be Finished:\n" + df.format(dateDesiredFinish.getTime());
     }
 
-    //TODO: Work on
     public String unitsRemainingToString() {
         if (incrementType.equals(IncrementType.HOURLY)) {
             return remainingCheckpoints + ((remainingCheckpoints!=1) ? " hours " : " hour ")
@@ -117,12 +115,9 @@ public class CountdownCompleterGoal extends Goal {
         } else if (incrementType.equals(IncrementType.MONTHLY)) {
             return remainingCheckpoints + ((remainingCheckpoints!=1) ? " months " : " month ")
                     + "remaining";
-        } else if (incrementType.equals(IncrementType.YEARLY)) {
+        } else {
             return remainingCheckpoints + ((remainingCheckpoints!=1) ? " years " : " year ")
                     + "remaining";
-        } else {
-            //TODO: implement custom
-            return null;
         }
     }
 

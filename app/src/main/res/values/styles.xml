@@ -60,7 +60,7 @@
 
 
     <!-- Theme for the Goals base activity. MUST EXTEND APPCOMPAT -->
-    <style name="AppThemePurpleGoalsBase" parent="Theme.AppCompat.Light">
+    <style name="AppThemePurpleAppCompat" parent="Theme.AppCompat.Light">
         <!-- Main theme colors -->
         <!--   branding color for the app bar -->
         <item name="android:colorPrimary">@color/primaryP</item>
@@ -86,10 +86,15 @@
         <!--   Other colors -->
         <item name="android:textColorSecondary">@color/text3</item>
         <item name="android:textColorTertiary">@color/text2</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogStyle</item>
     </style>
 
     <style name="PurpleActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
         <item name="background">@color/primaryP</item>
+    </style>
+
+    <style name="AlertDialogStyle" parent="@android:style/Theme.Dialog">
+        <item name="android:textColor">@color/primaryP</item>
     </style>
 
     <style name="DatepickerStyle" parent="android:Theme.Material.Light.Dialog">

@@ -21,6 +21,7 @@ import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Account;
 import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
+import com.austin.goaltracker.Model.IncrementType;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.austin.goaltracker.R;
 import com.firebase.client.FirebaseException;
@@ -31,7 +32,7 @@ import java.util.Calendar;
 
 public class GoalsStreakCreatorActivity extends Activity implements TimePickerDialog.OnTimeSetListener {
     String goalTask;
-    Goal.IncrementType type;
+    IncrementType type;
     int skipNumber;
     int mPromptMinute;
     int mPromptHour;

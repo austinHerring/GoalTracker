@@ -1,6 +1,7 @@
 package com.austin.goaltracker.Controller;
 
 import com.austin.goaltracker.Model.Goal;
+import com.austin.goaltracker.Model.IncrementType;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -22,21 +23,21 @@ public class Converter {
         return c;
     }
 
-    public static Goal.IncrementType stringToFrequency(String input) {
+    public static IncrementType stringToFrequency(String input) {
         if (input.equals("HOURLY")) {
-            return Goal.IncrementType.HOURLY;
+            return IncrementType.HOURLY;
         } else if (input.equals("DAILY")) {
-            return Goal.IncrementType.DAILY;
+            return IncrementType.DAILY;
         } else if (input.equals("BIDAILY")) {
-            return Goal.IncrementType.BIDAILY;
+            return IncrementType.BIDAILY;
         } else if (input.equals("WEEKLY")) {
-            return Goal.IncrementType.WEEKLY;
+            return IncrementType.WEEKLY;
         } else if (input.equals("BIWEEKLY")) {
-            return Goal.IncrementType.BIWEEKLY;
+            return IncrementType.BIWEEKLY;
         } else if (input.equals("MONTHLY")) {
-            return Goal.IncrementType.MONTHLY;
+            return IncrementType.MONTHLY;
         } else if (input.equals("YEARLY")) {
-            return Goal.IncrementType.YEARLY;
+            return IncrementType.YEARLY;
         } else {
             return null;
         }

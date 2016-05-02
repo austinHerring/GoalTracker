@@ -47,7 +47,7 @@ public class CronJobIntentService extends IntentService {
 
                 Log.info("ENDPOINT SHOULD HAVE ADDED A JOB");
             } else if (action.equals("REMOVE")) {
-                cronJobService.removeCron(intent.getStringExtra("cronKey"));
+                cronJobService.removeCron(intent.getStringExtra("cronKey")).execute();
                 Log.info("ENDPOINT SHOULD HAVE REMOVED A JOB");
             } else {
                 Log.info("WHEN INTERACTING WITH DATASTORE THERE WAS AN INVALID ACTION: " + action);
