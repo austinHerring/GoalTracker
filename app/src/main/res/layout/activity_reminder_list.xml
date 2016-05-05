@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@id/android:list"
-    android:name="com.austin.goaltracker.View.PendingReminders.ReminderListFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layoutManager="LinearLayoutManager"
-    tools:context=".View.ReminderListActivity"
-    tools:listitem="@layout/reminder_list_content">
+    android:layout_height="match_parent">
+    <ListView
+        android:id="@+id/list_of_reminders"
+        android:name="com.austin.goaltracker.View.PendingReminders.ReminderListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".View.ReminderListActivity"
+        tools:listitem="@layout/reminder_list_content">
 
-</ListView>
+    </ListView>
+</LinearLayout>

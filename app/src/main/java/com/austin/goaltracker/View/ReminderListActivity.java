@@ -1,13 +1,14 @@
 package com.austin.goaltracker.View;
 
-import android.app.ListActivity;
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.austin.goaltracker.Controller.PendingNotificationListAdapter;
@@ -16,12 +17,13 @@ import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.ToastType;
 import com.austin.goaltracker.R;
+import com.austin.goaltracker.View.Goals.GoalsBaseActivity;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
-public class ReminderListActivity extends ListActivity {
+public class ReminderListActivity extends AppCompatActivity {
     private PendingNotificationListAdapter mListAdapter;
     private Firebase mFirebaseListRef;
     private ValueEventListener mConnectedListener;
@@ -45,7 +47,7 @@ public class ReminderListActivity extends ListActivity {
     @Override
     public void onStart() {
         super.onStart();
-        final ListView listView = getListView();
+        final ListView listView = (ListView) findViewById(R.id.list_of_reminders);
         mListAdapter = new PendingNotificationListAdapter(mFirebaseListRef.limit(50), this, R.layout.reminder_list_content);
         listView.setAdapter(mListAdapter);
         mListAdapter.registerDataSetObserver(new DataSetObserver() {
@@ -82,9 +84,32 @@ public class ReminderListActivity extends ListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu items for use in the action bar
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_goals_base, menu);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_reminder_activity, menu);
+        setupWindowAnimations();
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(i);
+            return true;
+        } else if (id == R.id.action_logout) {
+            Util.currentUser = null;    // Clear out the current user
+            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clean up all activities
+            startActivity(i);
+            finish();
+            return true;
+        } else if (id == R.id.action_home) {
+            Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
+            startActivity(i);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

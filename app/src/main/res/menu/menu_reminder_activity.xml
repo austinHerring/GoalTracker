@@ -1,10 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:compat="http://schemas.android.com/apk/res-auto">
     <item
-        android:title="@string/action_pending_goals"
-        android:id="@+id/pending_goals"
-        compat:showAsAction="ifRoom"
-        android:visible="false"/>
+        android:id="@+id/action_home"
+        android:title="@string/action_home"
+        android:icon="@drawable/home_icon"
+        compat:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"

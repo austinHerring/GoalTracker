@@ -94,13 +94,13 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
                 } else {
                     StreakSustainerGoal sGoal = (StreakSustainerGoal) goal;
                     if (sGoal.updateCheatNumber()) {
-                        // The goal ran out of cheats, notify user and flag as terminated
+                        // The goal ran out of cheats, flag as terminated
                         sGoal.setIsTerminated(true);
-                        Util.updateAccountGoalOnDB(Util.currentUser.getId(), sGoal);
                         GAEDatastoreController.removeCron(Util.currentUser.getGoals().get(pendingGoalNotification.getAssociatedGoalId()));
                     } else {
                         Util.removePendingGoalNotificationFromDB(pendingGoalNotification.getId());
                     }
+                    Util.updateAccountGoalOnDB(Util.currentUser.getId(), sGoal);
                 }
                 notifyUserTermination(view.getContext(), goal);
             }

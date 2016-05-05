@@ -44,7 +44,7 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
     ListView listOfGoals;
     private static
     Spinner spinner;
-    String[] activities = {"Goals", "Friends", "TEST", "Messages", "History"};
+    String[] activities = {"Goals", "Friends", "Messages", "History"};
     private static Button buttonPending;
     private static Button buttonNewGoal;
     private static int mPendingCount = 0;
@@ -128,7 +128,6 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
         } else if (id == R.id.action_logout) {
             Util.currentUser = null;    // Clear out the current user
             Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-            i.putExtra("finish", true);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clean up all activities
             startActivity(i);
             finish();
