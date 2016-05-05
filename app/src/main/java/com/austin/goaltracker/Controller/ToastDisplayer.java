@@ -6,6 +6,8 @@ import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.austin.goaltracker.Model.ToastType;
+
 /**
  * @author Austin Herring
  * @version 1.0
@@ -13,15 +15,14 @@ import android.widget.Toast;
  * Class to display hints to user with a Toast
  */
 public class ToastDisplayer {
-    public enum MessageType {FAILURE, SUCCESS}
 
-    public static void displayHint(String message, MessageType type, Context appContext) {
+    public static void displayHint(String message, ToastType type, Context appContext) {
         Toast toast = Toast.makeText(appContext, message, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         TextView view = (TextView) toast.getView().findViewById(android.R.id.message);
-        if (type.equals(MessageType.FAILURE)) {
+        if (type.equals(ToastType.FAILURE)) {
             view.setTextColor(Color.RED);
-        } else if (type.equals(MessageType.SUCCESS)) {
+        } else if (type.equals(ToastType.SUCCESS)) {
             view.setTextColor(Color.GREEN);
         }
         toast.show();

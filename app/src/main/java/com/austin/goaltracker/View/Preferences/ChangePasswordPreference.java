@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Password;
+import com.austin.goaltracker.Model.ToastType;
 import com.firebase.client.FirebaseException;
 
 /**
@@ -69,19 +70,15 @@ public class ChangePasswordPreference extends DialogPreference {
                                                     passwordNew1.getText().toString());
                         Util.currentUser.setPassword(password);
                         setSummary(Util.currentUser.getPasswordDate());
-                        ToastDisplayer.displayHint("Change Successful",
-                                ToastDisplayer.MessageType.SUCCESS, getContext());
+                        ToastDisplayer.displayHint("Change Successful", ToastType.SUCCESS, getContext());
                     } catch (FirebaseException e) {
-                        ToastDisplayer.displayHint("Could not connect to database",
-                                ToastDisplayer.MessageType.FAILURE, getContext());
+                        ToastDisplayer.displayHint("Could not connect to database", ToastType.FAILURE, getContext());
                     }
                 } else {
-                    ToastDisplayer.displayHint("New Passwords Do Not Match",
-                            ToastDisplayer.MessageType.FAILURE, getContext());
+                    ToastDisplayer.displayHint("New Passwords Do Not Match", ToastType.FAILURE, getContext());
                 }
             } else {
-                ToastDisplayer.displayHint("Current Password Incorrect",
-                        ToastDisplayer.MessageType.FAILURE, getContext());
+                ToastDisplayer.displayHint("Current Password Incorrect", ToastType.FAILURE, getContext());
             }
         }
     }
@@ -89,8 +86,7 @@ public class ChangePasswordPreference extends DialogPreference {
     public void setPassword(String passwordNew) {
         if (passwordNew.length() < 6 || !(passwordNew.matches(".*[a-z].*") && passwordNew.matches(".*[A-Z].*")
                 && passwordNew.matches(".*[0-9].*"))) {
-            ToastDisplayer.displayHint("Password Does Not Meet Security Standard",
-                    ToastDisplayer.MessageType.FAILURE, getContext());
+            ToastDisplayer.displayHint("Password Does Not Meet Security Standard", ToastType.FAILURE, getContext());
         } else {
             this.passwordInDB = passwordNew;
         }

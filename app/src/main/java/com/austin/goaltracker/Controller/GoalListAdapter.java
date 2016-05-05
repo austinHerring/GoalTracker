@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
@@ -19,13 +18,13 @@ import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.Model.GoalClassification;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
+import com.austin.goaltracker.Model.ToastType;
 import com.austin.goaltracker.R;
 import com.daimajia.swipe.SwipeLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * @author Austin Herring
@@ -133,8 +132,7 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
         trash.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 destroyGoal(goal);
-                ToastDisplayer.displayHint("Goal Removed",
-                        ToastDisplayer.MessageType.SUCCESS, GoalTrackerApplication.INSTANCE);
+                ToastDisplayer.displayHint("Goal Removed", ToastType.SUCCESS, GoalTrackerApplication.INSTANCE);
             }
         });
 
@@ -188,7 +186,6 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
         Util.removeGoalFromDB(goal.getId());
 
         // REMOVE TRACES LOCALLY
-        //TODO Look into binding
         HashMap<String, Goal> goals = Util.currentUser.getGoals();
         goals.remove(goal.getId());
     }

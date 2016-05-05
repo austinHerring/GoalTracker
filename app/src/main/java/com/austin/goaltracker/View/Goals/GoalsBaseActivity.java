@@ -157,7 +157,7 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
 
     @Override
     public String toString() {
-        return "Goals";
+        return "ActiveGoals";
     }
 
     @Override

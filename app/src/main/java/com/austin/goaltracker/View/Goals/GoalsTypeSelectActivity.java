@@ -14,6 +14,7 @@ import android.widget.EditText;
 import com.austin.goaltracker.Controller.GoalMediator;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
+import com.austin.goaltracker.Model.ToastType;
 import com.austin.goaltracker.R;
 
 public class GoalsTypeSelectActivity extends Activity {
@@ -34,11 +35,9 @@ public class GoalsTypeSelectActivity extends Activity {
             public void onClick(View v) {
 
                 if (goalTitle.getText().toString().equals("")) {
-                    ToastDisplayer.displayHint("Fill in all fields",
-                            ToastDisplayer.MessageType.FAILURE, getApplicationContext());
+                    ToastDisplayer.displayHint("Fill in all fields", ToastType.FAILURE, getApplicationContext());
                 } else if(goalTitle.getText().toString().contains(";")) {
-                    ToastDisplayer.displayHint("Semicolons are not permitted",
-                            ToastDisplayer.MessageType.FAILURE, getApplicationContext());
+                    ToastDisplayer.displayHint("Semicolons are not permitted", ToastType.FAILURE, getApplicationContext());
                 } else {
                     GoalMediator.copyInfo1(goalTitle.getText().toString());
                     Intent i = new Intent(getApplicationContext(), GoalsCountdownCreatorActivity.class);
@@ -51,8 +50,7 @@ public class GoalsTypeSelectActivity extends Activity {
         streak.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (goalTitle.getText().toString().equals("")) {
-                    ToastDisplayer.displayHint("Fill in all fields",
-                            ToastDisplayer.MessageType.FAILURE, getApplicationContext());
+                    ToastDisplayer.displayHint("Fill in all fields", ToastType.FAILURE, getApplicationContext());
                 } else {
                     GoalMediator.copyInfo1(goalTitle.getText().toString());
                     Intent i = new Intent(getApplicationContext(), GoalsStreakCreatorActivity.class);

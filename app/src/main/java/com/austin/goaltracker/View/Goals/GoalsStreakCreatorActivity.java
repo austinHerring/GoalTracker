@@ -23,6 +23,7 @@ import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.IncrementType;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
+import com.austin.goaltracker.Model.ToastType;
 import com.austin.goaltracker.R;
 import com.firebase.client.FirebaseException;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
@@ -80,17 +81,14 @@ public class GoalsStreakCreatorActivity extends Activity implements TimePickerDi
                         Util.updateAccountGoalOnDB(account.getId(), newGoal);
                         GAEDatastoreController.persistCron(newGoal, mPromptMinute, mPromptHour);
                         account.addGoal(newGoal.getId(), newGoal);
-                        ToastDisplayer.displayHint("Goal Created",
-                                ToastDisplayer.MessageType.SUCCESS, getApplicationContext());
+                        ToastDisplayer.displayHint("Goal Created", ToastType.SUCCESS, getApplicationContext());
                         Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
                         startActivity(i);
                     } catch (FirebaseException e) {
-                        ToastDisplayer.displayHint("Could not connect to database",
-                                ToastDisplayer.MessageType.FAILURE, getApplicationContext());
+                        ToastDisplayer.displayHint("Could not connect to database", ToastType.FAILURE, getApplicationContext());
                     }
                 } else {
-                    ToastDisplayer.displayHint("Fill in all fields",
-                            ToastDisplayer.MessageType.FAILURE, getApplicationContext());
+                    ToastDisplayer.displayHint("Fill in all fields", ToastType.FAILURE, getApplicationContext());
                 }
             }
         });

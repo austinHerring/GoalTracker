@@ -1,6 +1,7 @@
 package com.austin.goaltracker.Controller;
 
-import android.util.Log;
+import android.app.Activity;
+import android.content.Intent;
 
 import com.austin.goaltracker.Model.Account;
 
@@ -8,19 +9,17 @@ import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.Model.GoalClassification;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
+import com.austin.goaltracker.Model.NewMemberEmail;
 import com.austin.goaltracker.Model.Password;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
-import com.firebase.client.ChildEventListener;
+import com.austin.goaltracker.Model.ToastType;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.FirebaseException;
-import com.google.appengine.api.datastore.Query;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
+import com.firebase.client.ValueEventListener;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Austin Herring
@@ -29,88 +28,97 @@ import java.util.Map;
  * Class to help with database interaction
  */
 public class Util {
-    public static Firebase db;
     public static Account currentUser;
-    public static HashMap<String, Account> registeredUsers = new HashMap<>();
-
-    public static void setDB(Firebase d) {
-        db = d;
-    }
 
     /**
-     * Authenticates a user before logging in by filtering through local accounts
+     * Authenticates a user against Firebase before logging
      *
+     * @param startActivity the context from the login screen
+     * @param intent where to send the user if successful login
      * @param username the username of the account
      * @param password the password of the account
      */
-    public static String authenticate(final String username, final String password) {
-        Predicate<Account> authFilter = new Predicate<Account>() {
-            public boolean apply(Account account) {
-                return (account.getUsername().equals(username) && account.getPassword().equals(password));
+    public static void authenticateUserAndLoad(final Activity startActivity, final Intent intent, final String username, final String password) {
+        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts");
+        com.firebase.client.Query queryRef = firebaseRef.orderByChild("username").equalTo(username);
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    ToastDisplayer.displayHint("Invalid Username", ToastType.FAILURE, startActivity);
+                    return;
+                }
+
+                HashMap<String, HashMap<String, Object>> accounts =
+                        (HashMap<String, HashMap<String, Object>>) snapshot.getValue();
+
+                HashMap<String, Object> userAccount = accounts.entrySet().iterator().next().getValue();
+                Account accountToLoad = new Account(
+                        (String)userAccount.get("firstname"),
+                        (String)userAccount.get("lastname"),
+                        (String)userAccount.get("username"),
+                        retrieveUserPasswordToLocal(userAccount),
+                        (String)userAccount.get("email"),
+                        (String)userAccount.get("id"));
+
+                if (!password.equals(accountToLoad.getPassword())) {
+                    ToastDisplayer.displayHint("Invalid Password", ToastType.FAILURE, startActivity);
+                    return;
+                }
+
+                currentUser = accountToLoad;
+                addListenerToGoals(); // Handles adding goals
+                GAEDatastoreController.registerdeviceForCurrentUser();
+                startActivity.startActivity(intent);
             }
-        };
-        Map<String, Account> filteredAccount = Maps.filterValues(registeredUsers, authFilter);
-        if (filteredAccount.size() == 1) {
-            currentUser = (Account) filteredAccount.values().toArray()[0]; // Log in as current user;
-            return null;
-        }
-        return "Invalid Username Or Password";
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
     }
 
     /**
      * Attempts to Register with given information. If conditions are met, the account is created
      * and set
      *
-     * @param nameFirst the first name of the account
-     * @param nameLast the last name of the account
-     * @param username the username of the account
-     * @param password the password of the account
-     * @param email the email of the account
-     *
-     * @return String of an error message
+     * @param startActivity the context from the login screen
+     * @param intent where to send the user if successful login
+     * @param account the account information to create
      */
-    public static String registerUserOnDB(String nameFirst, String nameLast, final String username,
-                                          String password, String email) {
-        // Checks that all fields are filled in
-        if (nameFirst.equals("") || nameLast.equals("") || username.equals("") || email.equals("")
-                || password.equals("")) {
-            return "Fill In All Fields";
-        }
-        // Checks for valid Password.. 6 characters, at least 1 number, lower and upper letter
-        if (password.length() < 6 || !(password.matches(".*[a-z].*") && password.matches(".*[A-Z].*")
-                && password.matches(".*[0-9].*"))) {
-            return "Invalid Password";
-        }
-        // Checks for valid email
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            return "Invalid Email Address";
-        }
+    public static void registerUserAndLoad(final Activity startActivity, final Intent intent, final Account account) {
+        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts");
+        com.firebase.client.Query queryRef = firebaseRef.orderByChild("username").equalTo(account.getUsername());
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    Firebase accountsRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts");
+                    Firebase newRow = accountsRef.push();
+                    account.setId(newRow.getKey());
 
-        // Checks if username is taken
-        Predicate<Account> accountFilter = new Predicate<Account>() {
-            public boolean apply(Account account) {
-                return (account.getUsername().equals(username));
+                    // ADDS ACCOUNT TO DB
+                    HashMap<String,Object> newAccountAsEntry = generateBasicAccountMappingForDB(account);
+                    newRow.setValue(newAccountAsEntry);
+                    currentUser = account;
+                    addListenerToGoals();
+
+                    new EmailDispatchService(new NewMemberEmail(Util.currentUser)).send();
+                    GAEDatastoreController.registerdeviceForCurrentUser();
+                    startActivity.startActivity(intent);
+                    ToastDisplayer.displayHint("Registration Successful", ToastType.SUCCESS, startActivity);
+
+                } else {
+                    ToastDisplayer.displayHint("Account Already In Use", ToastType.FAILURE, startActivity);
+                }
             }
-        };
-        Map<String, Account> filteredAccounts = Maps.filterValues(registeredUsers, accountFilter);
-        if (filteredAccounts.size() != 0) {
-            return "Account Already In Use";
-        }
 
-        Account newAccount = new Account(nameFirst, nameLast, username, new Password(password), email);
-        Firebase accountsRef = db.child("accounts");
-        Firebase newRow = accountsRef.push();
-
-        // ADDS ACCOUNT TO LOCAL MAP
-        newAccount.setId(newRow.getKey());
-        registeredUsers.put(newAccount.getId(), newAccount);
-
-        // ADDS ACCOUNT TO DB
-        HashMap<String,Object> newAccountAsEntry = generateBasicAccountMappingForDB(newAccount);
-        newRow.setValue(newAccountAsEntry);
-
-        currentUser = newAccount;
-        return null;
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
     }
 
     /**
@@ -120,7 +128,8 @@ public class Util {
      * @param goal the goal object itself to persist
      */
     public static void updateAccountGoalOnDB(String accountId, Goal goal) throws FirebaseException {
-        Firebase accountGoalsRef = db.child("accounts").child(accountId).child("goals");
+        Firebase accountGoalsRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+                .child("accounts").child(accountId).child("goals");
         String goalId = goal.getId();
         Firebase row;
         if (goalId == null) {
@@ -146,7 +155,7 @@ public class Util {
     /**
      * Updates a password for an account on the database.
      *
-     * @param account account reset a password for
+     * @param account account to reset a password for
      * @param password the new password
      */
     public static Password updatePasswordForAccountOnDB(Account account, String password) throws FirebaseException {
@@ -154,7 +163,8 @@ public class Util {
             Password passwordObject = (password==null) ?
                     new Password(PasswordGenerator.generatePassword()) : new Password(password);
 
-            Firebase passwordRef = db.child("accounts").child(account.getId()).child("password object");
+            Firebase passwordRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+                    .child("accounts").child(account.getId()).child("password object");
             HashMap<String, Object> newPassword = generatePasswordMappingForDB(passwordObject);
             passwordRef.setValue(newPassword, new Firebase.CompletionListener() {
                 @Override
@@ -235,85 +245,45 @@ public class Util {
     }
 
     /**
-     * Generates a list storing all of the accounts that are currently registered
-     * in the database.
+     * Adds a goal to the local current user
      *
-     * @param snapshot firebase snapshot of data
+     * @param goalSnapShot the account given in from DB used to generate a hashmap
      */
-    public static void retrieveUsersToLocal(DataSnapshot snapshot) {
-        if (!snapshot.exists())
-            return;
-        HashMap<String, HashMap<String, String>> accounts =
-                ( HashMap<String, HashMap<String, String>>) snapshot.getValue();
-        if (accounts == null) {
-            return;
-        }
-        String id = "";
-        Account accountToAdd = null;
-        for (HashMap accountSnapshot : accounts.values()) {
-            id = (String)accountSnapshot.get("id");
-            if (!registeredUsers.keySet().contains(id)) {
-                accountToAdd = new Account(
-                        (String)accountSnapshot.get("firstname"),
-                        (String)accountSnapshot.get("lastname"),
-                        (String)accountSnapshot.get("username"),
-                        retrieveUserPasswordToLocal(accountSnapshot),
-                        (String)accountSnapshot.get("email"),
-                        (String)accountSnapshot.get("id"));
-                if (accountSnapshot.get("goals") != null) {
-                    accountToAdd.setGoals(retrieveUserGoalsToLocal(accountSnapshot));
-                }
-                registeredUsers.put(id, accountToAdd);
+    public static void loadUserGoal(HashMap goalSnapShot) {
+        if (goalSnapShot.get("classification").equals("COUNTDOWN")) {
+            CountdownCompleterGoal goalToAdd = new CountdownCompleterGoal();
+            goalToAdd.setId((String) goalSnapShot.get("id"));
+            goalToAdd.setIsTerminated((boolean) goalSnapShot.get("isTerminated"));
+            goalToAdd.setName((String) goalSnapShot.get("name"));
+            goalToAdd.setTask((String) goalSnapShot.get("task"));
+            goalToAdd.setCronJobKey((String) goalSnapShot.get("cron key"));
+            goalToAdd.setUnitsRemaining((String) goalSnapShot.get("units remaining string"));
+            goalToAdd.setIncrementType(Converter.stringToFrequency((String) goalSnapShot.get("frequency")));
+            goalToAdd.setDateOfOrigin(Converter.longToCalendar((Long) goalSnapShot.get("date start")));
+            if (goalSnapShot.get("date broken") != null) {
+                goalToAdd.setBrokenDate(Converter.longToCalendar((Long) goalSnapShot.get("date broken")));
             }
-        }
-    }
-
-    /**
-     * Loops through the goals for an account and converts it from DB to Object
-     *
-     * @param accountSnapshot the account given in from DB used to generate a hashmap
-     */
-    public static HashMap<String, Goal> retrieveUserGoalsToLocal(HashMap accountSnapshot) {
-        HashMap<String, Goal> aggregatedGoals = new HashMap<>();
-        HashMap<String, HashMap<String,Object>> goalsSnapShots  = (HashMap < String, HashMap < String, Object >>) accountSnapshot.get("goals");
-        for(HashMap<String, Object> goalSnapShot : goalsSnapShots.values()) {
-            if (goalSnapShot.get("classification").equals("COUNTDOWN")) {
-                CountdownCompleterGoal goalToAdd = new CountdownCompleterGoal();
-                goalToAdd.setId((String) goalSnapShot.get("id"));
-                goalToAdd.setIsTerminated((boolean) goalSnapShot.get("isTerminated"));
-                goalToAdd.setName((String) goalSnapShot.get("name"));
-                goalToAdd.setTask((String) goalSnapShot.get("task"));
-                goalToAdd.setCronJobKey((String) goalSnapShot.get("cron key"));
-                goalToAdd.setUnitsRemaining((String) goalSnapShot.get("units remaining string"));
-                goalToAdd.setIncrementType(Converter.stringToFrequency((String) goalSnapShot.get("frequency")));
-                goalToAdd.setDateOfOrigin(Converter.longToCalendar((Long) goalSnapShot.get("date start")));
-                if (goalSnapShot.get("date broken") != null) {
-                    goalToAdd.setBrokenDate(Converter.longToCalendar((Long) goalSnapShot.get("date broken")));
-                }
-                goalToAdd.setDateDesiredFinish(Converter.longToCalendar((Long) goalSnapShot.get("date end")));
-                goalToAdd.setPercentProgress(((Long) goalSnapShot.get("percent progress")).intValue());
-                goalToAdd.setRemainingCheckpoints(((Long) goalSnapShot.get("remaining checkpoints")).intValue());
-                goalToAdd.setTotalCheckpoints(((Long)goalSnapShot.get("total checkpoints")).intValue());
-                aggregatedGoals.put((String) goalSnapShot.get("id"), goalToAdd);
-            } else {
-                StreakSustainerGoal goalToAdd = new StreakSustainerGoal();
-                goalToAdd.setId((String) goalSnapShot.get("id"));
-                goalToAdd.setIsTerminated((boolean) goalSnapShot.get("isTerminated"));
-                goalToAdd.setName((String) goalSnapShot.get("name"));
-                goalToAdd.setTask((String) goalSnapShot.get("task"));
-                goalToAdd.setCronJobKey((String) goalSnapShot.get("cron key"));
-                goalToAdd.setIncrementType(Converter.stringToFrequency((String) goalSnapShot.get("frequency")));
-                goalToAdd.setDateOfOrigin(Converter.longToCalendar((Long) goalSnapShot.get("date start")));
-                if (goalSnapShot.get("date broken") != null) {
-                    goalToAdd.setBrokenDate(Converter.longToCalendar((Long) goalSnapShot.get("date broken")));
-                }
-                goalToAdd.setCheatNumber(((Long) goalSnapShot.get("cheat number")).intValue());
-                goalToAdd.setCheatsRemaining(((Long) goalSnapShot.get("cheats remaining")).intValue());
-                goalToAdd.setStreak(((Long) goalSnapShot.get("streak number")).intValue());
-                aggregatedGoals.put((String) goalSnapShot.get("id"), goalToAdd);
+            goalToAdd.setDateDesiredFinish(Converter.longToCalendar((Long) goalSnapShot.get("date end")));
+            goalToAdd.setPercentProgress(((Long) goalSnapShot.get("percent progress")).intValue());
+            goalToAdd.setRemainingCheckpoints(((Long) goalSnapShot.get("remaining checkpoints")).intValue());
+            currentUser.getGoals().put((String) goalSnapShot.get("id"), goalToAdd);
+        } else {
+            StreakSustainerGoal goalToAdd = new StreakSustainerGoal();
+            goalToAdd.setId((String) goalSnapShot.get("id"));
+            goalToAdd.setIsTerminated((boolean) goalSnapShot.get("isTerminated"));
+            goalToAdd.setName((String) goalSnapShot.get("name"));
+            goalToAdd.setTask((String) goalSnapShot.get("task"));
+            goalToAdd.setCronJobKey((String) goalSnapShot.get("cron key"));
+            goalToAdd.setIncrementType(Converter.stringToFrequency((String) goalSnapShot.get("frequency")));
+            goalToAdd.setDateOfOrigin(Converter.longToCalendar((Long) goalSnapShot.get("date start")));
+            if (goalSnapShot.get("date broken") != null) {
+                goalToAdd.setBrokenDate(Converter.longToCalendar((Long) goalSnapShot.get("date broken")));
             }
+            goalToAdd.setCheatNumber(((Long) goalSnapShot.get("cheat number")).intValue());
+            goalToAdd.setCheatsRemaining(((Long) goalSnapShot.get("cheats remaining")).intValue());
+            goalToAdd.setStreak(((Long) goalSnapShot.get("streak number")).intValue());
+            currentUser.getGoals().put((String) goalSnapShot.get("id"), goalToAdd);
         }
-        return aggregatedGoals;
     }
 
     /**
@@ -321,7 +291,7 @@ public class Util {
      *
      * @param accountSnapshot firebase snapshot of data
      */
-    private static Password retrieveUserPasswordToLocal(HashMap accountSnapshot) {
+    public static Password retrieveUserPasswordToLocal(HashMap accountSnapshot) {
         HashMap<String, String> map = (HashMap<String, String>) accountSnapshot.get("password object");
         return new Password(map.get("password"), map.get("date last changed"));
     }
@@ -362,12 +332,33 @@ public class Util {
      *
      * @param goalId Id of the goal to remove pending notification associated with it
      */
-    private static void removeAssociatedPendingGoalNotificationsFromDB(String goalId) {
-        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+    private static void removeAssociatedPendingGoalNotificationsFromDB(final String goalId) {
+        final Firebase rootFirebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
                 .child("accounts")
                 .child(currentUser.getId())
                 .child("pending goal notifications");
-        com.firebase.client.Query queryRef = firebaseRef.orderByChild("associatedGoalId").equalTo(goalId);
-        queryRef.getRef().removeValue();
+        com.firebase.client.Query queryRef = rootFirebaseRef.orderByChild("associatedGoalId").equalTo(goalId);
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    HashMap<String, HashMap<String, Object>> notifications =
+                            (HashMap<String, HashMap<String, Object>>) snapshot.getValue();
+                    for (String notificationKey : notifications.keySet()) {
+                        rootFirebaseRef.child(notificationKey).removeValue();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    private static void addListenerToGoals() {
+        Firebase goalsRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts").child(currentUser.getId()).child("goals");
+        goalsRef.addChildEventListener(new FirebaseGoalListener());
     }
 }

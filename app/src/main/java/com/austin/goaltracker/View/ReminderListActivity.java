@@ -6,12 +6,15 @@ import android.os.Bundle;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.ListView;
 
 import com.austin.goaltracker.Controller.PendingNotificationListAdapter;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
+import com.austin.goaltracker.Model.ToastType;
 import com.austin.goaltracker.R;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -27,6 +30,7 @@ public class ReminderListActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder_list);
+        GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
         setupWindowAnimations();
         mFirebaseListRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts")
                 .child((Util.currentUser.getId())).child("pending goal notifications");
@@ -58,8 +62,7 @@ public class ReminderListActivity extends ListActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 boolean connected = (Boolean) dataSnapshot.getValue();
                 if (!connected) {
-                    ToastDisplayer.displayHint("Could not connect to Database",
-                            ToastDisplayer.MessageType.FAILURE, getApplicationContext());
+                    ToastDisplayer.displayHint("Could not connect to Database", ToastType.FAILURE, getApplicationContext());
                 }
             }
 
@@ -75,5 +78,13 @@ public class ReminderListActivity extends ListActivity {
         super.onStop();
         mFirebaseListRef.getRoot().child(".info/connected").removeEventListener(mConnectedListener);
         mListAdapter.cleanup();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_goals_base, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 }

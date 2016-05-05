@@ -13,8 +13,11 @@ import com.austin.goaltracker.Controller.GAEDatastoreController;
 import com.austin.goaltracker.Controller.LoginMediator;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
+import com.austin.goaltracker.Model.Account;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.NewMemberEmail;
+import com.austin.goaltracker.Model.Password;
+import com.austin.goaltracker.Model.ToastType;
 import com.austin.goaltracker.R;
 import com.austin.goaltracker.View.Goals.GoalsBaseActivity;
 
@@ -24,19 +27,23 @@ import com.firebase.client.FirebaseError;
 
 public class RegistrationActivity extends Activity {
 
-    String nameFirst;
-    String nameLast;
-    String username;
-    String emailaddress;
-    String password;
-    String passwordConfirm;
-    String errorMessage;
+    private String nameFirst;
+    private String nameLast;
+    private String username;
+    private String emailaddress;
+    private String password;
+    private String passwordConfirm;
+    private String errorMessage;
+    private Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
         setTitle("Registration");
+        GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
+        activity = this;
+
         // Copy the carry over username and password from login screen
         ((EditText) findViewById(R.id.username)).setText(LoginMediator.pasteUsername());
         ((EditText) findViewById(R.id.password)).setText(LoginMediator.pastePassword());
@@ -50,53 +57,14 @@ public class RegistrationActivity extends Activity {
                 emailaddress = ((EditText) findViewById(R.id.emailaddress)).getText().toString();
                 password = ((EditText) findViewById(R.id.password)).getText().toString();
                 passwordConfirm = ((EditText) findViewById(R.id.passwordConfirm)).getText().toString();
-
-                // Check that passwords match first
-                if (password.equals(passwordConfirm)) {
-                    attemptRegistration(nameFirst, nameLast, username, password, emailaddress);
-                } else {
-                    ToastDisplayer.displayHint("Passwords Do Not Match",
-                            ToastDisplayer.MessageType.FAILURE, getApplicationContext());
+                if (checkInputSyntaxt()) {
+                    Intent intent = new Intent(getApplicationContext(), GoalsBaseActivity.class);
+                    Util.registerUserAndLoad(
+                            activity,
+                            intent,
+                            new Account(nameFirst, nameLast, username, new Password(password), emailaddress)
+                    );
                 }
-            }
-        });
-    }
-
-    void attemptRegistration(String nameFirst, String nameLast, String username,
-                             String password, String emailaddress) {
-        final String nF = nameFirst;
-        final String nL = nameLast;
-        final String u = username;
-        final String e = emailaddress;
-        final String p = password;
-        Util.db.child("accounts").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                Util.retrieveUsersToLocal(snapshot);
-                errorMessage = Util.registerUserOnDB(nF, nL, u, p, e);
-                if (errorMessage == null) {
-                    EmailDispatchService dispatcher =
-                            new EmailDispatchService(new NewMemberEmail(Util.currentUser));
-                    errorMessage = dispatcher.send();
-                    if (errorMessage == null) {
-                        GAEDatastoreController.registerdeviceForCurrentUser();
-                        Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
-                        startActivity(i);
-                        ToastDisplayer.displayHint("Registration Successful",
-                                ToastDisplayer.MessageType.SUCCESS, getApplicationContext());
-                    } else {
-                        ToastDisplayer.displayHint(errorMessage,
-                                ToastDisplayer.MessageType.FAILURE, getApplicationContext());
-                    }
-                } else {
-                    ToastDisplayer.displayHint(errorMessage,
-                            ToastDisplayer.MessageType.FAILURE, getApplicationContext());
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });
     }
@@ -113,5 +81,31 @@ public class RegistrationActivity extends Activity {
                 .unregisterReceiver(GoalTrackerApplication.INSTANCE.mRegistrationBroadcastReceiver);
         GoalTrackerApplication.INSTANCE.isReceiverRegistered = false;
         super.onPause();
+    }
+
+    private boolean checkInputSyntaxt() {
+        // Checks that all fields are filled in
+        if (nameFirst.equals("") || nameLast.equals("") || username.equals("") || emailaddress.equals("")
+                || password.equals("")) {
+            ToastDisplayer.displayHint("Fill In All Fields", ToastType.FAILURE, getApplicationContext());
+            return false;
+        }
+        // Checks for valid Password.. 6 characters, at least 1 number, lower and upper letter
+        if (password.length() < 6 || !(password.matches(".*[a-z].*") && password.matches(".*[A-Z].*")
+                && password.matches(".*[0-9].*"))) {
+            ToastDisplayer.displayHint("Invalid Password", ToastType.FAILURE, getApplicationContext());
+            return false;
+        }
+        // Checks for valid email
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(emailaddress).matches()) {
+            ToastDisplayer.displayHint("Invalid Email Address", ToastType.FAILURE, getApplicationContext());
+            return false;
+        }
+        //Checks if passwords match
+        if (!password.equals(passwordConfirm)) {
+            ToastDisplayer.displayHint("Passwords Do Not Match", ToastType.FAILURE, getApplicationContext());
+            return false;
+        }
+        return true;
     }
 }

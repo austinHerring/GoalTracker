@@ -10,6 +10,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.firebase.client.Firebase;
+
 import java.util.logging.Logger;
 
 /**
@@ -30,11 +32,11 @@ public class GoalTrackerApplication extends Application {
     private Activity mCurrentActivity = null;
     static Logger Log = Logger.getLogger(GoalTrackerApplication.class.getName());
     public static int notificationId = 0;
-    public static int NOTIFICATION_COUNT = 0;
 
     public void onCreate(){
         super.onCreate();
         INSTANCE = this;
+        Firebase.setAndroidContext(this);
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
