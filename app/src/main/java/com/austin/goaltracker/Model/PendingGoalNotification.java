@@ -1,9 +1,11 @@
 package com.austin.goaltracker.Model;
 
-import java.util.Calendar;
-
 /**
- * Created by austin on 4/24/16.
+ * @author Austin Herring
+ * @version 1.0
+ *
+ * Class that joins reminder notifications to an associated goal. Displays in the reminder
+ * list activity
  */
 public class PendingGoalNotification {
     private String id;
@@ -34,13 +36,5 @@ public class PendingGoalNotification {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public void setAssociatedGoalId(String associatedGoalId) {
-        this.associatedGoalId = associatedGoalId;
-    }
-
-    public void setDateTimeNotified(long dateTimeNotified) {
-        this.dateTimeNotified = dateTimeNotified;
     }
 }

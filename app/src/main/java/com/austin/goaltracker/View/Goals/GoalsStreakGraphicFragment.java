@@ -1,8 +1,5 @@
 package com.austin.goaltracker.View.Goals;
 
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -18,15 +15,7 @@ import com.austin.goaltracker.R;
 import xyz.hanks.library.SmallBang;
 import me.alexrs.wavedrawable.WaveDrawable;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link GoalsStreakGraphicFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link GoalsStreakGraphicFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class GoalsStreakGraphicFragment extends Fragment {
+public class GoalsStreakGraphicFragment extends Fragment  implements View.OnClickListener {
     private static final String GOAL_NAME = "goal name";
     private static final String GOAL_TASK = "goal task";
     private static final String GOAL_CHEAT_NUMBER = "goal cheat number";
@@ -83,6 +72,7 @@ public class GoalsStreakGraphicFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View rootView =  inflater.inflate(R.layout.fragment_goals_streak_graphic, container, false);
+        rootView.setOnClickListener(this);
         ((TextView) rootView.findViewById(R.id.goal_title)).setText(mGoalName);
         rootView.findViewById(R.id.goal_title).setSelected(true);
         ((TextView) rootView.findViewById(R.id.goal_task)).setText(mGoalTask);
@@ -121,19 +111,12 @@ public class GoalsStreakGraphicFragment extends Fragment {
         return rootView;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+
+    @Override
+    public void onClick(View v) {
+        getActivity().getFragmentManager().beginTransaction().remove(this).commit();
+        ((GoalsBaseActivity) getActivity()).getGoalListAdapter().getFilter().filter(null);
+
     }
 
 }

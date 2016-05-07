@@ -34,6 +34,7 @@ public class LoginActivity extends Activity {
         Button loginButton = (Button) findViewById(R.id.buttonLogin);
         loginButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
                 String usernameInfo = usernameInput.getText().toString();
                 String passwordInfo = passwordInput.getText().toString();
                 Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);

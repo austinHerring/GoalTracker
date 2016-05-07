@@ -26,8 +26,9 @@ public class StreakSustainerGoal extends Goal {
     }
 
     public boolean updateCheatNumber() {
-        cheatNumber--;
-        return cheatNumber < 0;
+        // return true if out of cheats
+        cheatsRemaining--;
+        return cheatsRemaining < 0;
     }
 
     public int getStreak() {
@@ -55,35 +56,19 @@ public class StreakSustainerGoal extends Goal {
     }
 
     public String toBasicInfo() {
-        return "Current streak is " + streak + ((streak!=1) ? " checkpoints" : " checkpoint");
+        return "Current streak is " + streak + unitToString(streak);
     }
 
     public String currentStreakToString() {
-        String ret = "";
-        if (incrementType.equals(IncrementType.HOURLY)) {
-            ret += "You streaked " + streak + ((streak!=1) ? " hours " : " hour ");
-        } else if (incrementType.equals(IncrementType.DAILY)) {
-            ret += "You streaked " + streak + ((streak!=1) ? " days " : " day ");
-        } else if (incrementType.equals(IncrementType.BIDAILY)) {
-            ret += "You streaked " + streak + ((streak!=1) ? " bi-days " : " bi-day ");
-        } else if (incrementType.equals(IncrementType.WEEKLY)) {
-            ret += "You streaked " + streak + ((streak!=1) ? " weeks " : " week ");
-        } else if (incrementType.equals(IncrementType.BIWEEKLY)) {
-            ret += "You streaked " + streak + ((streak!=1) ? " bi-weeks " : " bi-week ");
-        } else if (incrementType.equals(IncrementType.MONTHLY)) {
-            ret += "You streaked " + streak + ((streak!=1) ? " months " : " month ");
-        } else if (incrementType.equals(IncrementType.YEARLY)) {
-            ret += "You streaked " + streak + ((streak!=1) ? " years " : " year ");
-        } else {
-            //TODO: implement custom
-            return ret;
-        }
+        String ret = "You streaked " + streak + unitToString(streak);
 
         if (cheatNumber > 0) {
-            ret += "with " + cheatsRemaining + ((cheatsRemaining!=1) ? " cheats " : " cheat ") + "left";
+            ret += " with " + cheatsRemaining + ((cheatsRemaining!=1) ? " cheats " : " cheat ") + "left";
         } else {
             ret += "without cheating";
         }
         return ret;
     }
+
+
 }

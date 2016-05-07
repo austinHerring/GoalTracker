@@ -58,6 +58,7 @@ public class RegistrationActivity extends Activity {
                 password = ((EditText) findViewById(R.id.password)).getText().toString();
                 passwordConfirm = ((EditText) findViewById(R.id.passwordConfirm)).getText().toString();
                 if (checkInputSyntaxt()) {
+                    findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
                     Intent intent = new Intent(getApplicationContext(), GoalsBaseActivity.class);
                     Util.registerUserAndLoad(
                             activity,

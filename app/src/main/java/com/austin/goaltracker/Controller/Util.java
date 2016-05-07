@@ -2,6 +2,7 @@ package com.austin.goaltracker.Controller;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.view.View;
 
 import com.austin.goaltracker.Model.Account;
 
@@ -13,6 +14,7 @@ import com.austin.goaltracker.Model.NewMemberEmail;
 import com.austin.goaltracker.Model.Password;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.austin.goaltracker.Model.ToastType;
+import com.austin.goaltracker.R;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -45,6 +47,7 @@ public class Util {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
+                    startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                     ToastDisplayer.displayHint("Invalid Username", ToastType.FAILURE, startActivity);
                     return;
                 }
@@ -62,6 +65,7 @@ public class Util {
                         (String)userAccount.get("id"));
 
                 if (!password.equals(accountToLoad.getPassword())) {
+                    startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                     ToastDisplayer.displayHint("Invalid Password", ToastType.FAILURE, startActivity);
                     return;
                 }
@@ -106,10 +110,12 @@ public class Util {
 
                     new EmailDispatchService(new NewMemberEmail(Util.currentUser)).send();
                     GAEDatastoreController.registerdeviceForCurrentUser();
+                    startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                     startActivity.startActivity(intent);
                     ToastDisplayer.displayHint("Registration Successful", ToastType.SUCCESS, startActivity);
 
                 } else {
+                    startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                     ToastDisplayer.displayHint("Account Already In Use", ToastType.FAILURE, startActivity);
                 }
             }
@@ -222,7 +228,6 @@ public class Util {
             map.put("percent progress", ((CountdownCompleterGoal) goal).getPercentProgress());
             map.put("remaining checkpoints", ((CountdownCompleterGoal) goal).getRemainingCheckpoints());
             map.put("total checkpoints", ((CountdownCompleterGoal) goal).getTotalCheckpoints());
-            map.put("units remaining string", ((CountdownCompleterGoal) goal).getUnitsRemaining());
         } else {
             map.put("streak number", ((StreakSustainerGoal) goal).getStreak());
             map.put("cheat number", ((StreakSustainerGoal) goal).getCheatNumber());
@@ -257,7 +262,6 @@ public class Util {
             goalToAdd.setName((String) goalSnapShot.get("name"));
             goalToAdd.setTask((String) goalSnapShot.get("task"));
             goalToAdd.setCronJobKey((String) goalSnapShot.get("cron key"));
-            goalToAdd.setUnitsRemaining((String) goalSnapShot.get("units remaining string"));
             goalToAdd.setIncrementType(Converter.stringToFrequency((String) goalSnapShot.get("frequency")));
             goalToAdd.setDateOfOrigin(Converter.longToCalendar((Long) goalSnapShot.get("date start")));
             if (goalSnapShot.get("date broken") != null) {
@@ -266,6 +270,7 @@ public class Util {
             goalToAdd.setDateDesiredFinish(Converter.longToCalendar((Long) goalSnapShot.get("date end")));
             goalToAdd.setPercentProgress(((Long) goalSnapShot.get("percent progress")).intValue());
             goalToAdd.setRemainingCheckpoints(((Long) goalSnapShot.get("remaining checkpoints")).intValue());
+            goalToAdd.setTotalCheckpoints(((Long) goalSnapShot.get("total checkpoints")).intValue());
             currentUser.getGoals().put((String) goalSnapShot.get("id"), goalToAdd);
         } else {
             StreakSustainerGoal goalToAdd = new StreakSustainerGoal();
@@ -332,7 +337,7 @@ public class Util {
      *
      * @param goalId Id of the goal to remove pending notification associated with it
      */
-    private static void removeAssociatedPendingGoalNotificationsFromDB(final String goalId) {
+    public static void removeAssociatedPendingGoalNotificationsFromDB(final String goalId) {
         final Firebase rootFirebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
                 .child("accounts")
                 .child(currentUser.getId())

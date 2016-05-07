@@ -85,20 +85,26 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
         negativeResponse = (Button) view.findViewById(R.id.negativeResponse);
         negativeResponse.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Goal goal = getGoalFromId(pendingGoalNotification.getAssociatedGoalId());
+                String goalId = pendingGoalNotification.getAssociatedGoalId();
+                Goal goal = getGoalFromId(goalId);
+
                 if (goal.classification().equals(GoalClassification.COUNTDOWN)) {
                     CountdownCompleterGoal cGoal = (CountdownCompleterGoal) goal;
                     cGoal.setIsTerminated(true);
                     Util.updateAccountGoalOnDB(Util.currentUser.getId(), cGoal);
-                    GAEDatastoreController.removeCron(Util.currentUser.getGoals().get(pendingGoalNotification.getAssociatedGoalId()));
+
+                    Util.removeAssociatedPendingGoalNotificationsFromDB(goalId);
+                    GAEDatastoreController.removeCron(Util.currentUser.getGoals().get(goalId));
                 } else {
                     StreakSustainerGoal sGoal = (StreakSustainerGoal) goal;
                     if (sGoal.updateCheatNumber()) {
                         // The goal ran out of cheats, flag as terminated
                         sGoal.setIsTerminated(true);
-                        GAEDatastoreController.removeCron(Util.currentUser.getGoals().get(pendingGoalNotification.getAssociatedGoalId()));
+                        // Remove cron and other associated reminders
+                        Util.removeAssociatedPendingGoalNotificationsFromDB(goalId);
+                        GAEDatastoreController.removeCron(Util.currentUser.getGoals().get(goalId));
                     } else {
-                        Util.removePendingGoalNotificationFromDB(pendingGoalNotification.getId());
+                        Util.removePendingGoalNotificationFromDB(goalId);
                     }
                     Util.updateAccountGoalOnDB(Util.currentUser.getId(), sGoal);
                 }
@@ -149,7 +155,7 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
 
             } else {
                 alert.setTitle("Using a cheat!");
-                message = "You just used a cheat so your streak won't stop.\n\n There are "
+                message = "You just used a cheat so your streak won't stop.\n\nThere are "
                     + cheatsRemaining + " cheats remaining. Keep it up!";
             }
         }

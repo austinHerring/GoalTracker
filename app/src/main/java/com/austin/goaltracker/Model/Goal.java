@@ -141,7 +141,23 @@ public abstract class Goal {
         }
     }
 
-    abstract String toBasicInfo();
-
-    abstract void update();
+    protected String unitToString(long number) {
+        if (incrementType.equals(IncrementType.HOURLY)) {
+            return ((number!=1) ? " hours" : " hour");
+        } else if (incrementType.equals(IncrementType.DAILY)) {
+            return ((number!=1) ? " days" : " day");
+        } else if (incrementType.equals(IncrementType.BIDAILY)) {
+            return ((number!=1) ? " bi-days" : " bi-day");
+        } else if (incrementType.equals(IncrementType.WEEKLY)) {
+            return ((number!=1) ? " weeks" : " week");
+        } else if (incrementType.equals(IncrementType.BIWEEKLY)) {
+            return ((number!=1) ? " bi-weeks" : " bi-week");
+        } else if (incrementType.equals(IncrementType.MONTHLY)) {
+            return ((number!=1) ? " months" : " month");
+        } else if (incrementType.equals(IncrementType.YEARLY)) {
+            return ((number!=1) ? " years" : " year");
+        } else {
+            return "";
+        }
+    }
 }

@@ -36,6 +36,7 @@ public class ForgotPasswordActivity extends Activity {
         Button submitButton = (Button) findViewById(R.id.buttonSubmit);
         submitButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
                 attemptReset(usernameText.getText().toString());
             }
         });
@@ -66,12 +67,15 @@ public class ForgotPasswordActivity extends Activity {
                         NewPasswordEmail email = new NewPasswordEmail(account);
                         EmailDispatchService dispatcher = new EmailDispatchService(email);
                         dispatcher.send();
+                        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                         Intent i = new Intent(getApplicationContext(), LoginActivity.class);
                         startActivity(i);
                     } catch (FirebaseException e) {
+                        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                         ToastDisplayer.displayHint(e.getMessage(), ToastType.FAILURE, getApplicationContext());
                     }
                 } else {
+                    findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                     ToastDisplayer.displayHint("This Account Does Not Exist", ToastType.FAILURE, getApplicationContext());
                 }
             }

@@ -12,13 +12,10 @@ import java.util.GregorianCalendar;
  * for some discrete time or number of executions and the goal completes when it is done.
  */
 public class CountdownCompleterGoal extends Goal {
-
-
     private Calendar dateDesiredFinish;
     private long remainingCheckpoints;
     private long totalCheckpoints;
     private int percentProgress;
-    private String unitsRemainingString;
 
     public CountdownCompleterGoal(String goalName, IncrementType type, Calendar dateDesiredFinish) {
         super(goalName, type, GoalClassification.COUNTDOWN);
@@ -26,7 +23,6 @@ public class CountdownCompleterGoal extends Goal {
         totalCheckpoints = calculateRemainingCheckpoints();
         remainingCheckpoints = totalCheckpoints;
         percentProgress = 0;
-        unitsRemainingString = unitsRemainingToString();
     }
 
     public CountdownCompleterGoal() {
@@ -38,14 +34,10 @@ public class CountdownCompleterGoal extends Goal {
         percentProgress = (int) ((double)(totalCheckpoints - remainingCheckpoints) / totalCheckpoints * 100);
     }
 
-
     private long calculateRemainingCheckpoints() {
         long checkpointDiff = 0;
         // Create a new date to figure out checkpoint difference
-        Calendar start = new GregorianCalendar(
-                dateOfOrigin.get(Calendar.YEAR),
-                dateOfOrigin.get(Calendar.MONTH),
-                dateOfOrigin.get(Calendar.DAY_OF_MONTH));
+        Calendar start = Calendar.getInstance();
 
         if (incrementType.equals(IncrementType.HOURLY)) {
             while (start.before(dateDesiredFinish)) {
@@ -87,8 +79,7 @@ public class CountdownCompleterGoal extends Goal {
     }
 
     public String toBasicInfo() {
-        return remainingCheckpoints + ((remainingCheckpoints!=1) ? " checkpoints " : " checkpoint ")
-                + "left until completion";
+        return remainingCheckpoints + unitToString(remainingCheckpoints) + " left until completion";
     }
 
     public String desiredFinishDateToString() {
@@ -97,42 +88,15 @@ public class CountdownCompleterGoal extends Goal {
     }
 
     public String unitsRemainingToString() {
-        if (incrementType.equals(IncrementType.HOURLY)) {
-            return remainingCheckpoints + ((remainingCheckpoints!=1) ? " hours " : " hour ")
-                    + "remaining";
-        } else if (incrementType.equals(IncrementType.DAILY)) {
-            return remainingCheckpoints + ((remainingCheckpoints!=1) ? " days " : " day ")
-                    + "remaining";
-        } else if (incrementType.equals(IncrementType.BIDAILY)) {
-            return remainingCheckpoints + ((remainingCheckpoints!=1) ? " bi-days " : " bi-day ")
-                    + "remaining";
-        } else if (incrementType.equals(IncrementType.WEEKLY)) {
-            return remainingCheckpoints + ((remainingCheckpoints!=1) ? " weeks " : " week ")
-                    + "remaining";
-        } else if (incrementType.equals(IncrementType.BIWEEKLY)) {
-            return remainingCheckpoints + ((remainingCheckpoints!=1) ? " bi-weeks " : " bi-week ")
-                    + "remaining";
-        } else if (incrementType.equals(IncrementType.MONTHLY)) {
-            return remainingCheckpoints + ((remainingCheckpoints!=1) ? " months " : " month ")
-                    + "remaining";
-        } else {
-            return remainingCheckpoints + ((remainingCheckpoints!=1) ? " years " : " year ")
-                    + "remaining";
-        }
+        return remainingCheckpoints + unitToString(remainingCheckpoints) + " remaining";
     }
 
     public Calendar getDateDesiredFinish() {
-//        return dateDesiredFinish.get(Calendar.YEAR) + "," + dateDesiredFinish.get(Calendar.MONTH)
-//                + "," + dateDesiredFinish.get(Calendar.DAY_OF_MONTH);
         return dateDesiredFinish;
     }
 
     public int getPercentProgress() {
         return percentProgress;
-    }
-
-    public String getUnitsRemaining() {
-        return unitsRemainingString;
     }
 
     public long getRemainingCheckpoints() {
@@ -157,9 +121,5 @@ public class CountdownCompleterGoal extends Goal {
 
     public void setPercentProgress(int percent) {
         percentProgress = percent;
-    }
-
-    public void setUnitsRemaining(String s) {
-        unitsRemainingString = s;
     }
 }

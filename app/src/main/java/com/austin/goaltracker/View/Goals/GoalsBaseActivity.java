@@ -1,5 +1,6 @@
 package com.austin.goaltracker.View.Goals;
 
+import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.Spinner;
 import com.austin.goaltracker.Controller.BaseActivitySelectorAdapter;
 import com.austin.goaltracker.Controller.GoalListAdapter;
 import com.austin.goaltracker.Controller.Util;
+import com.austin.goaltracker.Model.Account;
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.Model.GoalClassification;
@@ -207,5 +209,9 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });
+    }
+
+    public GoalListAdapter getGoalListAdapter() {
+        return goalListAdapter;
     }
 }
