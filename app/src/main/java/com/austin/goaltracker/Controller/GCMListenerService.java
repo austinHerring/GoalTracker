@@ -34,8 +34,6 @@ public class GCMListenerService extends GcmListenerService {
      */
     @Override
     public void onMessageReceived(String from, Bundle data) {
-
-        // TODO THIS CRASHES WHEN PHONE TURNS ON
         Intent intent = new Intent(GoalTrackerApplication.INSTANCE, PendingNotificationIntentService.class);
         intent.putExtra("accountId",data.getString("accountId"));
         intent.putExtra("goalId", data.getString("goalId"));

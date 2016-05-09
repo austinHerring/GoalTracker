@@ -86,7 +86,6 @@
         <!--   Other colors -->
         <item name="android:textColorSecondary">@color/text3</item>
         <item name="android:textColorTertiary">@color/text2</item>
-        <item name="android:alertDialogTheme">@style/AlertDialogStyle</item>
     </style>
 
     <style name="PurpleActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
@@ -94,7 +93,11 @@
     </style>
 
     <style name="AlertDialogStyle" parent="@android:style/Theme.Dialog">
-        <item name="android:textColor">@color/primaryP</item>
+        <item name="android:textColorPrimary">@color/primaryP</item>
+        <item name="windowMinWidthMajor">600dp</item>
+        <item name="windowMinWidthMinor">600dp</item>
+        <item name="android:background">@color/primaryW</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
 
     <style name="DatepickerStyle" parent="android:Theme.Material.Light.Dialog">

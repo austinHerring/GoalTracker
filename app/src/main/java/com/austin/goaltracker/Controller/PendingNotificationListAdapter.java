@@ -67,8 +67,7 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
                     CountdownCompleterGoal cGoal = (CountdownCompleterGoal) goal;
                     cGoal.update();
                     if (cGoal.getPercentProgress() >= 100) {
-                        // The goal was completed, flag it as termineted and notify user
-                        //TODO update style
+                        // The goal was completed, flag it as terminated and notify user
                         notifyUserCompletion(view.getContext(), goal);
                         cGoal.setIsTerminated(true);
                     }
@@ -123,10 +122,9 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
     private void notifyUserCompletion(Context context, Goal goal) {
         SimpleDateFormat format = new SimpleDateFormat("MMMM, dd h:mm a");
         String date = format.format(goal.getDateOfOrigin().getTime());
-        AlertDialog.Builder alert = new AlertDialog.Builder (context);
-        alert.setTitle("Conratulations!");
-        String message = "You just finished your the goal to " + goal.getGoalName()
-                + " that you started " + date + ".\n\nYou'll be able to view this " +
+        AlertDialog.Builder alert = new AlertDialog.Builder(context, R.style.AlertDialogStyle);
+        String message = "Congratulations!\n\nYou just finished your the goal to " + goal.getGoalName()
+                + " that started " + date + ".\n\nYou'll be able to view this " +
                 "in 'History' along with the other completed goals.\n\nHappy Goal Tracking!";
         alert.setMessage (message);
         Dialog dialog = alert.create();
@@ -135,31 +133,28 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
 
     private void notifyUserTermination(Context context, Goal goal) {
         GoalClassification type  = goal.classification();
-        AlertDialog.Builder alert = new AlertDialog.Builder (context);
+        AlertDialog.Builder alert = new AlertDialog.Builder(context, R.style.AlertDialogStyle);
 
         String message;
         if (type == GoalClassification.COUNTDOWN) {
-            alert.setTitle("Goal Ended");
-            message = "We're sorry to see that you're quiting your goal to " + goal.getGoalName() +
+            message = "Goal Ended\n\nWe're sorry to see that you're quiting your goal to " + goal.getGoalName() +
                     ".\nYou will be able to look at the details in 'History'";
 
         } else {
             int cheatsRemaining = ((StreakSustainerGoal) goal).getCheatsRemaining();
 
             if (cheatsRemaining < 0) {
-                alert.setTitle("Goal Ended");
                 long streak = ((StreakSustainerGoal) goal).getStreak();
-                message = "Your goal to " + goal.getGoalName() + " stopped at a streak of " +
+                message = "Goal Ended\n\nYour goal to " + goal.getGoalName() + " stopped at a streak of " +
                         streak + ". You had a great run!.\n\nYou will be able to look at the " +
                         "details in 'History'";
 
             } else {
-                alert.setTitle("Using a cheat!");
-                message = "You just used a cheat so your streak won't stop.\n\nThere are "
+                message = "Using a cheat!\n\nYou just used a cheat so your streak won't stop.\n\nThere are "
                     + cheatsRemaining + " cheats remaining. Keep it up!";
             }
         }
-        alert.setMessage (message);
+        alert.setMessage(message);
 
         Dialog dialog = alert.create();
         dialog.show();

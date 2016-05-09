@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cronentries>
-    <cron>
-        <url>/cronJobManager</url>
-        <description>Send pending notifications</description>
-        <schedule>every 1 minutes</schedule>
-    </cron>
-</cronentries>

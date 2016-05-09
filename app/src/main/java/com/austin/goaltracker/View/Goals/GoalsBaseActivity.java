@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.view.Gravity;
@@ -181,11 +182,12 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
     }
 
     private void setupWindowAnimations() {
-//        getWindow().setAllowEnterTransitionOverlap(false);
-//        Transition fade = new Fade();
-//        getWindow().setExitTransition(fade);
+        getWindow().setAllowEnterTransitionOverlap(false);
+        Transition fade = new Fade();
+        fade.setDuration(400);
+        getWindow().setExitTransition(fade);
         Transition slideIn = new Slide(Gravity.BOTTOM);
-        slideIn.setDuration(1000);
+        slideIn.setDuration(400);
         getWindow().setExitTransition(slideIn);
     }
 
