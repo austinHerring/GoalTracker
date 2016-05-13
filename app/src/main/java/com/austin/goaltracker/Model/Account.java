@@ -1,5 +1,7 @@
 package com.austin.goaltracker.Model;
 
+import com.austin.goaltracker.Controller.Util;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,8 +18,11 @@ public class Account {
     private String username;
     private Password password;
     private String email;
-    private HashMap<String, Goal> goals= new HashMap<>();
-    private ArrayList<Account> friends = new ArrayList<>();
+    private long totalFriends;
+    private long totalGoalsStarted;
+    private long totalGoalsCompleted;
+    private HashMap<String, Goal> goals;
+    private HashMap<String, String> friends;
     private String id;
 
     /**
@@ -36,25 +41,8 @@ public class Account {
         this.username = username;
         this.password = password;
         this.email = email;
-    }
-
-    /**
-     * Create a new Account with a given ID
-     *
-     * @param nameFirst the first name of the account
-     * @param nameLast the last name of the account
-     * @param username the username of the account
-     * @param password the password of the account
-     * @param email the email of the account
-     */
-    public Account(String nameFirst, String nameLast,String username, Password password, String email,
-                   String id) {
-        this.nameFirst = nameFirst;
-        this.nameLast = nameLast;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.id = id;
+        this.friends = new HashMap<>();
+        this.goals = new HashMap<>();
     }
 
     public String getNameFirst() {
@@ -101,7 +89,39 @@ public class Account {
         return id;
     }
 
+    public HashMap<String, String> getFriends() {
+        return friends;
+    }
+
+    public long getTotalFriends() {
+        return totalFriends;
+    }
+
+    public long getTotalGoalsCompleted() {
+        return totalGoalsCompleted;
+    }
+
+    public long getTotalGoalsStarted() {
+        return totalGoalsStarted;
+    }
+
     public void setId(String id) { this.id = id; }
+
+    public void setTotalFriends(long totalFriends) {
+        this.totalFriends = totalFriends;
+    }
+
+    public void setFriends(HashMap<String, String> friends) {
+        this.friends = friends;
+    }
+
+    public void setTotalGoalsCompleted(long totalGoalsCompleted) {
+        this.totalGoalsCompleted = totalGoalsCompleted;
+    }
+
+    public void setTotalGoalsStarted(long totalGoalsStarted) {
+        this.totalGoalsStarted = totalGoalsStarted;
+    }
 
     public HashMap<String, Goal> getGoals() {
         return goals;
@@ -109,6 +129,24 @@ public class Account {
 
     public void addGoal(String id, Goal goal) {
         goals.put(id, goal);
+        totalGoalsStarted++;
+        Util.updateFriendsForAccountOnDB(this.id, friends, totalFriends);
+    }
+
+    public void addFriend(String id) {
+        friends.put(id, id);
+        totalFriends++;
+        Util.updateFriendsForAccountOnDB(this.id, friends, totalFriends);
+    }
+
+    public void removeFriend(String id) {
+        friends.remove(id);
+        totalFriends--;
+        Util.updateFriendsForAccountOnDB(this.id, friends, totalFriends);
+    }
+
+    public void incrementCompletedGoals() {
+        totalGoalsCompleted++;
     }
 
     public ArrayList<Goal> activeGoalsToList() {

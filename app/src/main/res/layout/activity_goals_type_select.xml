@@ -53,8 +53,8 @@
                 android:layout_height="fill_parent"
                 android:id="@+id/button_streak_select"
                 android:text="@string/buttonFor_streak"
-                android:textColor="@drawable/custom_button_streak"
-                android:background="@drawable/custom_button_streak"
+                android:textColor="@drawable/button_streak"
+                android:background="@drawable/button_streak"
                 android:drawableTop="@drawable/streak_flame_small" />
 
 
@@ -71,8 +71,8 @@
                 android:layout_height="fill_parent"
                 android:id="@+id/button_countdown_select"
                 android:text="@string/buttonFor_countdown"
-                android:textColor="@drawable/custom_button_countdown"
-                android:background="@drawable/custom_button_countdown"
+                android:textColor="@drawable/button_countdown"
+                android:background="@drawable/button_countdown"
                 android:drawableTop="@drawable/countdown_flag_small"/>
 
         </RelativeLayout>

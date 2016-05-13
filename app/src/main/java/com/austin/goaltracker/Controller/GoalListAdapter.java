@@ -79,11 +79,6 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
         public TextView display_name;
         public TextView display_info;
         public ImageView display_icon;
-
-        public TextView getDisplayName() {
-            return display_name;
-        }
-
     }
 
     @Override
@@ -93,7 +88,7 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
         final Goal goal= displayedListOfGoals.get(position);
         try {
             if (convertView == null) {
-                v = inflater.inflate(R.layout.layout_row, null);
+                v = inflater.inflate(R.layout.layout_goal_row, null);
                 holder = new ViewHolder();
 
                 holder.display_name = (TextView) v.findViewById(R.id.goalNameList);

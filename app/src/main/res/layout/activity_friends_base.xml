@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:orientation="vertical" tools:context=".View.Goals.GoalsBaseActivity">
+    android:orientation="vertical" tools:context=".View.Friends.FriendsBaseActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:text="@string/button_new_object"
-            android:id="@+id/buttonNewGoal"
+            android:id="@+id/buttonNewFriend"
             android:background="@drawable/button_basic"/>
 
         <Spinner
@@ -28,14 +28,32 @@
             android:layout_marginEnd="5dp"
             android:gravity="center"
             android:overlapAnchor="false"/>
+
     </LinearLayout>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent" android:layout_height="wrap_content"
-        android:orientation="vertical" android:id="@+id/goal_graphic" />
-
-    <ListView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/listOfGoals"/>
+        android:layout_height="wrap_content">
+
+        <!-- Login progress -->
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:id="@+id/loadingPanel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:indeterminate="true"
+            android:layout_centerInParent="true" />
+
+        <ListView
+            android:id="@+id/list_of_friend_users"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/layout_user_friend_row">
+
+        </ListView>
+
+    </RelativeLayout>
+
 </LinearLayout>
+

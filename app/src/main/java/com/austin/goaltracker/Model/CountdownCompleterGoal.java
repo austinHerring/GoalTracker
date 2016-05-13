@@ -13,8 +13,7 @@ import java.util.GregorianCalendar;
  */
 public class CountdownCompleterGoal extends Goal {
     private Calendar dateDesiredFinish;
-    private long remainingCheckpoints;
-    private long totalCheckpoints;
+    private long remainingCheckpoints, totalCheckpoints;
     private int percentProgress;
 
     public CountdownCompleterGoal(String goalName, IncrementType type, Calendar dateDesiredFinish) {

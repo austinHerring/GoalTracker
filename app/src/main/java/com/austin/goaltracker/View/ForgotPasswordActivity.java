@@ -59,8 +59,8 @@ public class ForgotPasswordActivity extends Activity {
                                 (String) filteredAccount.get("lastname"),
                                 (String) filteredAccount.get("username"),
                                 Util.retrieveUserPasswordToLocal(filteredAccount),
-                                (String) filteredAccount.get("email"),
-                                (String) filteredAccount.get("id"));
+                                (String) filteredAccount.get("email"));
+                        account.setId((String) filteredAccount.get("id"));
 
                         Password password = Util.updatePasswordForAccountOnDB(account, null);
                         account.setPassword(password);

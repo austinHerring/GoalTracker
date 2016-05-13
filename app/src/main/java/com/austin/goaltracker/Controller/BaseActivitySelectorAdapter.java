@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.R;
 
 /**
@@ -21,18 +22,18 @@ public class BaseActivitySelectorAdapter extends ArrayAdapter<String>
     private Context context;
     private String[] activities;
 
-    public BaseActivitySelectorAdapter(Context context, int textViewResourceId, String[] objects)
+    public BaseActivitySelectorAdapter(Context context, int textViewResourceId)
     {
-        super(context, textViewResourceId, objects);
+        super(context, textViewResourceId, GoalTrackerApplication.ACTIVITIES);
         this.context = context;
-        activities = objects;
+        this.activities = GoalTrackerApplication.ACTIVITIES;
     }
 
 
     @Override
     public View getDropDownView(int position, View convertView,ViewGroup parent)
     {
-        return getCustomView(position, convertView, parent);
+        return getCustomView(position, parent);
     }
 
     @Override
@@ -47,7 +48,7 @@ public class BaseActivitySelectorAdapter extends ArrayAdapter<String>
         return row;
     }
 
-    public View getCustomView(int position, View convertView, ViewGroup parent)
+    public View getCustomView(int position, ViewGroup parent)
     {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row=inflater.inflate(R.layout.layout_spinner_dropdown, parent, false);

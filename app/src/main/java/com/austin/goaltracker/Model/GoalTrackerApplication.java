@@ -32,6 +32,7 @@ public class GoalTrackerApplication extends Application {
     private Activity mCurrentActivity = null;
     static Logger Log = Logger.getLogger(GoalTrackerApplication.class.getName());
     public static int notificationId = 0;
+    public static String[] ACTIVITIES = {"Goals", "Friends", "Messages", "History"};
 
     public void onCreate(){
         super.onCreate();

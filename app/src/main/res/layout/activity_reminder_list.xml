@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".View.ReminderListActivity"
-        tools:listitem="@layout/reminder_list_content">
+        tools:listitem="@layout/layout_reminder_row">
 
     </ListView>
 </LinearLayout>

@@ -54,7 +54,7 @@ public class FirebaseGoalListener implements ChildEventListener {
 
     private void updateList() {
         Activity activity = GoalTrackerApplication.INSTANCE.getCurrentActivity();
-        if (activity.toString().equals("ActiveGoals")) {
+        if (activity.toString().equals("Goals")) {
             activity.recreate();
         }
     }

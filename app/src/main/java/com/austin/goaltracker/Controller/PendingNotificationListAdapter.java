@@ -69,6 +69,7 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
                     if (cGoal.getPercentProgress() >= 100) {
                         // The goal was completed, flag it as terminated and notify user
                         notifyUserCompletion(view.getContext(), goal);
+                        Util.currentUser.incrementCompletedGoals();
                         cGoal.setIsTerminated(true);
                     }
                     Util.updateAccountGoalOnDB(Util.currentUser.getId(), cGoal);

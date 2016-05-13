@@ -14,7 +14,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_width="0dip"
-            android:background="@drawable/trash_selector"/>
+            android:background="@drawable/selector_trash"/>
     </LinearLayout>
     <!-- Bottom View End-->
 

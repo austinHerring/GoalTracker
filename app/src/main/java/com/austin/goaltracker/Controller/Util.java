@@ -3,18 +3,26 @@ package com.austin.goaltracker.Controller;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
+import android.widget.ListView;
 
 import com.austin.goaltracker.Model.Account;
 
 import com.austin.goaltracker.Model.CountdownCompleterGoal;
+import com.austin.goaltracker.Model.GetAccount;
+import com.austin.goaltracker.Model.GetAccounts;
+import com.austin.goaltracker.Model.GetGoal;
+import com.austin.goaltracker.Model.GetGoals;
 import com.austin.goaltracker.Model.Goal;
 import com.austin.goaltracker.Model.GoalClassification;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
+import com.austin.goaltracker.Model.IncrementType;
 import com.austin.goaltracker.Model.NewMemberEmail;
 import com.austin.goaltracker.Model.Password;
 import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.austin.goaltracker.Model.ToastType;
 import com.austin.goaltracker.R;
+import com.austin.goaltracker.View.Friends.FriendsAddActivity;
+import com.austin.goaltracker.View.Friends.FriendsBaseActivity;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -57,12 +65,11 @@ public class Util {
 
                 HashMap<String, Object> userAccount = accounts.entrySet().iterator().next().getValue();
                 Account accountToLoad = new Account(
-                        (String)userAccount.get("firstname"),
-                        (String)userAccount.get("lastname"),
+                        (String)userAccount.get("nameFirst"),
+                        (String)userAccount.get("nameLast"),
                         (String)userAccount.get("username"),
                         retrieveUserPasswordToLocal(userAccount),
-                        (String)userAccount.get("email"),
-                        (String)userAccount.get("id"));
+                        (String)userAccount.get("email"));
 
                 if (!password.equals(accountToLoad.getPassword())) {
                     startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
@@ -70,9 +77,23 @@ public class Util {
                     return;
                 }
 
+                accountToLoad.setId((String)userAccount.get("id"));
+                accountToLoad.setTotalFriends((Long)userAccount.get("totalFriends"));
+                accountToLoad.setTotalGoalsStarted((Long)userAccount.get("totalGoalsStarted"));
+                accountToLoad.setTotalGoalsCompleted((Long)userAccount.get("totalGoalsCompleted"));
+
+                HashMap<String, String> friends = (HashMap<String, String>) userAccount.get("friends");
+                if (friends == null) {
+                    accountToLoad.setFriends(new HashMap<String, String>());
+                } else {
+                    accountToLoad.setFriends(friends);
+                }
+
                 currentUser = accountToLoad;
+
                 addListenerToGoals(); // Handles adding goals
                 GAEDatastoreController.registerdeviceForCurrentUser();
+                startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                 startActivity.startActivity(intent);
             }
 
@@ -134,8 +155,9 @@ public class Util {
      * @param goal the goal object itself to persist
      */
     public static void updateAccountGoalOnDB(String accountId, Goal goal) throws FirebaseException {
-        Firebase accountGoalsRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
-                .child("accounts").child(accountId).child("goals");
+        Firebase accountRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+                .child("accounts").child(accountId);
+        Firebase accountGoalsRef = accountRef.child("goals");
         String goalId = goal.getId();
         Firebase row;
         if (goalId == null) {
@@ -145,17 +167,9 @@ public class Util {
             row = accountGoalsRef.child(goalId);
         }
         HashMap<String,Object> newGoalAsEntry = generateGoalMappingForDB(goal);
-        row.setValue(newGoalAsEntry, new Firebase.CompletionListener() {
-            @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                if (firebaseError != null) {
-                    System.out.println("Data could not be saved. " + firebaseError.getMessage());
-                    throw new FirebaseException(firebaseError.getMessage());
-                } else {
-                    System.out.println("Data saved successfully.");
-                }
-            }
-        });
+        row.setValue(newGoalAsEntry);
+        accountRef.child("totalGoalsStarted").setValue(Util.currentUser.getTotalGoalsStarted());
+        accountRef.child("totalGoalsCompleted").setValue(Util.currentUser.getTotalGoalsCompleted());
     }
 
     /**
@@ -190,6 +204,20 @@ public class Util {
     }
 
     /**
+     * Updates the friends for an account
+     *
+     * @param accountId the account to update
+     * @param friendsList the new friends list
+     * @param totalFriends the number of Friends
+     */
+    public static void updateFriendsForAccountOnDB(String accountId, HashMap friendsList, long totalFriends) throws FirebaseException {
+        Firebase accountRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+                .child("accounts").child(accountId);
+        accountRef.child("friends").setValue(friendsList);
+        accountRef.child("totalFriends").setValue(totalFriends);
+    }
+
+    /**
      * Accounts are represented as hashmaps to access particular data
      *
      * @param account The account to generate a HashMap for.
@@ -198,11 +226,14 @@ public class Util {
     private static HashMap<String, Object> generateBasicAccountMappingForDB(Account account) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("id", account.getId());  // Integer must be stored as String for database
-        map.put("firstname", account.getNameFirst());
-        map.put("lastname", account.getNameLast());
+        map.put("nameFirst", account.getNameFirst());
+        map.put("nameLast", account.getNameLast());
         map.put("username", account.getUsername());
-        map.put("password object", generatePasswordMappingForDB(account.getPasswordObject()));
+        map.put("password", generatePasswordMappingForDB(account.getPasswordObject()));
         map.put("email", account.getEmail());
+        map.put("totalFriends", account.getTotalFriends());
+        map.put("totalGoalsStarted", account.getTotalGoalsStarted());
+        map.put("totalGoalsCompleted", account.getTotalGoalsCompleted());
         return map;
     }
 
@@ -216,22 +247,22 @@ public class Util {
         HashMap<String, Object> map = new HashMap<>();
         map.put("id", goal.getId());
         map.put("classification", goal.classification());
-        map.put("name", goal.getGoalName());
+        map.put("goalName", goal.getGoalName());
         map.put("isTerminated", goal.isTerminated());
-        map.put("date start", goal.getDateOfOrigin());
-        map.put("date broken", goal.getBrokenDate());
+        map.put("dateOfOrigin", goal.getDateOfOrigin());
+        map.put("dateBroken", goal.getBrokenDate());
         map.put("task", goal.getTask());
-        map.put("frequency", goal.getIncrementType());
-        map.put("cron key", goal.getCronJobKey());
+        map.put("incrementType", goal.getIncrementType());
+        map.put("cronJobKey", goal.getCronJobKey());
         if (goal.classification().equals(GoalClassification.COUNTDOWN)) {
-            map.put("date end", ((CountdownCompleterGoal) goal).getDateDesiredFinish());
-            map.put("percent progress", ((CountdownCompleterGoal) goal).getPercentProgress());
-            map.put("remaining checkpoints", ((CountdownCompleterGoal) goal).getRemainingCheckpoints());
-            map.put("total checkpoints", ((CountdownCompleterGoal) goal).getTotalCheckpoints());
+            map.put("dateDesiredFinish", ((CountdownCompleterGoal) goal).getDateDesiredFinish());
+            map.put("percentProgress", ((CountdownCompleterGoal) goal).getPercentProgress());
+            map.put("remainingCheckpoints", ((CountdownCompleterGoal) goal).getRemainingCheckpoints());
+            map.put("totalCheckpoints", ((CountdownCompleterGoal) goal).getTotalCheckpoints());
         } else {
-            map.put("streak number", ((StreakSustainerGoal) goal).getStreak());
-            map.put("cheat number", ((StreakSustainerGoal) goal).getCheatNumber());
-            map.put("cheats remaining", ((StreakSustainerGoal) goal).getCheatsRemaining());
+            map.put("streak", ((StreakSustainerGoal) goal).getStreak());
+            map.put("cheatNumber", ((StreakSustainerGoal) goal).getCheatNumber());
+            map.put("cheatsRemaining", ((StreakSustainerGoal) goal).getCheatsRemaining());
         }
         return map;
     }
@@ -245,7 +276,7 @@ public class Util {
     private static HashMap<String, Object> generatePasswordMappingForDB(Password password) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("password", password.toPasswordString());
-        map.put("date last changed", password.toDateString());
+        map.put("dateLastChanged", password.toDateString());
         return map;
     }
 
@@ -259,34 +290,34 @@ public class Util {
             CountdownCompleterGoal goalToAdd = new CountdownCompleterGoal();
             goalToAdd.setId((String) goalSnapShot.get("id"));
             goalToAdd.setIsTerminated((boolean) goalSnapShot.get("isTerminated"));
-            goalToAdd.setName((String) goalSnapShot.get("name"));
+            goalToAdd.setName((String) goalSnapShot.get("goalName"));
             goalToAdd.setTask((String) goalSnapShot.get("task"));
-            goalToAdd.setCronJobKey((String) goalSnapShot.get("cron key"));
-            goalToAdd.setIncrementType(Converter.stringToFrequency((String) goalSnapShot.get("frequency")));
-            goalToAdd.setDateOfOrigin(Converter.longToCalendar((Long) goalSnapShot.get("date start")));
-            if (goalSnapShot.get("date broken") != null) {
-                goalToAdd.setBrokenDate(Converter.longToCalendar((Long) goalSnapShot.get("date broken")));
+            goalToAdd.setCronJobKey((String) goalSnapShot.get("cronJobKey"));
+            goalToAdd.setIncrementType(Converter.stringToFrequency((String) goalSnapShot.get("incrementType")));
+            goalToAdd.setDateOfOrigin(Converter.longToCalendar((Long) goalSnapShot.get("dateOfOrigin")));
+            if (goalSnapShot.get("dateBroken") != null) {
+                goalToAdd.setBrokenDate(Converter.longToCalendar((Long) goalSnapShot.get("dateBroken")));
             }
-            goalToAdd.setDateDesiredFinish(Converter.longToCalendar((Long) goalSnapShot.get("date end")));
-            goalToAdd.setPercentProgress(((Long) goalSnapShot.get("percent progress")).intValue());
-            goalToAdd.setRemainingCheckpoints(((Long) goalSnapShot.get("remaining checkpoints")).intValue());
-            goalToAdd.setTotalCheckpoints(((Long) goalSnapShot.get("total checkpoints")).intValue());
+            goalToAdd.setDateDesiredFinish(Converter.longToCalendar((Long) goalSnapShot.get("dateDesiredFinish")));
+            goalToAdd.setPercentProgress(((Long) goalSnapShot.get("percentProgress")).intValue());
+            goalToAdd.setRemainingCheckpoints(((Long) goalSnapShot.get("remainingCheckpoints")).intValue());
+            goalToAdd.setTotalCheckpoints(((Long) goalSnapShot.get("totalCheckpoints")).intValue());
             currentUser.getGoals().put((String) goalSnapShot.get("id"), goalToAdd);
         } else {
             StreakSustainerGoal goalToAdd = new StreakSustainerGoal();
             goalToAdd.setId((String) goalSnapShot.get("id"));
             goalToAdd.setIsTerminated((boolean) goalSnapShot.get("isTerminated"));
-            goalToAdd.setName((String) goalSnapShot.get("name"));
+            goalToAdd.setName((String) goalSnapShot.get("goalName"));
             goalToAdd.setTask((String) goalSnapShot.get("task"));
-            goalToAdd.setCronJobKey((String) goalSnapShot.get("cron key"));
-            goalToAdd.setIncrementType(Converter.stringToFrequency((String) goalSnapShot.get("frequency")));
-            goalToAdd.setDateOfOrigin(Converter.longToCalendar((Long) goalSnapShot.get("date start")));
-            if (goalSnapShot.get("date broken") != null) {
-                goalToAdd.setBrokenDate(Converter.longToCalendar((Long) goalSnapShot.get("date broken")));
+            goalToAdd.setCronJobKey((String) goalSnapShot.get("cronJobKey"));
+            goalToAdd.setIncrementType(Converter.stringToFrequency((String) goalSnapShot.get("incrementType")));
+            goalToAdd.setDateOfOrigin(Converter.longToCalendar((Long) goalSnapShot.get("dateOfOrigin")));
+            if (goalSnapShot.get("dateBroken") != null) {
+                goalToAdd.setBrokenDate(Converter.longToCalendar((Long) goalSnapShot.get("dateBroken")));
             }
-            goalToAdd.setCheatNumber(((Long) goalSnapShot.get("cheat number")).intValue());
-            goalToAdd.setCheatsRemaining(((Long) goalSnapShot.get("cheats remaining")).intValue());
-            goalToAdd.setStreak(((Long) goalSnapShot.get("streak number")).intValue());
+            goalToAdd.setCheatNumber(((Long) goalSnapShot.get("cheatNumber")).intValue());
+            goalToAdd.setCheatsRemaining(((Long) goalSnapShot.get("cheatsRemaining")).intValue());
+            goalToAdd.setStreak(((Long) goalSnapShot.get("streak")).intValue());
             currentUser.getGoals().put((String) goalSnapShot.get("id"), goalToAdd);
         }
     }
@@ -297,8 +328,8 @@ public class Util {
      * @param accountSnapshot firebase snapshot of data
      */
     public static Password retrieveUserPasswordToLocal(HashMap accountSnapshot) {
-        HashMap<String, String> map = (HashMap<String, String>) accountSnapshot.get("password object");
-        return new Password(map.get("password"), map.get("date last changed"));
+        HashMap<String, String> map = (HashMap<String, String>) accountSnapshot.get("password");
+        return new Password(map.get("password"), map.get("dateLastChanged"));
     }
 
 
@@ -365,5 +396,117 @@ public class Util {
     private static void addListenerToGoals() {
         Firebase goalsRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts").child(currentUser.getId()).child("goals");
         goalsRef.addChildEventListener(new FirebaseGoalListener());
+    }
+
+    /**
+     * get accounts from database and hydrate view
+     *
+     * @param activity the activity to get the accounts for
+     * @param isOnlyFriends whether or not its a friends list
+     */
+    public static void GetAccounts(final Activity activity, final boolean isOnlyFriends) {
+        final HashMap<String, String> friends = Util.currentUser.getFriends();
+        Firebase firebaseAccounts = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts");
+        firebaseAccounts.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.exists())
+                    return;
+                HashMap<String, HashMap<String, String>> users =
+                        ( HashMap<String, HashMap<String, String>>) snapshot.getValue();
+                if (users == null) {
+                    return;
+                }
+
+                GetAccounts getAccounts = new GetAccounts();
+                String id;
+                UserListAdapter listAdapter;
+
+                if (!isOnlyFriends) {
+                    for (HashMap accountSnapshot : users.values()) {
+                        id = (String)accountSnapshot.get("id");
+                        if (!currentUser.getId().equals(id) && (friends == null || !friends.containsKey(id))) {
+                            getAccounts.addAccount(retrieveUserAccount(accountSnapshot));
+                        }
+                    }
+                    ListView listView = (ListView) activity.findViewById(R.id.list_of_users);
+                    listAdapter = new UserListAdapter(activity, R.layout.layout_user_row, getAccounts, isOnlyFriends);
+                    ((FriendsAddActivity) activity).ListAdapter = listAdapter;
+                    listView.setAdapter(listAdapter);
+
+                }
+
+                if (isOnlyFriends) {
+                    for (HashMap accountSnapshot : users.values()) {
+                        id = (String)accountSnapshot.get("id");
+                        if (!currentUser.getId().equals(id) && friends.containsKey(id)) {
+                            getAccounts.addAccount(retrieveUserAccount(accountSnapshot));
+                        }
+                    }
+                    ListView listView = (ListView) activity.findViewById(R.id.list_of_friend_users);
+                    listAdapter = new UserListAdapter(activity, R.layout.layout_user_friend_row, getAccounts, isOnlyFriends);
+                    ((FriendsBaseActivity) activity).ListAdapter = listAdapter;
+                    listView.setAdapter(listAdapter);
+                }
+
+                activity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+    }
+
+    private static GetAccount retrieveUserAccount(final HashMap accountSnapshot) {
+        GetAccount getAccount = new GetAccount();
+        getAccount.setId((String)accountSnapshot.get("id"));
+        getAccount.setTotalGoalsStarted(((Long) accountSnapshot.get("totalGoalsStarted")).intValue());
+        getAccount.setTotalGoalsCompleted(((Long) accountSnapshot.get("totalGoalsCompleted")).intValue());
+        getAccount.setTotalFriends(((Long) accountSnapshot.get("totalFriends")).intValue());
+        getAccount.setNameFirst((String)accountSnapshot.get("nameFirst"));
+        getAccount.setNameLast((String)accountSnapshot.get("nameLast"));
+        getAccount.setUsername((String)accountSnapshot.get("username"));
+
+        if (accountSnapshot.get("goals") != null) {
+            getAccount.setGetGoals(retrieveUserGoals(accountSnapshot));
+        }
+
+        if (accountSnapshot.get("friends") != null) {
+            getAccount.setFriends((HashMap < String, String>) accountSnapshot.get("friends"));
+        }
+        return getAccount;
+    }
+
+    private static GetGoals retrieveUserGoals(HashMap accountSnapshot) {
+        GetGoals getGoals = new GetGoals();
+        HashMap<String, HashMap<String,Object>> goalsSnapShots  = (HashMap < String, HashMap < String, Object >>) accountSnapshot.get("goals");
+        for(HashMap<String, Object> goalSnapShot : goalsSnapShots.values()) {
+            GetGoal getGoal = new GetGoal();
+            getGoal.setId((String) goalSnapShot.get("id"));
+            getGoal.setGoalName((String) goalSnapShot.get("goalName"));
+            getGoal.setTask((String) goalSnapShot.get("task"));
+            getGoal.setIncrementType(IncrementType.valueOf((String) goalSnapShot.get("incrementType")));
+            getGoal.setIsTerminated((boolean) goalSnapShot.get("isTerminated"));
+            getGoal.setDateOfOrigin(Converter.longToCalendar((Long) goalSnapShot.get("dateOfOrigin")));
+
+            if (goalSnapShot.get("dateBroken") != null) {
+                getGoal.setDateBroken(Converter.longToCalendar((Long) goalSnapShot.get("dateBroken")));
+            }
+
+            GoalClassification classification = GoalClassification.valueOf((String) goalSnapShot.get("classification"));
+            getGoal.setClassification(classification);
+
+            if (classification == GoalClassification.COUNTDOWN) {
+                getGoal.setDateDesiredFinish(Converter.longToCalendar((Long) goalSnapShot.get("dateDesiredFinish")));
+                getGoal.setPercentProgress(((Long) goalSnapShot.get("percentProgress")).intValue());
+            } else {
+                getGoal.setStreak(((Long) goalSnapShot.get("streak")).intValue());
+            }
+            getGoals.AddGoal(getGoal);
+        }
+        return getGoals;
     }
 }

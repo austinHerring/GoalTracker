@@ -67,7 +67,7 @@
                 android:layout_gravity="center_vertical|end"
                 android:text="@string/action_forgot_password"
                 android:id="@+id/buttonForgotPassword"
-                android:background="@drawable/custom_button"/>
+                android:background="@drawable/button_basic"/>
         </LinearLayout>
 
         <Button
@@ -76,7 +76,7 @@
             android:text="@string/action_login"
             android:id="@+id/buttonLogin"
             android:layout_marginTop="16dp"
-            android:background="@drawable/custom_button"/>
+            android:background="@drawable/button_basic"/>
 
         <Button
             android:id="@+id/buttonRegister"
@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:text="@string/action_register"
             android:layout_marginTop="16dp"
-            android:background="@drawable/custom_button"/>
+            android:background="@drawable/button_basic"/>
 
     </LinearLayout>
 

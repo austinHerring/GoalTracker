@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.austin.goaltracker" >
+    package="com.austin.goaltracker">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
@@ -33,11 +33,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppThemePurple"
-        tools:replace="android:icon" >
+        tools:replace="android:icon">
         <activity
             android:name=".View.Goals.GoalsBaseActivity"
-            android:theme="@style/AppThemePurpleAppCompat"
-            android:label="@string/title_activity_goals" />
+            android:label="@string/title_activity_goals"
+            android:theme="@style/AppThemePurpleAppCompat" />
         <activity
             android:name=".View.LoginActivity"
             android:label="@string/title_activity_login"
@@ -50,7 +50,7 @@
         <activity
             android:name=".View.RegistrationActivity"
             android:label="@string/title_activity_registration"
-            android:parentActivityName=".View.LoginActivity" >
+            android:parentActivityName=".View.LoginActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.austin.goaltracker.View.LoginActivity" />
@@ -58,7 +58,7 @@
         <activity
             android:name=".View.ForgotPasswordActivity"
             android:label="@string/title_activity_forgot_password"
-            android:parentActivityName=".View.LoginActivity" >
+            android:parentActivityName=".View.LoginActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.austin.goaltracker.View.LoginActivity" />
@@ -70,7 +70,7 @@
         <activity
             android:name=".View.SplashActivity"
             android:label="@string/title_activity_splash"
-            android:theme="@style/AppSplashPurple" >
+            android:theme="@style/AppSplashPurple">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -78,20 +78,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".View.Friends.FriendsBaseActivityListActivity"
-            android:label="@string/title_friendsbaseactivity_list" />
-        <activity
-            android:name=".View.Friends.FriendsBaseActivityDetailActivity"
-            android:label="@string/title_friendsbaseactivity_detail"
-            android:parentActivityName=".View.Friends.FriendsBaseActivityListActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.austin.goaltracker.View.Friends.FriendsBaseActivityListActivity" />
-        </activity>
-        <activity
             android:name=".View.Goals.GoalsTypeSelectActivity"
             android:label="@string/title_activity_goals_type_select"
-            android:parentActivityName=".View.Goals.GoalsBaseActivity" >
+            android:parentActivityName=".View.Goals.GoalsBaseActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.austin.goaltracker.View.Goals.GoalsBaseActivity" />
@@ -99,7 +88,7 @@
         <activity
             android:name=".View.Goals.GoalsStreakCreatorActivity"
             android:label="@string/title_activity_goals_streak_creator"
-            android:parentActivityName=".View.Goals.GoalsTypeSelectActivity" >
+            android:parentActivityName=".View.Goals.GoalsTypeSelectActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.austin.goaltracker.View.Goals.GoalsTypeSelectActivity" />
@@ -107,7 +96,7 @@
         <activity
             android:name=".View.Goals.GoalsCountdownCreatorActivity"
             android:label="@string/title_activity_goals_countdown_creator"
-            android:parentActivityName=".View.Goals.GoalsTypeSelectActivity" >
+            android:parentActivityName=".View.Goals.GoalsTypeSelectActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.austin.goaltracker.View.Goals.GoalsTypeSelectActivity" />
@@ -116,7 +105,7 @@
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
@@ -135,14 +124,14 @@
             android:exported="false" />
         <service
             android:name=".Controller.GCMListenerService"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
         <service
             android:name=".Controller.MyInstanceIDListenerService"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
@@ -152,6 +141,18 @@
             android:name=".View.ReminderListActivity"
             android:label="@string/title_reminder_list"
             android:theme="@style/AppThemePurpleAppCompat" />
+        <activity
+            android:name=".View.Friends.FriendsBaseActivity"
+            android:label="@string/title_activity_friends_base"
+            android:theme="@style/AppThemePurpleAppCompat" />
+        <activity
+            android:name=".View.Friends.FriendsAddActivity"
+            android:label="@string/title_activity_friends_add"
+            android:parentActivityName=".View.Friends.FriendsBaseActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.austin.goaltracker.View.Friends.FriendsBaseActivity" />
+        </activity>
     </application>
 
 </manifest>

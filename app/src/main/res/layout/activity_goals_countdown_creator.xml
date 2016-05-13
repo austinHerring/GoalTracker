@@ -64,11 +64,11 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@drawable/custom_button_setter"
+            android:textColor="@drawable/button_setter"
             android:id="@+id/promptTimeCountdown"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:background="@drawable/custom_button_setter"/>
+            android:background="@drawable/button_setter"/>
 
         <TextView android:text="@string/task_duration"
             android:layout_width="match_parent"
@@ -82,11 +82,11 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@drawable/custom_button_setter"
+            android:textColor="@drawable/button_setter"
             android:id="@+id/promptDate"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:background="@drawable/custom_button_setter"
+            android:background="@drawable/button_setter"
             android:paddingLeft="10dp"
             android:paddingRight="10dp" />
 
@@ -103,7 +103,7 @@
             android:id="@+id/buttonfinish"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:background="@drawable/custom_button"/>
+            android:background="@drawable/button_basic"/>
     </LinearLayout>
 
 </ScrollView>

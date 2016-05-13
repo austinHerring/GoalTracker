@@ -27,7 +27,7 @@
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
         tools:context=".View.ReminderListActivity"
-        tools:listitem="@layout/reminder_list_content" />
+        tools:listitem="@layout/layout_reminder_row" />
 
     <FrameLayout
         android:id="@+id/reminder_detail_container"

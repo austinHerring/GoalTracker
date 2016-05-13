@@ -1,4 +1,4 @@
-package com.austin.goaltracker.View.Goals;
+package com.austin.goaltracker.View.Friends;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
@@ -6,29 +6,20 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.transition.Transition;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.austin.goaltracker.Controller.BaseActivitySelectorAdapter;
-import com.austin.goaltracker.Controller.GoalListAdapter;
+import com.austin.goaltracker.Controller.UserListAdapter;
 import com.austin.goaltracker.Controller.Util;
-import com.austin.goaltracker.Model.CountdownCompleterGoal;
-import com.austin.goaltracker.Model.Goal;
-import com.austin.goaltracker.Model.GoalClassification;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
-import com.austin.goaltracker.Model.StreakSustainerGoal;
 import com.austin.goaltracker.R;
 
-import com.austin.goaltracker.View.Friends.FriendsBaseActivity;
+import com.austin.goaltracker.View.Goals.GoalsBaseActivity;
 import com.austin.goaltracker.View.LoginActivity;
 import com.austin.goaltracker.View.ReminderListActivity;
 import com.austin.goaltracker.View.SettingsActivity;
@@ -40,63 +31,48 @@ import com.firebase.client.ValueEventListener;
 import java.util.HashMap;
 
 
-public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class FriendsBaseActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    ListView listOfGoals;
     private Spinner spinner;
     private static Button buttonPending;
-    private static Button buttonNewGoal;
+    private static Button buttonNewFriend;
     private static int mPendingCount = 0;
-    private GoalListAdapter goalListAdapter;
     private Firebase mFirebaseRef;
+    public UserListAdapter ListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_goals_base);
+        setContentView(R.layout.activity_friends_base);
         GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
-        setupWindowAnimations();
         setUpNotificationCountWithFirebaseListener();
+        findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
 
         spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
         spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
+        spinner.setSelection(1);
         spinner.setOnItemSelectedListener(this);
 
-        buttonNewGoal = (Button) findViewById(R.id.buttonNewGoal);
-        buttonNewGoal.setOnClickListener(new View.OnClickListener() {
+        buttonNewFriend = (Button) findViewById(R.id.buttonNewFriend);
+        buttonNewFriend.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), GoalsTypeSelectActivity.class);
+                Intent i = new Intent(getApplicationContext(), FriendsAddActivity.class);
                 startActivity(i);
-            }
-        });
-
-        listOfGoals = (ListView) findViewById(R.id.listOfGoals);
-        goalListAdapter = new GoalListAdapter(this, android.R.layout.simple_list_item_1, Util.currentUser.activeGoalsToList());
-        listOfGoals.setAdapter(goalListAdapter);
-        listOfGoals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Pulling from the visible items, not the entire list
-                Goal listItem =  ((GoalListAdapter)parent.getAdapter()).getItemFromFilteredList(position);
-                goalListAdapter.getFilter().filter(listItem.getId());
-
-                if (listItem.classification().equals(GoalClassification.COUNTDOWN)) {
-                    GoalCountdownGraphicFragment fragment = GoalCountdownGraphicFragment.newInstance((CountdownCompleterGoal)listItem);
-                    getFragmentManager().beginTransaction().replace(R.id.goal_graphic, fragment).commit();
-                } else {
-                    GoalsStreakGraphicFragment fragment = GoalsStreakGraphicFragment.newInstance((StreakSustainerGoal) listItem);
-                    getFragmentManager().beginTransaction().replace(R.id.goal_graphic, fragment).commit();
-                }
             }
         });
 
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Util.GetAccounts(this, true);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_base, menu);
-        setupWindowAnimations();
 
         MenuItem countItem = menu.findItem(R.id.pending_goals);
         MenuItemCompat.setActionView(countItem, R.layout.feed_update_count);
@@ -107,7 +83,7 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
             buttonPending.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     Intent i = new Intent(getApplicationContext(), ReminderListActivity.class);
-                    startActivity(i, ActivityOptions.makeSceneTransitionAnimation(GoalsBaseActivity.this).toBundle());
+                    startActivity(i, ActivityOptions.makeSceneTransitionAnimation(FriendsBaseActivity.this).toBundle());
                 }
             });
         } else {
@@ -142,8 +118,8 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         if (!parent.getItemAtPosition(pos).equals(this.toString())
-                && parent.getItemAtPosition(pos).equals("Friends")) {
-            Intent i = new Intent(getApplicationContext(), FriendsBaseActivity.class);
+                && parent.getItemAtPosition(pos).equals("Goals")) {
+            Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
             startActivity(i);
         }
     }
@@ -155,7 +131,7 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
 
     @Override
     public String toString() {
-        return "Goals";
+        return "Friends";
     }
 
     @Override
@@ -177,16 +153,6 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
         invalidateOptionsMenu();
     }
 
-    private void setupWindowAnimations() {
-        getWindow().setAllowEnterTransitionOverlap(false);
-        Transition fade = new Fade();
-        fade.setDuration(400);
-        getWindow().setExitTransition(fade);
-        Transition slideIn = new Slide(Gravity.BOTTOM);
-        slideIn.setDuration(400);
-        getWindow().setExitTransition(slideIn);
-    }
-
     private void setUpNotificationCountWithFirebaseListener() {
         mFirebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
                 .child("accounts")
@@ -200,16 +166,11 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
                 } else {
                     setPendingGoalsCountInActionBar(((HashMap<String, Object>) snapshot.getValue()).size());
                 }
-
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });
-    }
-
-    public GoalListAdapter getGoalListAdapter() {
-        return goalListAdapter;
     }
 }

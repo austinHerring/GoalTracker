@@ -48,7 +48,7 @@ public class ReminderListActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         final ListView listView = (ListView) findViewById(R.id.list_of_reminders);
-        mListAdapter = new PendingNotificationListAdapter(mFirebaseListRef.limit(50), this, R.layout.reminder_list_content);
+        mListAdapter = new PendingNotificationListAdapter(mFirebaseListRef.limit(50), this, R.layout.layout_reminder_row);
         listView.setAdapter(mListAdapter);
         mListAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override

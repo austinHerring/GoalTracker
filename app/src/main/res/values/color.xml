@@ -23,4 +23,6 @@
     <color name="negative_action">#ff4952</color>
     <color name="positive_action_pressed">#00ac50</color>
     <color name="negative_action_pressed">#b62f36</color>
+    <color name="gray_dark">#969696</color>
+    <color name="gray_light">#cecece</color>
 </resources>

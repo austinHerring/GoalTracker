@@ -9,9 +9,7 @@ package com.austin.goaltracker.Model;
  */
 public class StreakSustainerGoal extends Goal {
 
-    int cheatNumber;
-    int cheatsRemaining;
-    int streak;
+    int cheatNumber, cheatsRemaining, streak;
 
     public StreakSustainerGoal(String goalName, IncrementType type) {
         super(goalName, type, GoalClassification.STREAK);

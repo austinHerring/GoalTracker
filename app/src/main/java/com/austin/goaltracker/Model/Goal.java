@@ -12,14 +12,11 @@ import java.util.Calendar;
  */
 public abstract class Goal {
 
-    private String goalName, task;
-    private String id;
-    protected Calendar dateOfOrigin;
-    private Calendar dateBroken;
+    private String goalName, task, id, cronJobKey;
+    protected Calendar dateOfOrigin, dateBroken;
     protected IncrementType incrementType;
     //private ArrayList<Account> supporters;
     private GoalClassification classification;
-    private String cronJobKey;
     private boolean isTerminated;
 
     Goal(String name, IncrementType type, GoalClassification c) {

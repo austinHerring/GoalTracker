@@ -21,6 +21,10 @@
     <string name="title_activity_goals_streak_creator">Streak Goal Creator</string>
     <string name="title_activity_goals_countdown_creator">Countdown Goal Creator</string>
     <string name="button_set">Set</string>
+    <string name="button_add_friend">Add Friend</string>
+    <string name="button_friend_added">Added</string>
     <string name="title_reminder_list">Reminders</string>
     <string name="title_reminder_detail">Reminder Detail</string>
+    <string name="title_activity_friends_base">My Friends</string>
+    <string name="title_activity_friends_add">Find A Friend</string>
 </resources>

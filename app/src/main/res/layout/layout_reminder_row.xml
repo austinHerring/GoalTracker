@@ -14,14 +14,14 @@ android:layout_width="match_parent" android:layout_height="70dp">
         android:layout_height="match_parent"
         android:layout_weight=".5"
         android:layout_width="0dip"
-        android:background="@drawable/x_icon_selector"
+        android:background="@drawable/selector_x_icon"
         />
     <Button
         android:id="@+id/positiveResponse"
         android:layout_height="match_parent"
         android:layout_weight=".5"
         android:layout_width="0dip"
-        android:background="@drawable/checkmark_selector"/>
+        android:background="@drawable/selector_checkmark"/>
 </LinearLayout>
 <!-- Bottom View End-->
 

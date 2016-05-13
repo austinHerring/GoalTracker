@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="75dip"
+    android:weightSum="1">
+
+    <FrameLayout
+        android:layout_width="0dip"
+        android:layout_weight="0.20"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_width="64dip"
+            android:layout_height="64dip"
+            android:id="@+id/profilePicture"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dip"
+        android:layout_weight="0.50"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dip"
+            android:id="@+id/userName"
+            android:textSize="18sp"
+            android:textColor="@color/primaryP"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dip"
+            android:textSize="16sp"
+            android:textColor="@color/primaryP"
+            android:id="@+id/numberOfGoals"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="0dip"
+        android:layout_weight="0.30"
+        android:layout_height="match_parent">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dip"
+            android:layout_marginBottom="20dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:textColor="@drawable/button_add_friend"
+            android:id="@+id/addFriend"
+            android:background="@drawable/button_add_friend"
+            android:text="@string/button_add_friend"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dip"
+            android:layout_marginBottom="20dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:id="@+id/friendAdded"
+            android:enabled="false"
+            android:visibility="gone"
+            android:textColor="@drawable/button_add_friend_inactive"
+            android:background="@drawable/button_add_friend_inactive"
+            android:text="@string/button_friend_added"/>
+
+    </FrameLayout>
+
+</LinearLayout>
