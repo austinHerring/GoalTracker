@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.austin.goaltracker.Model.CountdownCompleterGoal;
+import com.austin.goaltracker.Model.Goal.CountdownCompleterGoal;
 import com.austin.goaltracker.R;
 import me.itangqi.waveloadingview.WaveLoadingView;
 

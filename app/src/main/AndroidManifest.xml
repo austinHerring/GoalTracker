@@ -114,23 +114,23 @@
         </receiver>
 
         <service
-            android:name=".Controller.PendingNotificationIntentService"
+            android:name=".Controller.Services.PendingNotificationIntentService"
             android:exported="false" />
         <service
-            android:name=".Controller.RegistrationIntentService"
+            android:name=".Controller.Services.RegistrationIntentService"
             android:exported="false" />
         <service
-            android:name=".Controller.CronJobIntentService"
+            android:name=".Controller.Services.CronJobIntentService"
             android:exported="false" />
         <service
-            android:name=".Controller.GCMListenerService"
+            android:name=".Controller.Services.GCMListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
         <service
-            android:name=".Controller.MyInstanceIDListenerService"
+            android:name=".Controller.Services.MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
@@ -153,6 +153,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.austin.goaltracker.View.Friends.FriendsBaseActivity" />
         </activity>
+        <activity android:name=".View.Friends.FriendsDetailActivity" />
+        <activity android:name=".View.Friends.FriendsOfFriendsDetailActivity"></activity>
     </application>
 
 </manifest>

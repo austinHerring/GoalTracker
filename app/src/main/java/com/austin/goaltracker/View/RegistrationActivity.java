@@ -8,22 +8,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.austin.goaltracker.Controller.EmailDispatchService;
-import com.austin.goaltracker.Controller.GAEDatastoreController;
-import com.austin.goaltracker.Controller.LoginMediator;
+import com.austin.goaltracker.Controller.Mediators.LoginMediator;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Account;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
-import com.austin.goaltracker.Model.NewMemberEmail;
 import com.austin.goaltracker.Model.Password;
-import com.austin.goaltracker.Model.ToastType;
+import com.austin.goaltracker.Model.Enums.ToastType;
 import com.austin.goaltracker.R;
 import com.austin.goaltracker.View.Goals.GoalsBaseActivity;
-
-import com.firebase.client.ValueEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.FirebaseError;
 
 public class RegistrationActivity extends Activity {
 

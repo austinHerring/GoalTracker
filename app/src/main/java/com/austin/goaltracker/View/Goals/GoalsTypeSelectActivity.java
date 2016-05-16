@@ -11,10 +11,10 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.austin.goaltracker.Controller.GoalMediator;
+import com.austin.goaltracker.Controller.Mediators.GoalMediator;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
-import com.austin.goaltracker.Model.ToastType;
+import com.austin.goaltracker.Model.Enums.ToastType;
 import com.austin.goaltracker.R;
 
 public class GoalsTypeSelectActivity extends Activity {

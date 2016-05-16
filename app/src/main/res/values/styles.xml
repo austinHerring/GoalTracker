@@ -25,6 +25,8 @@
         <!--   Other colors -->
         <item name="android:textColorSecondary">@color/text3</item>
         <item name="android:textColorTertiary">@color/text2</item>
+        <!-- Animations -->
+        <item name="android:windowContentTransitions">true</item>
     </style>
 
     <!-- SPLASH SCREEN STYLE-->
@@ -86,6 +88,8 @@
         <!--   Other colors -->
         <item name="android:textColorSecondary">@color/text3</item>
         <item name="android:textColorTertiary">@color/text2</item>
+        <!-- Animations -->
+        <item name="android:windowContentTransitions">true</item>
     </style>
 
     <style name="PurpleActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">

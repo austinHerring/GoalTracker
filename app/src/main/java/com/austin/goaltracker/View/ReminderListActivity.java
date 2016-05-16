@@ -11,11 +11,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import com.austin.goaltracker.Controller.PendingNotificationListAdapter;
+import com.austin.goaltracker.Controller.Adapters.PendingNotificationListAdapter;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
-import com.austin.goaltracker.Model.ToastType;
+import com.austin.goaltracker.Model.Enums.ToastType;
 import com.austin.goaltracker.R;
 import com.austin.goaltracker.View.Goals.GoalsBaseActivity;
 import com.firebase.client.DataSnapshot;

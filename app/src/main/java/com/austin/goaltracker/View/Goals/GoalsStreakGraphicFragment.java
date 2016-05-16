@@ -9,7 +9,7 @@ import android.view.animation.BounceInterpolator;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.austin.goaltracker.Model.StreakSustainerGoal;
+import com.austin.goaltracker.Model.Goal.StreakSustainerGoal;
 import com.austin.goaltracker.R;
 
 import xyz.hanks.library.SmallBang;

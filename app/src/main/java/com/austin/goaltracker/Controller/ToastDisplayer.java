@@ -6,7 +6,7 @@ import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.austin.goaltracker.Model.ToastType;
+import com.austin.goaltracker.Model.Enums.ToastType;
 
 /**
  * @author Austin Herring

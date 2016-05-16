@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Password;
-import com.austin.goaltracker.Model.ToastType;
+import com.austin.goaltracker.Model.Enums.ToastType;
 import com.firebase.client.FirebaseException;
 
 /**

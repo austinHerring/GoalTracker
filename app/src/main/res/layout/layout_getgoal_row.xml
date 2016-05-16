@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/goal_row_layout"
+    android:padding="10dp"
+    android:layout_weight="1">
+
+    <LinearLayout
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentStart="true"
+        android:layout_weight="0.8">
+
+        <TextView
+            android:id="@+id/goalName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_gravity="fill_horizontal|start"
+            android:gravity="center_vertical">
+        </TextView>
+
+        <TextView
+            android:id="@+id/goalTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_gravity="fill_horizontal|start"
+            android:gravity="center_vertical">
+        </TextView>
+
+        <TextView
+            android:id="@+id/goalStartInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_gravity="fill_horizontal|start"
+            android:gravity="center_vertical">
+        </TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dip"
+        android:layout_weight="0.2"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="5dip"
+            android:id="@+id/terminatedFlag"
+            android:textColor="@color/primaryW"
+            android:background="@color/gray_light"
+            android:text="@string/done_flag"
+            android:padding="1dip"
+            android:gravity="center"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/goalProgressFriend"
+            android:textSize="20sp"
+            android:layout_gravity="center" />
+
+    </LinearLayout>
+
+</LinearLayout>

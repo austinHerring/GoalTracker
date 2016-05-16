@@ -18,14 +18,14 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import com.austin.goaltracker.Controller.BaseActivitySelectorAdapter;
-import com.austin.goaltracker.Controller.GoalListAdapter;
+import com.austin.goaltracker.Controller.Adapters.BaseActivitySelectorAdapter;
+import com.austin.goaltracker.Controller.Adapters.GoalListAdapter;
 import com.austin.goaltracker.Controller.Util;
-import com.austin.goaltracker.Model.CountdownCompleterGoal;
-import com.austin.goaltracker.Model.Goal;
-import com.austin.goaltracker.Model.GoalClassification;
+import com.austin.goaltracker.Model.Goal.CountdownCompleterGoal;
+import com.austin.goaltracker.Model.Goal.Goal;
+import com.austin.goaltracker.Model.Enums.GoalClassification;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
-import com.austin.goaltracker.Model.StreakSustainerGoal;
+import com.austin.goaltracker.Model.Goal.StreakSustainerGoal;
 import com.austin.goaltracker.R;
 
 import com.austin.goaltracker.View.Friends.FriendsBaseActivity;
@@ -90,6 +90,15 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
             }
         });
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
+        spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
+        spinner.setOnItemSelectedListener(this);
+        spinner.setSelection(0);
     }
 
     @Override

@@ -5,24 +5,28 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.ListView;
 
+import com.austin.goaltracker.Controller.Adapters.GetAccountListAdapter;
+import com.austin.goaltracker.Controller.Generators.PasswordGenerator;
+import com.austin.goaltracker.Controller.Services.EmailDispatchService;
 import com.austin.goaltracker.Model.Account;
 
-import com.austin.goaltracker.Model.CountdownCompleterGoal;
-import com.austin.goaltracker.Model.GetAccount;
-import com.austin.goaltracker.Model.GetAccounts;
-import com.austin.goaltracker.Model.GetGoal;
-import com.austin.goaltracker.Model.GetGoals;
-import com.austin.goaltracker.Model.Goal;
-import com.austin.goaltracker.Model.GoalClassification;
+import com.austin.goaltracker.Model.Goal.CountdownCompleterGoal;
+import com.austin.goaltracker.Model.RealTime.GetAccount;
+import com.austin.goaltracker.Model.RealTime.GetAccounts;
+import com.austin.goaltracker.Model.RealTime.GetGoal;
+import com.austin.goaltracker.Model.RealTime.GetGoals;
+import com.austin.goaltracker.Model.Goal.Goal;
+import com.austin.goaltracker.Model.Enums.GoalClassification;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
-import com.austin.goaltracker.Model.IncrementType;
-import com.austin.goaltracker.Model.NewMemberEmail;
+import com.austin.goaltracker.Model.Enums.IncrementType;
+import com.austin.goaltracker.Model.Mail.NewMemberEmail;
 import com.austin.goaltracker.Model.Password;
-import com.austin.goaltracker.Model.StreakSustainerGoal;
-import com.austin.goaltracker.Model.ToastType;
+import com.austin.goaltracker.Model.Goal.StreakSustainerGoal;
+import com.austin.goaltracker.Model.Enums.ToastType;
 import com.austin.goaltracker.R;
 import com.austin.goaltracker.View.Friends.FriendsAddActivity;
 import com.austin.goaltracker.View.Friends.FriendsBaseActivity;
+import com.austin.goaltracker.View.Friends.FriendsOfFriendsDetailActivity;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -81,6 +85,7 @@ public class Util {
                 accountToLoad.setTotalFriends((Long)userAccount.get("totalFriends"));
                 accountToLoad.setTotalGoalsStarted((Long)userAccount.get("totalGoalsStarted"));
                 accountToLoad.setTotalGoalsCompleted((Long)userAccount.get("totalGoalsCompleted"));
+                accountToLoad.setLongestStreak((Long)userAccount.get("longestStreak"));
 
                 HashMap<String, String> friends = (HashMap<String, String>) userAccount.get("friends");
                 if (friends == null) {
@@ -170,6 +175,7 @@ public class Util {
         row.setValue(newGoalAsEntry);
         accountRef.child("totalGoalsStarted").setValue(Util.currentUser.getTotalGoalsStarted());
         accountRef.child("totalGoalsCompleted").setValue(Util.currentUser.getTotalGoalsCompleted());
+        accountRef.child("longestStreak").setValue(Util.currentUser.getLongestStreak());
     }
 
     /**
@@ -234,6 +240,7 @@ public class Util {
         map.put("totalFriends", account.getTotalFriends());
         map.put("totalGoalsStarted", account.getTotalGoalsStarted());
         map.put("totalGoalsCompleted", account.getTotalGoalsCompleted());
+        map.put("longestStreak", account.getLongestStreak());
         return map;
     }
 
@@ -402,10 +409,11 @@ public class Util {
      * get accounts from database and hydrate view
      *
      * @param activity the activity to get the accounts for
-     * @param isOnlyFriends whether or not its a friends list
+     * @param queryFriends users to display in the list
+     * @param isFriendsOfFriends this controls permissions to view friends of friends
      */
-    public static void GetAccounts(final Activity activity, final boolean isOnlyFriends) {
-        final HashMap<String, String> friends = Util.currentUser.getFriends();
+    public static void GetAccounts(final Activity activity, final HashMap<String, String> queryFriends, final boolean isFriendsOfFriends) {
+        final HashMap<String, String> currentUserFriends = Util.currentUser.getFriends();
         Firebase firebaseAccounts = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts");
         firebaseAccounts.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -420,32 +428,39 @@ public class Util {
 
                 GetAccounts getAccounts = new GetAccounts();
                 String id;
-                UserListAdapter listAdapter;
+                GetAccountListAdapter listAdapter;
 
-                if (!isOnlyFriends) {
+                if (queryFriends == null) { // Add Friends activity
                     for (HashMap accountSnapshot : users.values()) {
-                        id = (String)accountSnapshot.get("id");
-                        if (!currentUser.getId().equals(id) && (friends == null || !friends.containsKey(id))) {
+                        id = (String) accountSnapshot.get("id");
+                        if (!currentUser.getId().equals(id)
+                                && (currentUserFriends == null || !currentUserFriends.containsKey(id))) {
                             getAccounts.addAccount(retrieveUserAccount(accountSnapshot));
                         }
                     }
                     ListView listView = (ListView) activity.findViewById(R.id.list_of_users);
-                    listAdapter = new UserListAdapter(activity, R.layout.layout_user_row, getAccounts, isOnlyFriends);
+                    listAdapter = new GetAccountListAdapter(activity, R.layout.layout_user_row, getAccounts, false, isFriendsOfFriends);
                     ((FriendsAddActivity) activity).ListAdapter = listAdapter;
                     listView.setAdapter(listAdapter);
 
                 }
 
-                if (isOnlyFriends) {
+                if (queryFriends != null) {
                     for (HashMap accountSnapshot : users.values()) {
                         id = (String)accountSnapshot.get("id");
-                        if (!currentUser.getId().equals(id) && friends.containsKey(id)) {
+                        if (!currentUser.getId().equals(id) && queryFriends.containsKey(id)) {
                             getAccounts.addAccount(retrieveUserAccount(accountSnapshot));
                         }
                     }
                     ListView listView = (ListView) activity.findViewById(R.id.list_of_friend_users);
-                    listAdapter = new UserListAdapter(activity, R.layout.layout_user_friend_row, getAccounts, isOnlyFriends);
-                    ((FriendsBaseActivity) activity).ListAdapter = listAdapter;
+                    listAdapter = new GetAccountListAdapter(activity, R.layout.layout_user_friend_row, getAccounts, true, isFriendsOfFriends);
+
+                    if (activity.toString().equals("Friends")) {
+                        ((FriendsBaseActivity) activity).ListAdapter = listAdapter;
+                    } else {
+                        ((FriendsOfFriendsDetailActivity) activity).ListAdapter = listAdapter;
+                    }
+
                     listView.setAdapter(listAdapter);
                 }
 
@@ -465,6 +480,7 @@ public class Util {
         getAccount.setId((String)accountSnapshot.get("id"));
         getAccount.setTotalGoalsStarted(((Long) accountSnapshot.get("totalGoalsStarted")).intValue());
         getAccount.setTotalGoalsCompleted(((Long) accountSnapshot.get("totalGoalsCompleted")).intValue());
+        getAccount.setLongestStreak(((Long) accountSnapshot.get("longestStreak")).intValue());
         getAccount.setTotalFriends(((Long) accountSnapshot.get("totalFriends")).intValue());
         getAccount.setNameFirst((String)accountSnapshot.get("nameFirst"));
         getAccount.setNameLast((String)accountSnapshot.get("nameLast"));

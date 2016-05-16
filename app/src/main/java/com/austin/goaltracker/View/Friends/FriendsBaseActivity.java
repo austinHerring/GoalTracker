@@ -13,8 +13,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
 
-import com.austin.goaltracker.Controller.BaseActivitySelectorAdapter;
-import com.austin.goaltracker.Controller.UserListAdapter;
+import com.austin.goaltracker.Controller.Adapters.BaseActivitySelectorAdapter;
+import com.austin.goaltracker.Controller.Adapters.GetAccountListAdapter;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.R;
@@ -38,7 +38,7 @@ public class FriendsBaseActivity extends AppCompatActivity implements AdapterVie
     private static Button buttonNewFriend;
     private static int mPendingCount = 0;
     private Firebase mFirebaseRef;
-    public UserListAdapter ListAdapter;
+    public GetAccountListAdapter ListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +47,6 @@ public class FriendsBaseActivity extends AppCompatActivity implements AdapterVie
         GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
         setUpNotificationCountWithFirebaseListener();
         findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-
-        spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
-        spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
-        spinner.setSelection(1);
-        spinner.setOnItemSelectedListener(this);
 
         buttonNewFriend = (Button) findViewById(R.id.buttonNewFriend);
         buttonNewFriend.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +61,11 @@ public class FriendsBaseActivity extends AppCompatActivity implements AdapterVie
     @Override
     public void onStart() {
         super.onStart();
-        Util.GetAccounts(this, true);
+        spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
+        spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
+        spinner.setSelection(1);
+        spinner.setOnItemSelectedListener(this);
+        Util.GetAccounts(this, Util.currentUser.getFriends(), false);
     }
 
     @Override

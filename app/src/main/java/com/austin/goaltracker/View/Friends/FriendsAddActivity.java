@@ -4,13 +4,13 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.view.View;
 
-import com.austin.goaltracker.Controller.UserListAdapter;
+import com.austin.goaltracker.Controller.Adapters.GetAccountListAdapter;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.R;
 
 public class FriendsAddActivity extends Activity {
-    public UserListAdapter ListAdapter;
+    public GetAccountListAdapter ListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +24,11 @@ public class FriendsAddActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-        Util.GetAccounts(this, false);
+        Util.GetAccounts(this, null, false);
     }
 
+    @Override
+    public String toString() {
+        return "Users";
+    }
 }

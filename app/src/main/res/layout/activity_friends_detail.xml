@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dip"
+    tools:context="com.austin.goaltracker.View.Friends.FriendsDetailActivity">
+
+    <Button
+        android:layout_width="30dip"
+        android:layout_height="30dip"
+        android:visibility="gone"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/trash_red"
+        android:id="@+id/removeFriendButton" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/detailProfilePic"
+            android:background="@drawable/goals_icon"
+            android:transitionName="@string/shared_picture"
+            android:layout_gravity="center_horizontal"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/profileName"
+            android:textColor="@color/primaryP"
+            android:textSize="30dp"
+            android:layout_margin="5dip"
+            android:text="Austin Herring"
+            android:layout_gravity="center_horizontal"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="5dip"
+            android:gravity="center"
+            android:id="@+id/friendsClickable">
+
+            <ImageView
+                android:layout_width="32dip"
+                android:layout_height="32dip"
+                android:background="@drawable/friends_icon"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/profileFriends"
+                android:textColor="@color/primaryP"
+                android:textSize="20dp"
+                android:layout_margin="5dip"
+                android:text="36 friends"
+                android:layout_gravity="center"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/profileGoalsTotal"
+            android:textColor="@color/primaryP"
+            android:textSize="20dp"
+            android:layout_margin="5dip"
+            android:text="45 Goals started"
+            android:layout_gravity="center_horizontal"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="5dip"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="32dip"
+                android:layout_height="32dip"
+                android:background="@drawable/countdown_flag_small"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/profileGoalsCompleted"
+                android:textColor="@color/text3"
+                android:textSize="20dp"
+                android:layout_margin="10dip"
+                android:text="5 goals"
+                android:layout_gravity="center"/>
+
+            <ImageView
+                android:layout_width="32dip"
+                android:layout_height="32dip"
+                android:background="@drawable/streak_flame_small"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/profileGoalsStreak"
+                android:textColor="@color/text2"
+                android:textSize="20dp"
+                android:layout_margin="10dip"
+                android:text="50 days"
+                android:layout_gravity="center"/>
+
+        </LinearLayout>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/listGoals"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

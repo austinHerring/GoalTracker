@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.austin.goaltracker.Controller.QuoteGenerator;
+import com.austin.goaltracker.Controller.Generators.QuoteGenerator;
 import com.austin.goaltracker.R;
 
 public class SplashActivity extends Activity {

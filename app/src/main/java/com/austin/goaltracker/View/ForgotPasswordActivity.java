@@ -7,14 +7,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.austin.goaltracker.Controller.EmailDispatchService;
+import com.austin.goaltracker.Controller.Services.EmailDispatchService;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Account;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
-import com.austin.goaltracker.Model.NewPasswordEmail;
+import com.austin.goaltracker.Model.Mail.NewPasswordEmail;
 import com.austin.goaltracker.Model.Password;
-import com.austin.goaltracker.Model.ToastType;
+import com.austin.goaltracker.Model.Enums.ToastType;
 import com.austin.goaltracker.R;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;

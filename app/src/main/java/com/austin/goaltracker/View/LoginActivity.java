@@ -1,6 +1,6 @@
 package com.austin.goaltracker.View;
 
-import com.austin.goaltracker.Controller.LoginMediator;
+import com.austin.goaltracker.Controller.Mediators.LoginMediator;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.R;
 import com.austin.goaltracker.Controller.Util;

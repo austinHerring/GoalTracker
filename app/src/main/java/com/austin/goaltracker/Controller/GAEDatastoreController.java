@@ -2,11 +2,13 @@ package com.austin.goaltracker.Controller;
 
 import android.content.Intent;
 
-import com.austin.goaltracker.Model.CountdownCompleterGoal;
-import com.austin.goaltracker.Model.Goal;
-import com.austin.goaltracker.Model.GoalClassification;
+import com.austin.goaltracker.Controller.Services.CronJobIntentService;
+import com.austin.goaltracker.Controller.Services.RegistrationIntentService;
+import com.austin.goaltracker.Model.Goal.CountdownCompleterGoal;
+import com.austin.goaltracker.Model.Goal.Goal;
+import com.austin.goaltracker.Model.Enums.GoalClassification;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
-import com.austin.goaltracker.Model.IncrementType;
+import com.austin.goaltracker.Model.Enums.IncrementType;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 

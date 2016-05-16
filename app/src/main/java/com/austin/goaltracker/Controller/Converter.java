@@ -1,7 +1,6 @@
 package com.austin.goaltracker.Controller;
 
-import com.austin.goaltracker.Model.Goal;
-import com.austin.goaltracker.Model.IncrementType;
+import com.austin.goaltracker.Model.Enums.IncrementType;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;

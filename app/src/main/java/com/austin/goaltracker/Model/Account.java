@@ -1,6 +1,7 @@
 package com.austin.goaltracker.Model;
 
 import com.austin.goaltracker.Controller.Util;
+import com.austin.goaltracker.Model.Goal.Goal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ public class Account {
     private long totalFriends;
     private long totalGoalsStarted;
     private long totalGoalsCompleted;
+    private long longestStreak;
     private HashMap<String, Goal> goals;
     private HashMap<String, String> friends;
     private String id;
@@ -101,6 +103,10 @@ public class Account {
         return totalGoalsCompleted;
     }
 
+    public long getLongestStreak() {
+        return longestStreak;
+    }
+
     public long getTotalGoalsStarted() {
         return totalGoalsStarted;
     }
@@ -121,6 +127,10 @@ public class Account {
 
     public void setTotalGoalsStarted(long totalGoalsStarted) {
         this.totalGoalsStarted = totalGoalsStarted;
+    }
+
+    public void setLongestStreak(long longestStreak) {
+        this.longestStreak = longestStreak;
     }
 
     public HashMap<String, Goal> getGoals() {
