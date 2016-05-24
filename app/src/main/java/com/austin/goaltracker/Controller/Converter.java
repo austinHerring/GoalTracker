@@ -1,7 +1,15 @@
 package com.austin.goaltracker.Controller;
 
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.util.Base64;
+
 import com.austin.goaltracker.Model.Enums.IncrementType;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -40,5 +48,20 @@ public class Converter {
         } else {
             return null;
         }
+    }
+
+    public static Drawable makeDrawableFromBase64String(Activity activity, String base64String) {
+        if (base64String != null && !base64String.equals("")) {
+            byte[] decodedString = Base64.decode(base64String, Base64.DEFAULT);
+            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            return new BitmapDrawable(activity.getResources(), decodedByte);
+        }
+        return null;
+    }
+
+    public static String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality) {
+        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+        image.compress(compressFormat, quality, byteArrayOS);
+        return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.DEFAULT);
     }
 }

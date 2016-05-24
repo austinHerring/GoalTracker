@@ -16,6 +16,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.austin.goaltracker.Controller.Converter;
 import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Enums.ToastType;
@@ -99,11 +100,16 @@ public class GetAccountListAdapter extends ArrayAdapter<GetAccount> implements F
             holder = (ViewHolder) v.getTag();
         }
 
-        Drawable profilePic = ResourcesCompat.getDrawable(activity.getResources(), R.drawable.goals_icon_current, null);
+        Drawable defaultPicture = ResourcesCompat.getDrawable(activity.getResources(), R.drawable.default_user_icon, null);
         String fullName = getAccount.getNameFirst() + " " + getAccount.getNameLast();
         String goalCount = "Goals: " + getAccount.getTotalGoalsStarted();
 
-        holder.profile_picture.setBackground(profilePic);
+        Drawable pic = Converter.makeDrawableFromBase64String(activity, getAccount.getPictureData());
+        if (pic != null) {
+            holder.profile_picture.setBackground(pic);
+        } else {
+            holder.profile_picture.setBackground(defaultPicture);
+        }
         holder.user_name.setText(fullName);
         holder.number_goals.setText(goalCount);
 

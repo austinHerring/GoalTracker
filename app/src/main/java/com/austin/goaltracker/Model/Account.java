@@ -14,18 +14,14 @@ import java.util.List;
  * Account structure used to keep track of account information
  */
 public class Account {
-    private String nameFirst;
-    private String nameLast;
-    private String username;
+    private String id, nameFirst, nameLast, username, email, pictureData;
     private Password password;
-    private String email;
     private long totalFriends;
     private long totalGoalsStarted;
     private long totalGoalsCompleted;
     private long longestStreak;
     private HashMap<String, Goal> goals;
     private HashMap<String, String> friends;
-    private String id;
 
     /**
      * Create a new Account
@@ -83,6 +79,10 @@ public class Account {
         return this.password.toDateString();
     }
 
+    public String getPictureData() {
+        return pictureData;
+    }
+
     public String getEmail() {
         return this.email;
     }
@@ -97,6 +97,10 @@ public class Account {
 
     public long getTotalFriends() {
         return totalFriends;
+    }
+
+    public void setPictureData(String pictureData) {
+        this.pictureData = pictureData;
     }
 
     public long getTotalGoalsCompleted() {

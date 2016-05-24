@@ -87,6 +87,10 @@ public class Util {
                 accountToLoad.setTotalGoalsCompleted((Long)userAccount.get("totalGoalsCompleted"));
                 accountToLoad.setLongestStreak((Long)userAccount.get("longestStreak"));
 
+                if (userAccount.get("pictureData") != null) {
+                    accountToLoad.setPictureData((String) userAccount.get("pictureData"));
+                }
+
                 HashMap<String, String> friends = (HashMap<String, String>) userAccount.get("friends");
                 if (friends == null) {
                     accountToLoad.setFriends(new HashMap<String, String>());
@@ -179,6 +183,18 @@ public class Util {
     }
 
     /**
+     * Updates a goal for an account on the database.
+     *
+     * @param accountId account update a goal for
+     * @param pictureData base 64 data for profile picture
+     */
+    public static void updateAccountPictureOnDB(String accountId, String pictureData) throws FirebaseException {
+        Firebase accountRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+                .child("accounts").child(accountId);
+        accountRef.child("pictureData").setValue(Util.currentUser.getPictureData());
+    }
+
+    /**
      * Updates a password for an account on the database.
      *
      * @param account account to reset a password for
@@ -241,6 +257,7 @@ public class Util {
         map.put("totalGoalsStarted", account.getTotalGoalsStarted());
         map.put("totalGoalsCompleted", account.getTotalGoalsCompleted());
         map.put("longestStreak", account.getLongestStreak());
+        map.put("pictureData", account.getPictureData());
         return map;
     }
 
@@ -488,6 +505,10 @@ public class Util {
 
         if (accountSnapshot.get("goals") != null) {
             getAccount.setGetGoals(retrieveUserGoals(accountSnapshot));
+        }
+
+        if (accountSnapshot.get("pictureData") != null) {
+            getAccount.setPictureData((String) accountSnapshot.get("pictureData"));
         }
 
         if (accountSnapshot.get("friends") != null) {

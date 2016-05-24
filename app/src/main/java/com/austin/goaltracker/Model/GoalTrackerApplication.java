@@ -33,6 +33,8 @@ public class GoalTrackerApplication extends Application {
     static Logger Log = Logger.getLogger(GoalTrackerApplication.class.getName());
     public static int notificationId = 0;
     public static String[] ACTIVITIES = {"Goals", "Friends", "Messages", "History"};
+    public static final int SELECT_REQUEST = 2;
+    public static final int PIC_CROP = 3;
 
     public void onCreate(){
         super.onCreate();

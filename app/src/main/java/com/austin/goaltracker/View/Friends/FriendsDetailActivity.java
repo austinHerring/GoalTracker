@@ -2,13 +2,16 @@ package com.austin.goaltracker.View.Friends;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.austin.goaltracker.Controller.Adapters.GetGoalListAdapter;
+import com.austin.goaltracker.Controller.Converter;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.RealTime.GetAccount;
@@ -41,6 +44,7 @@ public class FriendsDetailActivity extends Activity {
         long goalsCompleted = mGetAccount.getTotalGoalsCompleted();
         String goalsCompletedFormatted = (goalsCompleted == 1) ? goalsCompleted + " goal" : goalsCompleted + " goals";
         String longestStreak = formatLongestStreak(mGetAccount.getLongestStreak());
+        Drawable profilePicture = Converter.makeDrawableFromBase64String(this, mGetAccount.getPictureData());
 
         setTitle(mGetAccount.getUsername() + "'s profile");
         ((TextView) findViewById(R.id.profileName)).setText(fullName);
@@ -48,8 +52,10 @@ public class FriendsDetailActivity extends Activity {
         ((TextView) findViewById(R.id.profileGoalsTotal)).setText(goals);
         ((TextView) findViewById(R.id.profileGoalsCompleted)).setText(goalsCompletedFormatted);
         ((TextView) findViewById(R.id.profileGoalsStreak)).setText(longestStreak);
-
-        //TODO Profile picture
+        ((TextView) findViewById(R.id.profileGoalsStreak)).setText(longestStreak);
+        if (profilePicture != null) {
+            findViewById(R.id.detailProfilePic).setBackground(profilePicture);
+        }
 
         GetGoals getGoals = mGetAccount.getGetGoals();
         if (getGoals != null && getGoals.Goals.size() > 0) {

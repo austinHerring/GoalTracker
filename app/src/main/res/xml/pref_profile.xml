@@ -1,0 +1,15 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.austin.goaltracker.View.Preferences.ChangePasswordPreference
+        android:key="password_change_text"
+        android:title="@string/pref_title_password"
+        android:singleLine="true"
+        android:inputType="textPassword" />
+
+    <Preference
+        android:key="select_image"
+        android:title="@string/pref_title_picture"
+        android:icon="@drawable/default_user_icon"
+        android:layout="@layout/layout_profile_picture_preference"/>
+
+</PreferenceScreen>

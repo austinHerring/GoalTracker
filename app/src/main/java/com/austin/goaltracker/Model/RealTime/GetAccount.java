@@ -11,16 +11,10 @@ import java.util.HashMap;
  */
 public class GetAccount implements Serializable {
 
-    private String nameFirst;
-    private String nameLast;
-    private String username;
-    private long totalFriends;
-    private long totalGoalsStarted;
-    private long totalGoalsCompleted;
-    private long longestStreak;
+    private String nameFirst, nameLast, username, id, pictureData;
+    private long totalFriends, totalGoalsStarted, totalGoalsCompleted, longestStreak;
     private GetGoals getGoals;
     private HashMap<String, String> friends = new HashMap<>();
-    private String id;
 
     public HashMap<String, String> getFriends() {
         return friends;
@@ -58,6 +52,10 @@ public class GetAccount implements Serializable {
         return nameLast;
     }
 
+    public String getPictureData() {
+        return pictureData;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -84,6 +82,10 @@ public class GetAccount implements Serializable {
 
     public void setNameLast(String nameLast) {
         this.nameLast = nameLast;
+    }
+
+    public void setPictureData(String pictureData) {
+        this.pictureData = pictureData;
     }
 
     public void setTotalFriends(long totalFriends) {
