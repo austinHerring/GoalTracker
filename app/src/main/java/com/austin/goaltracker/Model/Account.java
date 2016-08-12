@@ -16,12 +16,10 @@ import java.util.List;
 public class Account {
     private String id, nameFirst, nameLast, username, email, pictureData;
     private Password password;
-    private long totalFriends;
-    private long totalGoalsStarted;
-    private long totalGoalsCompleted;
-    private long longestStreak;
+    private long totalFriends, totalGoalsStarted, totalGoalsCompleted, longestStreak;
     private HashMap<String, Goal> goals;
     private HashMap<String, String> friends;
+    private boolean receiveNotificationsOnCurrentDevice;
 
     /**
      * Create a new Account
@@ -83,6 +81,10 @@ public class Account {
         return pictureData;
     }
 
+    public boolean canReceiveNotificationsOnCurrentDevice() {
+        return receiveNotificationsOnCurrentDevice;
+    }
+
     public String getEmail() {
         return this.email;
     }
@@ -131,6 +133,10 @@ public class Account {
 
     public void setTotalGoalsStarted(long totalGoalsStarted) {
         this.totalGoalsStarted = totalGoalsStarted;
+    }
+
+    public void setReceiveNotificationsOnCurrentDevice(boolean canReceive) {
+        receiveNotificationsOnCurrentDevice = canReceive;
     }
 
     public void setLongestStreak(long longestStreak) {

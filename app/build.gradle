@@ -39,6 +39,7 @@ dependencies {
     compile 'me.itangqi.waveloadingview:library:0.1.5'
     compile 'hanks.xyz:smallbang-library:0.1.2'
     compile 'me.alexrs:wave-drawable:1.0.0'
+    compile 'com.android.support:design:23.4.0'
     compile 'com.google.android.gms:play-services-gcm:8.4.0'
     compile 'com.wdullaer:materialdatetimepicker:2.3.0'
     compile 'com.google.android.gms:play-services-ads:8.4.0'

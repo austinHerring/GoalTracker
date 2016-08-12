@@ -1,41 +1,47 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".View.Goals.GoalsBaseActivity"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:orientation="vertical" tools:context=".View.Goals.GoalsBaseActivity">
+    android:fitsSystemWindows="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:orientation="horizontal"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingBottom="5dp">
-
-        <Button
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:text="@string/button_new_object"
-            android:id="@+id/buttonNewGoal"
-            android:background="@drawable/button_basic"/>
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:orientation="vertical">
 
         <Spinner
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:id="@+id/spinnerSelectBase"
             android:background="@drawable/spinner_basic"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"
             android:gravity="center"
             android:overlapAnchor="false"/>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent" android:paddingTop="5dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" android:id="@+id/goal_graphic" />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/listOfGoals"/>
+
     </LinearLayout>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent" android:layout_height="wrap_content"
-        android:orientation="vertical" android:id="@+id/goal_graphic" />
-
-    <ListView
-        android:layout_width="match_parent"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/buttonNewGoal"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/listOfGoals"/>
-</LinearLayout>
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@color/primaryP"
+        android:src="@drawable/plus_icon" />
+
+</android.support.design.widget.CoordinatorLayout>

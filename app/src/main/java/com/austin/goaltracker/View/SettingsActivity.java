@@ -1,22 +1,14 @@
 package com.austin.goaltracker.View;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.austin.goaltracker.Controller.Converter;
@@ -116,8 +108,9 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_notification);
-
-            findPreference("notifications_enable_on_device");
+            boolean notificationEligible = Util.currentUser.canReceiveNotificationsOnCurrentDevice();
+            findPreference("notifications_enable_on_device").setDefaultValue(notificationEligible);
+            //findPreference("notifications_enable_on_device").setOnPreferenceChangeListener();
         }
     }
 

@@ -1,27 +1,22 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".View.Friends.FriendsBaseActivity"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:orientation="vertical" tools:context=".View.Friends.FriendsBaseActivity">
+    android:fitsSystemWindows="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:orientation="horizontal"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingBottom="5dp">
-
-        <Button
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:text="@string/button_new_object"
-            android:id="@+id/buttonNewFriend"
-            android:background="@drawable/button_basic"/>
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:orientation="vertical">
 
         <Spinner
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/spinnerSelectBase"
             android:background="@drawable/spinner_basic"
             android:layout_marginStart="5dp"
@@ -29,31 +24,40 @@
             android:gravity="center"
             android:overlapAnchor="false"/>
 
+        <RelativeLayout
+            android:paddingTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Login progress -->
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:id="@+id/loadingPanel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:indeterminate="true"
+                android:layout_centerInParent="true" />
+
+            <ListView
+                android:id="@+id/list_of_friend_users"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:listitem="@layout/layout_user_friend_row">
+
+            </ListView>
+
+        </RelativeLayout>
+
     </LinearLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/buttonNewFriend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@color/primaryP"
+        android:src="@drawable/plus_icon" />
 
-        <!-- Login progress -->
-        <ProgressBar
-            style="?android:attr/progressBarStyleLarge"
-            android:id="@+id/loadingPanel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:indeterminate="true"
-            android:layout_centerInParent="true" />
-
-        <ListView
-            android:id="@+id/list_of_friend_users"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:listitem="@layout/layout_user_friend_row">
-
-        </ListView>
-
-    </RelativeLayout>
-
-</LinearLayout>
-
+</android.support.design.widget.CoordinatorLayout>

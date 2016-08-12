@@ -2,7 +2,6 @@
 
     <CheckBoxPreference
         android:key="notifications_enable_on_device"
-        android:title="@string/pref_title_enable_notification_on_device"
-        android:defaultValue="true" />
+        android:title="@string/pref_title_enable_notification_on_device"/>
 
 </PreferenceScreen>

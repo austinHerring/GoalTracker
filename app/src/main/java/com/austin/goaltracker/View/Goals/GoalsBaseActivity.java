@@ -3,6 +3,7 @@ package com.austin.goaltracker.View.Goals;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -29,6 +30,7 @@ import com.austin.goaltracker.Model.Goal.StreakSustainerGoal;
 import com.austin.goaltracker.R;
 
 import com.austin.goaltracker.View.Friends.FriendsBaseActivity;
+import com.austin.goaltracker.View.History.HistoryBaseActivity;
 import com.austin.goaltracker.View.LoginActivity;
 import com.austin.goaltracker.View.ReminderListActivity;
 import com.austin.goaltracker.View.SettingsActivity;
@@ -45,7 +47,7 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
     ListView listOfGoals;
     private Spinner spinner;
     private static Button buttonPending;
-    private static Button buttonNewGoal;
+    private static FloatingActionButton buttonNewGoal;
     private static int mPendingCount = 0;
     private GoalListAdapter goalListAdapter;
     private Firebase mFirebaseRef;
@@ -62,7 +64,7 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
         spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
         spinner.setOnItemSelectedListener(this);
 
-        buttonNewGoal = (Button) findViewById(R.id.buttonNewGoal);
+        buttonNewGoal = (FloatingActionButton) findViewById(R.id.buttonNewGoal);
         buttonNewGoal.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), GoalsTypeSelectActivity.class);
@@ -98,7 +100,7 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
         spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
         spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
         spinner.setOnItemSelectedListener(this);
-        spinner.setSelection(0);
+        spinner.setSelection(0); // index in list
     }
 
     @Override
@@ -150,9 +152,13 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        if (!parent.getItemAtPosition(pos).equals(this.toString())
+        if (!parent.getItemAtPosition(pos).toString().equals(this.toString())
                 && parent.getItemAtPosition(pos).equals("Friends")) {
             Intent i = new Intent(getApplicationContext(), FriendsBaseActivity.class);
+            startActivity(i);
+        } else if (!parent.getItemAtPosition(pos).toString().equals(this.toString())
+                && parent.getItemAtPosition(pos).equals("History")) {
+            Intent i = new Intent(getApplicationContext(), HistoryBaseActivity.class);
             startActivity(i);
         }
     }

@@ -29,4 +29,5 @@
     <string name="title_activity_friends_add">Find A Friend</string>
     <string name="shared_picture">Shared Picture Element</string>
     <string name="done_flag">Done</string>
+    <string name="title_activity_history_base">HistoryBaseActivity</string>
 </resources>

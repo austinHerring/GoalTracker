@@ -1,27 +1,37 @@
-package com.austin.goaltracker.View.Friends;
+package com.austin.goaltracker.View.History;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.transition.Transition;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.austin.goaltracker.Controller.Adapters.BaseActivitySelectorAdapter;
-import com.austin.goaltracker.Controller.Adapters.GetAccountListAdapter;
+import com.austin.goaltracker.Controller.Adapters.GoalListAdapter;
 import com.austin.goaltracker.Controller.Util;
+import com.austin.goaltracker.Model.Enums.GoalClassification;
+import com.austin.goaltracker.Model.Goal.CountdownCompleterGoal;
+import com.austin.goaltracker.Model.Goal.Goal;
+import com.austin.goaltracker.Model.Goal.StreakSustainerGoal;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.R;
-
+import com.austin.goaltracker.View.Friends.FriendsBaseActivity;
+import com.austin.goaltracker.View.Goals.GoalCountdownGraphicFragment;
 import com.austin.goaltracker.View.Goals.GoalsBaseActivity;
-import com.austin.goaltracker.View.History.HistoryBaseActivity;
+import com.austin.goaltracker.View.Goals.GoalsStreakGraphicFragment;
+import com.austin.goaltracker.View.Goals.GoalsTypeSelectActivity;
 import com.austin.goaltracker.View.LoginActivity;
 import com.austin.goaltracker.View.ReminderListActivity;
 import com.austin.goaltracker.View.SettingsActivity;
@@ -32,32 +42,50 @@ import com.firebase.client.ValueEventListener;
 
 import java.util.HashMap;
 
+public class HistoryBaseActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-public class FriendsBaseActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-
+    ListView listOfHistory;
     private Spinner spinner;
     private static Button buttonPending;
-    private static FloatingActionButton buttonNewFriend;
     private static int mPendingCount = 0;
     private Firebase mFirebaseRef;
-    public GetAccountListAdapter ListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_friends_base);
+        setContentView(R.layout.activity_history_base);
         GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
+        setupWindowAnimations();
         setUpNotificationCountWithFirebaseListener();
-        findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
 
-        buttonNewFriend = (FloatingActionButton) findViewById(R.id.buttonNewFriend);
-        buttonNewFriend.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), FriendsAddActivity.class);
-                startActivity(i);
-            }
-        });
+        spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
+        spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
+        spinner.setOnItemSelectedListener(this);
 
+        listOfHistory = (ListView) findViewById(R.id.listOfHistory);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        if (!parent.getItemAtPosition(pos).toString().equals(this.toString())
+                && parent.getItemAtPosition(pos).equals("Goals")) {
+            Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
+            startActivity(i);
+        } else if (!parent.getItemAtPosition(pos).toString().equals(this.toString())
+                && parent.getItemAtPosition(pos).equals("Friends")) {
+            Intent i = new Intent(getApplicationContext(), FriendsBaseActivity.class);
+            startActivity(i);
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+    }
+
+    @Override
+    public String toString() {
+        return "History";
     }
 
     @Override
@@ -65,15 +93,15 @@ public class FriendsBaseActivity extends AppCompatActivity implements AdapterVie
         super.onStart();
         spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
         spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
-        spinner.setSelection(1); // index in list
         spinner.setOnItemSelectedListener(this);
-        Util.GetAccounts(this, Util.currentUser.getFriends(), false);
+        spinner.setSelection(3); // index in list
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_base, menu);
+        setupWindowAnimations();
 
         MenuItem countItem = menu.findItem(R.id.pending_goals);
         MenuItemCompat.setActionView(countItem, R.layout.feed_update_count);
@@ -84,7 +112,7 @@ public class FriendsBaseActivity extends AppCompatActivity implements AdapterVie
             buttonPending.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     Intent i = new Intent(getApplicationContext(), ReminderListActivity.class);
-                    startActivity(i, ActivityOptions.makeSceneTransitionAnimation(FriendsBaseActivity.this).toBundle());
+                    startActivity(i, ActivityOptions.makeSceneTransitionAnimation(HistoryBaseActivity.this).toBundle());
                 }
             });
         } else {
@@ -117,29 +145,6 @@ public class FriendsBaseActivity extends AppCompatActivity implements AdapterVie
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        if (!parent.getItemAtPosition(pos).equals(this.toString())
-                && parent.getItemAtPosition(pos).toString().equals("Goals")) {
-            Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
-            startActivity(i);
-        } else if (!parent.getItemAtPosition(pos).toString().equals(this.toString())
-                && parent.getItemAtPosition(pos).equals("History")) {
-            Intent i = new Intent(getApplicationContext(), HistoryBaseActivity.class);
-            startActivity(i);
-        }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        // Another interface callback
-    }
-
-    @Override
-    public String toString() {
-        return "Friends";
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         GoalTrackerApplication.INSTANCE.registerReceiver();
@@ -158,6 +163,16 @@ public class FriendsBaseActivity extends AppCompatActivity implements AdapterVie
         invalidateOptionsMenu();
     }
 
+    private void setupWindowAnimations() {
+        getWindow().setAllowEnterTransitionOverlap(false);
+        Transition fade = new Fade();
+        fade.setDuration(400);
+        getWindow().setExitTransition(fade);
+        Transition slideIn = new Slide(Gravity.BOTTOM);
+        slideIn.setDuration(400);
+        getWindow().setExitTransition(slideIn);
+    }
+
     private void setUpNotificationCountWithFirebaseListener() {
         mFirebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
                 .child("accounts")
@@ -171,6 +186,7 @@ public class FriendsBaseActivity extends AppCompatActivity implements AdapterVie
                 } else {
                     setPendingGoalsCountInActionBar(((HashMap<String, Object>) snapshot.getValue()).size());
                 }
+
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {

@@ -147,7 +147,11 @@
                 android:value="com.austin.goaltracker.View.Friends.FriendsBaseActivity" />
         </activity>
         <activity android:name=".View.Friends.FriendsDetailActivity" />
-        <activity android:name=".View.Friends.FriendsOfFriendsDetailActivity"></activity>
+        <activity android:name=".View.Friends.FriendsOfFriendsDetailActivity" />
+        <activity
+            android:name=".View.History.HistoryBaseActivity"
+            android:label="@string/title_activity_history_base"
+            android:theme="@style/AppThemePurpleAppCompat" />
     </application>
 
 </manifest>
