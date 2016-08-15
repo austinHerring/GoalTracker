@@ -65,7 +65,7 @@ public class FriendsBaseActivity extends AppCompatActivity implements AdapterVie
         super.onStart();
         spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
         spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
-        spinner.setSelection(1); // index in list
+        spinner.setSelection(GoalTrackerApplication.FRIENDS); // index in list
         spinner.setOnItemSelectedListener(this);
         Util.GetAccounts(this, Util.currentUser.getFriends(), false);
     }

@@ -2,8 +2,10 @@ package com.austin.goaltracker.Model;
 
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Goal.Goal;
+import com.austin.goaltracker.Model.RealTime.GetAccount;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -153,16 +155,18 @@ public class Account {
         Util.updateFriendsForAccountOnDB(this.id, friends, totalFriends);
     }
 
-    public void addFriend(String id) {
-        friends.put(id, id);
+    public void addFriend(GetAccount getAccount) {
+        friends.put(getAccount.getId(), getAccount.getId());
         totalFriends++;
         Util.updateFriendsForAccountOnDB(this.id, friends, totalFriends);
+        Util.addHistoryArtifactOnDB("FRIEND", id, Calendar.getInstance().getTimeInMillis(), true, getAccount);
     }
 
-    public void removeFriend(String id) {
-        friends.remove(id);
+    public void removeFriend(GetAccount getAccount) {
+        friends.remove(getAccount.getId());
         totalFriends--;
         Util.updateFriendsForAccountOnDB(this.id, friends, totalFriends);
+        Util.addHistoryArtifactOnDB("FRIEND", id, Calendar.getInstance().getTimeInMillis(), false, getAccount);
     }
 
     public void incrementCompletedGoals() {

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.austin.goaltracker.Controller.Converter;
 import com.austin.goaltracker.Controller.GAEDatastoreController;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Goal.CountdownCompleterGoal;
@@ -70,6 +71,8 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
                         notifyUserCompletion(view.getContext(), goal);
                         Util.currentUser.incrementCompletedGoals();
                         cGoal.setIsTerminated(true);
+                        cGoal.setBrokenDate(cGoal.getDateDesiredFinish());
+                        Util.addHistoryArtifactOnDB("GOAL", cGoal.getId(), cGoal.getDateDesiredFinish().getTimeInMillis(), true, null);
                     }
                     Util.updateAccountGoalOnDB(Util.currentUser.getId(), cGoal);
                 } else {
@@ -95,7 +98,9 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
                 if (goal.classification().equals(GoalClassification.COUNTDOWN)) {
                     CountdownCompleterGoal cGoal = (CountdownCompleterGoal) goal;
                     cGoal.setIsTerminated(true);
+                    cGoal.setBrokenDate(Converter.longToCalendar(pendingGoalNotification.getDateTimeNotified()));
                     Util.updateAccountGoalOnDB(Util.currentUser.getId(), cGoal);
+                    Util.addHistoryArtifactOnDB("GOAL", cGoal.getId(), pendingGoalNotification.getDateTimeNotified(), false, null);
 
                     Util.removeAssociatedPendingGoalNotificationsFromDB(goalId);
                     GAEDatastoreController.removeCron(Util.currentUser.getGoals().get(goalId));
@@ -104,6 +109,8 @@ public class PendingNotificationListAdapter extends FirebaseListAdapter<PendingG
                     if (sGoal.updateCheatNumber()) {
                         // The goal ran out of cheats, flag as terminated
                         sGoal.setIsTerminated(true);
+                        sGoal.setBrokenDate(Converter.longToCalendar(pendingGoalNotification.getDateTimeNotified()));
+                        Util.addHistoryArtifactOnDB("GOAL", sGoal.getId(), pendingGoalNotification.getDateTimeNotified(), false, null);
                         // Remove cron and other associated reminders
                         Util.removeAssociatedPendingGoalNotificationsFromDB(goalId);
                         GAEDatastoreController.removeCron(Util.currentUser.getGoals().get(goalId));

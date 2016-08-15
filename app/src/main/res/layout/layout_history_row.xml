@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/goal_row_layout"
+    android:padding="10dp"
+    android:layout_weight="1">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_weight="0.9"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/history_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_gravity="fill_horizontal|start"
+            android:gravity="center_vertical"
+            android:textStyle="bold">
+        </TextView>
+
+        <TextView
+            android:id="@+id/subject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_gravity="fill_horizontal|start"
+            android:gravity="center_vertical">
+        </TextView>
+    </LinearLayout>
+
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"
+        android:layout_marginStart="2dp">
+
+        <ImageView
+            android:id="@+id/history_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="64dip"
+            android:minWidth="64dip"
+            android:layout_gravity="center"
+            android:padding="4dp"
+            android:cropToPadding="true"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/history_stat"
+            android:textSize="20sp"
+            android:textColor="@color/primaryW"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:gravity="center_horizontal" />
+
+    </FrameLayout>
+
+
+</LinearLayout>

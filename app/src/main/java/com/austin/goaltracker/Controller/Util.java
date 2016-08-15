@@ -23,6 +23,7 @@ import com.austin.goaltracker.Model.Mail.NewMemberEmail;
 import com.austin.goaltracker.Model.Password;
 import com.austin.goaltracker.Model.Goal.StreakSustainerGoal;
 import com.austin.goaltracker.Model.Enums.ToastType;
+import com.austin.goaltracker.Model.RealTime.HistoryArtifact;
 import com.austin.goaltracker.R;
 import com.austin.goaltracker.View.Friends.FriendsAddActivity;
 import com.austin.goaltracker.View.Friends.FriendsBaseActivity;
@@ -191,7 +192,7 @@ public class Util {
     public static void updateAccountPictureOnDB(String accountId, String pictureData) throws FirebaseException {
         Firebase accountRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
                 .child("accounts").child(accountId);
-        accountRef.child("pictureData").setValue(Util.currentUser.getPictureData());
+        accountRef.child("pictureData").setValue(pictureData);
     }
 
     /**
@@ -289,6 +290,47 @@ public class Util {
             map.put("cheatsRemaining", ((StreakSustainerGoal) goal).getCheatsRemaining());
         }
         return map;
+    }
+
+    /**
+     * Create a History Artifact and stores on Firebase as JSON
+     *
+     * @param type History artifact -> FRIEND or GOAL.
+     * @param association Id of associated obect.
+     * @param date time of occurrence as long.
+     * @param positiveAction used to track new records with goals / friend additions with friends.
+     * @param getAccount optional parameter to pass account information through.
+     */
+    public static void addHistoryArtifactOnDB(
+            String type,
+            String association,
+            long date,
+            boolean positiveAction,
+            GetAccount getAccount) throws FirebaseException
+    {
+        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL);
+        Firebase accountHistoryRef = firebaseRef
+                .child("accounts")
+                .child(currentUser.getId())
+                .child("history");
+        Firebase row = accountHistoryRef.push();
+        HistoryArtifact artifact = new HistoryArtifact(association, type, date, positiveAction);
+        if (getAccount != null) {
+            artifact.setUsername(getAccount.getUsername());
+            artifact.setUserPic(getAccount.getPictureData());
+        }
+        artifact.setId(row.getKey());
+        row.setValue(artifact, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    System.out.println("Data could not be saved. " + firebaseError.getMessage());
+                    throw new FirebaseException(firebaseError.getMessage());
+                } else {
+                    System.out.println("Data saved successfully.");
+                }
+            }
+        });
     }
 
     /**

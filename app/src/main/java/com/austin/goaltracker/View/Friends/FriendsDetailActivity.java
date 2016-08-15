@@ -69,7 +69,7 @@ public class FriendsDetailActivity extends Activity {
             removeFriendButton.setVisibility(View.VISIBLE);
             removeFriendButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    Util.currentUser.removeFriend(mGetAccount.getId());
+                    Util.currentUser.removeFriend(mGetAccount);
                     Intent i = new Intent(getApplicationContext(), FriendsBaseActivity.class);
                     startActivity(i);
                 }

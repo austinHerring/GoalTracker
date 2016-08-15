@@ -20,8 +20,11 @@ import android.widget.Spinner;
 
 import com.austin.goaltracker.Controller.Adapters.BaseActivitySelectorAdapter;
 import com.austin.goaltracker.Controller.Adapters.GoalListAdapter;
+import com.austin.goaltracker.Controller.Adapters.HistoryListAdapter;
+import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Enums.GoalClassification;
+import com.austin.goaltracker.Model.Enums.ToastType;
 import com.austin.goaltracker.Model.Goal.CountdownCompleterGoal;
 import com.austin.goaltracker.Model.Goal.Goal;
 import com.austin.goaltracker.Model.Goal.StreakSustainerGoal;
@@ -44,11 +47,12 @@ import java.util.HashMap;
 
 public class HistoryBaseActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    ListView listOfHistory;
     private Spinner spinner;
     private static Button buttonPending;
     private static int mPendingCount = 0;
+    private HistoryListAdapter historyListAdapter;
     private Firebase mFirebaseRef;
+    private ValueEventListener mConnectedListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,13 +60,34 @@ public class HistoryBaseActivity extends AppCompatActivity implements AdapterVie
         setContentView(R.layout.activity_history_base);
         GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
         setupWindowAnimations();
+        mFirebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+                .child("accounts")
+                .child(Util.currentUser.getId());
         setUpNotificationCountWithFirebaseListener();
 
         spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
-        spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
+        spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_history_row));
         spinner.setOnItemSelectedListener(this);
 
-        listOfHistory = (ListView) findViewById(R.id.listOfHistory);
+        ListView listOfHistory = (ListView) findViewById(R.id.listOfHistory);
+        historyListAdapter = new HistoryListAdapter(mFirebaseRef.child("history").orderByChild("sort"), this, R.layout.layout_history_row);
+        listOfHistory.setAdapter(historyListAdapter);
+
+        // A little indication of connection status
+        mConnectedListener = mFirebaseRef.getRoot().child(".info/connected").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean connected = (Boolean) dataSnapshot.getValue();
+                if (!connected) {
+                    ToastDisplayer.displayHint("Could not connect to Database", ToastType.FAILURE, getApplicationContext());
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -94,7 +119,7 @@ public class HistoryBaseActivity extends AppCompatActivity implements AdapterVie
         spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
         spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
         spinner.setOnItemSelectedListener(this);
-        spinner.setSelection(3); // index in list
+        spinner.setSelection(GoalTrackerApplication.HISTORY); // index in list
     }
 
     @Override
@@ -174,11 +199,7 @@ public class HistoryBaseActivity extends AppCompatActivity implements AdapterVie
     }
 
     private void setUpNotificationCountWithFirebaseListener() {
-        mFirebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
-                .child("accounts")
-                .child(Util.currentUser.getId())
-                .child("pending goal notifications");
-        mFirebaseRef.addValueEventListener(new ValueEventListener() {
+        mFirebaseRef.child("pending goal notifications").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.getValue() == null) {

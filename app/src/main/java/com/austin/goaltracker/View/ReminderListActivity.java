@@ -58,7 +58,7 @@ public class ReminderListActivity extends AppCompatActivity {
             }
         });
 
-        // Finally, a little indication of connection status
+        // A little indication of connection status
         mConnectedListener = mFirebaseListRef.getRoot().child(".info/connected").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

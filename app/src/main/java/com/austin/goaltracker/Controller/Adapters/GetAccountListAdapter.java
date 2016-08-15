@@ -116,7 +116,7 @@ public class GetAccountListAdapter extends ArrayAdapter<GetAccount> implements F
         if (!isFriendsList) {
             holder.add_friend.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    Util.currentUser.addFriend(getAccount.getId());
+                    Util.currentUser.addFriend(getAccount);
                     holder.add_friend.setVisibility(View.GONE);
                     holder.add_friend_disabled.setVisibility(View.VISIBLE);
                 }

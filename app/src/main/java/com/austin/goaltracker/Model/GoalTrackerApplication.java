@@ -35,6 +35,10 @@ public class GoalTrackerApplication extends Application {
     public static String[] ACTIVITIES = {"Goals", "Friends", "Messages", "History"};
     public static final int SELECT_REQUEST = 2;
     public static final int PIC_CROP = 3;
+    public static final int GOALS = 0;
+    public static final int FRIENDS = 1;
+    public static final int NEWS = 2;
+    public static final int HISTORY = 3;
 
     public void onCreate(){
         super.onCreate();

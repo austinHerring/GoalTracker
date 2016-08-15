@@ -42,15 +42,14 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
     private ArrayList<Goal> displayedListOfGoals;
     private static LayoutInflater inflater = null;
     // Colors used for the list of goals
-    private int STREAK_RED;
-    private int COUNTDOWN_BLUE;
-    private int BLUE_BACKGROUND;
-    private int RED_BACKGROUND;
+    private int STREAK_RED, COUNTDOWN_BLUE, BLUE_BACKGROUND, RED_BACKGROUND;
+    private int mtextViewResourceId;
 
     public GoalListAdapter(Activity activity, int textViewResourceId, ArrayList<Goal> goals) {
         super(activity, textViewResourceId, goals);
         try {
             this.activity = activity;
+            mtextViewResourceId = textViewResourceId;
             displayedListOfGoals = goals;
             allListOfActiveGoals = goals;
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -91,7 +90,7 @@ public class GoalListAdapter extends ArrayAdapter<Goal> implements Filterable {
         final Goal goal= displayedListOfGoals.get(position);
         try {
             if (convertView == null) {
-                v = inflater.inflate(R.layout.layout_goal_row, null);
+                v = inflater.inflate(mtextViewResourceId, null);
                 holder = new ViewHolder();
 
                 holder.display_name = (TextView) v.findViewById(R.id.goalNameList);

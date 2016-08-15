@@ -39,6 +39,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import java.util.Calendar;
 import java.util.HashMap;
 
 
@@ -73,7 +74,7 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
         });
 
         listOfGoals = (ListView) findViewById(R.id.listOfGoals);
-        goalListAdapter = new GoalListAdapter(this, android.R.layout.simple_list_item_1, Util.currentUser.activeGoalsToList());
+        goalListAdapter = new GoalListAdapter(this, R.layout.layout_goal_row, Util.currentUser.activeGoalsToList());
         listOfGoals.setAdapter(goalListAdapter);
         listOfGoals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -100,7 +101,7 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
         spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
         spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
         spinner.setOnItemSelectedListener(this);
-        spinner.setSelection(0); // index in list
+        spinner.setSelection(GoalTrackerApplication.GOALS); // index in list
     }
 
     @Override
