@@ -30,4 +30,5 @@
     <string name="shared_picture">Shared Picture Element</string>
     <string name="done_flag">Done</string>
     <string name="title_activity_history_base">History</string>
+    <string name="title_activity_community_base">My Community</string>
 </resources>

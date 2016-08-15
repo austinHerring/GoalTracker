@@ -21,12 +21,14 @@ public class BaseActivitySelectorAdapter extends ArrayAdapter<String>
 {
     private Context context;
     private String[] activities;
+    private int textViewResourceId;
 
     public BaseActivitySelectorAdapter(Context context, int textViewResourceId)
     {
         super(context, textViewResourceId, GoalTrackerApplication.ACTIVITIES);
         this.context = context;
         this.activities = GoalTrackerApplication.ACTIVITIES;
+        this.textViewResourceId = textViewResourceId;
     }
 
 
@@ -51,7 +53,7 @@ public class BaseActivitySelectorAdapter extends ArrayAdapter<String>
     public View getCustomView(int position, ViewGroup parent)
     {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View row=inflater.inflate(R.layout.layout_spinner_dropdown, parent, false);
+        View row=inflater.inflate(textViewResourceId, parent, false);
         TextView label = (TextView)row.findViewById(R.id.baseList);
         ImageView icon = (ImageView)row.findViewById(R.id.icon);
         String current = activities[position];
@@ -62,16 +64,16 @@ public class BaseActivitySelectorAdapter extends ArrayAdapter<String>
             label.setTextColor(context.getResources().getColor(R.color.spinner_in_use));
         }
 
-        if (current.equals("Goals")) {
+        if (current.equals(GoalTrackerApplication.ACTIVITIES[0])) {
             imageID = (current.equals(context.toString()))
                     ? R.drawable.goals_icon_current : R.drawable.goals_icon;
-        } else if (current.equals("Friends")) {
+        } else if (current.equals(GoalTrackerApplication.ACTIVITIES[1])) {
             imageID = (current.equals(context.toString()))
                     ? R.drawable.friends_icon_current : R.drawable.friends_icon;
-        } else if (current.equals("Messages")) {
+        } else if (current.equals(GoalTrackerApplication.ACTIVITIES[2])) {
             imageID = (current.equals(context.toString()))
             ? R.drawable.messages_icon_current : R.drawable.messages_icon;
-        } else if (current.equals("History")) {
+        } else if (current.equals(GoalTrackerApplication.ACTIVITIES[3])) {
             imageID = (current.equals(context.toString()))
             ? R.drawable.history_icon_current : R.drawable.history_icon;
         }

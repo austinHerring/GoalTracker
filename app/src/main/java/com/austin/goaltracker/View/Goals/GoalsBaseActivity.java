@@ -29,6 +29,7 @@ import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.Goal.StreakSustainerGoal;
 import com.austin.goaltracker.R;
 
+import com.austin.goaltracker.View.Community.CommunityBaseActivity;
 import com.austin.goaltracker.View.Friends.FriendsBaseActivity;
 import com.austin.goaltracker.View.History.HistoryBaseActivity;
 import com.austin.goaltracker.View.LoginActivity;
@@ -161,6 +162,10 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
                 && parent.getItemAtPosition(pos).equals("History")) {
             Intent i = new Intent(getApplicationContext(), HistoryBaseActivity.class);
             startActivity(i);
+        } else if (!parent.getItemAtPosition(pos).toString().equals(this.toString())
+                && parent.getItemAtPosition(pos).equals("Community")) {
+            Intent i = new Intent(getApplicationContext(), CommunityBaseActivity.class);
+            startActivity(i);
         }
     }
 
@@ -171,7 +176,7 @@ public class GoalsBaseActivity extends AppCompatActivity implements AdapterView.
 
     @Override
     public String toString() {
-        return "Goals";
+        return GoalTrackerApplication.ACTIVITIES[0];
     }
 
     @Override

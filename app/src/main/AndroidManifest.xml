@@ -152,6 +152,10 @@
             android:name=".View.History.HistoryBaseActivity"
             android:label="@string/title_activity_history_base"
             android:theme="@style/AppThemePurpleAppCompat" />
+        <activity
+            android:name=".View.Community.CommunityBaseActivity"
+            android:label="@string/title_activity_community_base"
+            android:theme="@style/AppThemePurpleAppCompat" ></activity>
     </application>
 
 </manifest>

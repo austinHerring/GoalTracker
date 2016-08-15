@@ -30,6 +30,7 @@ import com.austin.goaltracker.Model.Goal.Goal;
 import com.austin.goaltracker.Model.Goal.StreakSustainerGoal;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.R;
+import com.austin.goaltracker.View.Community.CommunityBaseActivity;
 import com.austin.goaltracker.View.Friends.FriendsBaseActivity;
 import com.austin.goaltracker.View.Goals.GoalCountdownGraphicFragment;
 import com.austin.goaltracker.View.Goals.GoalsBaseActivity;
@@ -66,7 +67,7 @@ public class HistoryBaseActivity extends AppCompatActivity implements AdapterVie
         setUpNotificationCountWithFirebaseListener();
 
         spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
-        spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_history_row));
+        spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
         spinner.setOnItemSelectedListener(this);
 
         ListView listOfHistory = (ListView) findViewById(R.id.listOfHistory);
@@ -100,6 +101,10 @@ public class HistoryBaseActivity extends AppCompatActivity implements AdapterVie
                 && parent.getItemAtPosition(pos).equals("Friends")) {
             Intent i = new Intent(getApplicationContext(), FriendsBaseActivity.class);
             startActivity(i);
+        } else if (!parent.getItemAtPosition(pos).toString().equals(this.toString())
+                && parent.getItemAtPosition(pos).equals("Community")) {
+            Intent i = new Intent(getApplicationContext(), CommunityBaseActivity.class);
+            startActivity(i);
         }
     }
 
@@ -110,7 +115,7 @@ public class HistoryBaseActivity extends AppCompatActivity implements AdapterVie
 
     @Override
     public String toString() {
-        return "History";
+        return GoalTrackerApplication.ACTIVITIES[3];
     }
 
     @Override
