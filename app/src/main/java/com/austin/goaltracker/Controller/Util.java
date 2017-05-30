@@ -17,7 +17,6 @@ import com.austin.goaltracker.Model.RealTime.GetGoal;
 import com.austin.goaltracker.Model.RealTime.GetGoals;
 import com.austin.goaltracker.Model.Goal.Goal;
 import com.austin.goaltracker.Model.Enums.GoalClassification;
-import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.Enums.IncrementType;
 import com.austin.goaltracker.Model.Mail.NewMemberEmail;
 import com.austin.goaltracker.Model.Password;
@@ -28,11 +27,13 @@ import com.austin.goaltracker.R;
 import com.austin.goaltracker.View.Friends.FriendsAddActivity;
 import com.austin.goaltracker.View.Friends.FriendsBaseActivity;
 import com.austin.goaltracker.View.Friends.FriendsOfFriendsDetailActivity;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.FirebaseException;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseException;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
@@ -44,55 +45,49 @@ import java.util.HashMap;
  */
 public class Util {
     public static Account currentUser;
+    private static DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
     /**
-     * Authenticates a user against Firebase before logging
+     * Load an authenticated user. Otherwise redirect to Login screen
      *
      * @param startActivity the context from the login screen
      * @param intent where to send the user if successful login
-     * @param username the username of the account
-     * @param password the password of the account
+     * @param userId The authenticated firebase user ID
      */
-    public static void authenticateUserAndLoad(final Activity startActivity, final Intent intent, final String username, final String password) {
-        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts");
-        com.firebase.client.Query queryRef = firebaseRef.orderByChild("username").equalTo(username);
-        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    public static void tryLoadUser(final Activity startActivity, final Intent intent, String userId) {
+        DatabaseReference firebaseRef = database.child("accounts").child(userId);
+        firebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                    ToastDisplayer.displayHint("Invalid Username", ToastType.FAILURE, startActivity);
-                    return;
+                    FirebaseAuth.getInstance().signOut();
+                    if (startActivity.findViewById(R.id.loadingPanel) != null) {
+                        startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                    }
+                    startActivity.startActivity(intent);
+                    startActivity.finish();
+                    ToastDisplayer.displayHint("Authentication Failed", ToastType.FAILURE, startActivity);
                 }
 
-                HashMap<String, HashMap<String, Object>> accounts =
-                        (HashMap<String, HashMap<String, Object>>) snapshot.getValue();
-
-                HashMap<String, Object> userAccount = accounts.entrySet().iterator().next().getValue();
+                HashMap<String, Object> account = (HashMap<String, Object>) snapshot.getValue();
                 Account accountToLoad = new Account(
-                        (String)userAccount.get("nameFirst"),
-                        (String)userAccount.get("nameLast"),
-                        (String)userAccount.get("username"),
-                        retrieveUserPasswordToLocal(userAccount),
-                        (String)userAccount.get("email"));
+                        (String) account.get("nameFirst"),
+                        (String) account.get("nameLast"),
+                        (String) account.get("username"),
+                        retrieveUserPasswordToLocal(account),
+                        (String) account.get("email"));
 
-                if (!password.equals(accountToLoad.getPassword())) {
-                    startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                    ToastDisplayer.displayHint("Invalid Password", ToastType.FAILURE, startActivity);
-                    return;
+                accountToLoad.setId((String) account.get("id"));
+                accountToLoad.setTotalFriends((Long) account.get("totalFriends"));
+                accountToLoad.setTotalGoalsStarted((Long) account.get("totalGoalsStarted"));
+                accountToLoad.setTotalGoalsCompleted((Long) account.get("totalGoalsCompleted"));
+                accountToLoad.setLongestStreak((Long) account.get("longestStreak"));
+
+                if (account.get("pictureData") != null) {
+                    accountToLoad.setPictureData((String) account.get("pictureData"));
                 }
 
-                accountToLoad.setId((String)userAccount.get("id"));
-                accountToLoad.setTotalFriends((Long)userAccount.get("totalFriends"));
-                accountToLoad.setTotalGoalsStarted((Long)userAccount.get("totalGoalsStarted"));
-                accountToLoad.setTotalGoalsCompleted((Long)userAccount.get("totalGoalsCompleted"));
-                accountToLoad.setLongestStreak((Long)userAccount.get("longestStreak"));
-
-                if (userAccount.get("pictureData") != null) {
-                    accountToLoad.setPictureData((String) userAccount.get("pictureData"));
-                }
-
-                HashMap<String, String> friends = (HashMap<String, String>) userAccount.get("friends");
+                HashMap<String, String> friends = (HashMap<String, String>) account.get("friends");
                 if (friends == null) {
                     accountToLoad.setFriends(new HashMap<String, String>());
                 } else {
@@ -100,16 +95,25 @@ public class Util {
                 }
 
                 currentUser = accountToLoad;
-
-                addListenerToGoals(); // Handles adding goals
+                addListenerToGoals();
                 GAEDatastoreController.registerdeviceForCurrentUser();
-                startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+
+                if (startActivity.findViewById(R.id.loadingPanel) != null) {
+                    startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                }
                 startActivity.startActivity(intent);
+                startActivity.finish();
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
+            public void onCancelled(DatabaseError databaseError) {
+                FirebaseAuth.getInstance().signOut();
+                if (startActivity.findViewById(R.id.loadingPanel) != null) {
+                    startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                }
+                startActivity.startActivity(intent);
+                startActivity.finish();
+                ToastDisplayer.displayHint("Authentication Failed", ToastType.FAILURE, startActivity);
             }
         });
     }
@@ -123,39 +127,22 @@ public class Util {
      * @param account the account information to create
      */
     public static void registerUserAndLoad(final Activity startActivity, final Intent intent, final Account account) {
-        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts");
-        com.firebase.client.Query queryRef = firebaseRef.orderByChild("username").equalTo(account.getUsername());
-        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (!snapshot.exists()) {
-                    Firebase accountsRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts");
-                    Firebase newRow = accountsRef.push();
-                    account.setId(newRow.getKey());
+        DatabaseReference accountRef = database
+                .child("accounts")
+                .child(account.getId());
 
-                    // ADDS ACCOUNT TO DB
-                    HashMap<String,Object> newAccountAsEntry = generateBasicAccountMappingForDB(account);
-                    newRow.setValue(newAccountAsEntry);
-                    currentUser = account;
-                    addListenerToGoals();
+        // ADDS ACCOUNT TO DB
+        HashMap<String,Object> newAccountAsEntry = generateBasicAccountMappingForDB(account);
+        accountRef.setValue(newAccountAsEntry);
+        currentUser = account;
+        addListenerToGoals();
 
-                    new EmailDispatchService(new NewMemberEmail(Util.currentUser)).send();
-                    GAEDatastoreController.registerdeviceForCurrentUser();
-                    startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                    startActivity.startActivity(intent);
-                    ToastDisplayer.displayHint("Registration Successful", ToastType.SUCCESS, startActivity);
+        new EmailDispatchService(new NewMemberEmail(Util.currentUser)).send();
+        GAEDatastoreController.registerdeviceForCurrentUser();
+        startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        startActivity.startActivity(intent);
+        ToastDisplayer.displayHint("Registration Successful", ToastType.SUCCESS, startActivity);
 
-                } else {
-                    startActivity.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                    ToastDisplayer.displayHint("Account Already In Use", ToastType.FAILURE, startActivity);
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
-            }
-        });
     }
 
     /**
@@ -164,12 +151,11 @@ public class Util {
      * @param accountId account update a goal for
      * @param goal the goal object itself to persist
      */
-    public static void updateAccountGoalOnDB(String accountId, Goal goal) throws FirebaseException {
-        Firebase accountRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
-                .child("accounts").child(accountId);
-        Firebase accountGoalsRef = accountRef.child("goals");
+    public static void updateAccountGoalOnDB(String accountId, Goal goal) throws DatabaseException {
+        DatabaseReference accountRef = database.child("accounts").child(accountId);
+        DatabaseReference accountGoalsRef = accountRef.child("goals");
         String goalId = goal.getId();
-        Firebase row;
+        DatabaseReference row;
         if (goalId == null) {
             row = accountGoalsRef.push();
             goal.setId(row.getKey());
@@ -189,9 +175,8 @@ public class Util {
      * @param accountId account update a goal for
      * @param pictureData base 64 data for profile picture
      */
-    public static void updateAccountPictureOnDB(String accountId, String pictureData) throws FirebaseException {
-        Firebase accountRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
-                .child("accounts").child(accountId);
+    public static void updateAccountPictureOnDB(String accountId, String pictureData) throws DatabaseException {
+        DatabaseReference accountRef = database.child("accounts").child(accountId);
         accountRef.child("pictureData").setValue(pictureData);
     }
 
@@ -201,28 +186,20 @@ public class Util {
      * @param account account to reset a password for
      * @param password the new password
      */
-    public static Password updatePasswordForAccountOnDB(Account account, String password) throws FirebaseException {
+    public static Password updatePasswordForAccountOnDB(Account account, String password) throws DatabaseException {
         if (account != null) {
             Password passwordObject = (password==null) ?
                     new Password(PasswordGenerator.generatePassword()) : new Password(password);
 
-            Firebase passwordRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
-                    .child("accounts").child(account.getId()).child("password object");
+            DatabaseReference passwordRef = database
+                    .child("accounts")
+                    .child(account.getId())
+                    .child("password");
             HashMap<String, Object> newPassword = generatePasswordMappingForDB(passwordObject);
-            passwordRef.setValue(newPassword, new Firebase.CompletionListener() {
-                @Override
-                public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                    if (firebaseError != null) {
-                        System.out.println("Data could not be saved. " + firebaseError.getMessage());
-                        throw new FirebaseException(firebaseError.getMessage());
-                    } else {
-                        System.out.println("Data saved successfully.");
-                    }
-                }
-            });
+            passwordRef.setValue(newPassword);
             return passwordObject;
         } else {
-            throw new FirebaseException("This Account Does Not Exist");
+            throw new DatabaseException("This Account Does Not Exist");
         }
     }
 
@@ -233,9 +210,8 @@ public class Util {
      * @param friendsList the new friends list
      * @param totalFriends the number of Friends
      */
-    public static void updateFriendsForAccountOnDB(String accountId, HashMap friendsList, long totalFriends) throws FirebaseException {
-        Firebase accountRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
-                .child("accounts").child(accountId);
+    public static void updateFriendsForAccountOnDB(String accountId, HashMap friendsList, long totalFriends) throws DatabaseException {
+        DatabaseReference accountRef = database.child("accounts").child(accountId);
         accountRef.child("friends").setValue(friendsList);
         accountRef.child("totalFriends").setValue(totalFriends);
     }
@@ -306,31 +282,19 @@ public class Util {
             String association,
             long date,
             boolean positiveAction,
-            GetAccount getAccount) throws FirebaseException
+            GetAccount getAccount) throws DatabaseException
     {
-        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL);
-        Firebase accountHistoryRef = firebaseRef
-                .child("accounts")
+        DatabaseReference accountHistoryRef = database.child("accounts")
                 .child(currentUser.getId())
                 .child("history");
-        Firebase row = accountHistoryRef.push();
+        DatabaseReference row = accountHistoryRef.push();
         HistoryArtifact artifact = new HistoryArtifact(association, type, date, positiveAction);
         if (getAccount != null) {
             artifact.setUsername(getAccount.getUsername());
             artifact.setUserPic(getAccount.getPictureData());
         }
         artifact.setId(row.getKey());
-        row.setValue(artifact, new Firebase.CompletionListener() {
-            @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                if (firebaseError != null) {
-                    System.out.println("Data could not be saved. " + firebaseError.getMessage());
-                    throw new FirebaseException(firebaseError.getMessage());
-                } else {
-                    System.out.println("Data saved successfully.");
-                }
-            }
-        });
+        row.setValue(artifact);
     }
 
     /**
@@ -405,7 +369,7 @@ public class Util {
      * @param notificationId Id of the notification to remove
      */
     public static void removePendingGoalNotificationFromDB(String notificationId) {
-        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+        DatabaseReference firebaseRef = database
                 .child("accounts")
                 .child(currentUser.getId())
                 .child("pending goal notifications")
@@ -421,7 +385,7 @@ public class Util {
      */
     public static void removeGoalFromDB(String goalId) {
         removeAssociatedPendingGoalNotificationsFromDB(goalId);
-        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+        DatabaseReference firebaseRef = database
                 .child("accounts")
                 .child(currentUser.getId())
                 .child("goals")
@@ -435,11 +399,11 @@ public class Util {
      * @param goalId Id of the goal to remove pending notification associated with it
      */
     public static void removeAssociatedPendingGoalNotificationsFromDB(final String goalId) {
-        final Firebase rootFirebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+        final DatabaseReference rootFirebaseRef = database
                 .child("accounts")
                 .child(currentUser.getId())
                 .child("pending goal notifications");
-        com.firebase.client.Query queryRef = rootFirebaseRef.orderByChild("associatedGoalId").equalTo(goalId);
+        com.google.firebase.database.Query queryRef = rootFirebaseRef.orderByChild("associatedGoalId").equalTo(goalId);
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -453,14 +417,16 @@ public class Util {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });
     }
 
     private static void addListenerToGoals() {
-        Firebase goalsRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts").child(currentUser.getId()).child("goals");
+        DatabaseReference goalsRef = database.child("accounts")
+                .child(currentUser.getId())
+                .child("goals");
         goalsRef.addChildEventListener(new FirebaseGoalListener());
     }
 
@@ -473,7 +439,7 @@ public class Util {
      */
     public static void GetAccounts(final Activity activity, final HashMap<String, String> queryFriends, final boolean isFriendsOfFriends) {
         final HashMap<String, String> currentUserFriends = Util.currentUser.getFriends();
-        Firebase firebaseAccounts = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts");
+        DatabaseReference firebaseAccounts = database.child("accounts");
         firebaseAccounts.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -528,7 +494,7 @@ public class Util {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError firebaseError) {
 
             }
         });

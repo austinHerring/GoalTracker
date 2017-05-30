@@ -33,7 +33,7 @@ public class RegistrationIntentService extends IntentService {
 
         try {
             InstanceID instanceID = InstanceID.getInstance(this);
-            String token = instanceID.getToken(GoalTrackerApplication.PROJECT_NUMBER,
+            String token = instanceID.getToken(GoalTrackerApplication.GCM_PROJECT_NUMBER,
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             Log.i(TAG, "GCM Registration Token: " + token);
 

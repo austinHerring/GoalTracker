@@ -10,7 +10,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.firebase.client.Firebase;
+
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.logging.Logger;
 
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
 public class GoalTrackerApplication extends Application {
     public static GoalTrackerApplication INSTANCE;
     public static final String APPLICATION_NAME = "Goal Tracker";
-    public static final String PROJECT_NUMBER = "226374478657";
+    public static final String GCM_PROJECT_NUMBER = "226374478657";
     public static final String PROJECT_ADDRESS = "https://goal-tracker-1235.appspot.com/_ah/api/";
     public static final String FIREBASE_URL = "https://flickering-inferno-500.firebaseio.com/";
     public static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -43,7 +44,7 @@ public class GoalTrackerApplication extends Application {
     public void onCreate(){
         super.onCreate();
         INSTANCE = this;
-        Firebase.setAndroidContext(this);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {

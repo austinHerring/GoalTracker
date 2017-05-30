@@ -12,7 +12,9 @@ import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
 import com.austin.goaltracker.Model.Password;
 import com.austin.goaltracker.Model.Enums.ToastType;
-import com.firebase.client.FirebaseException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseException;
 
 /**
  * @author Austin Herring
@@ -69,9 +71,11 @@ public class ChangePasswordPreference extends DialogPreference {
                                                     Util.currentUser,
                                                     passwordNew1.getText().toString());
                         Util.currentUser.setPassword(password);
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        user.updatePassword(password.toPasswordString());
                         setSummary(Util.currentUser.getPasswordDate());
                         ToastDisplayer.displayHint("Change Successful", ToastType.SUCCESS, getContext());
-                    } catch (FirebaseException e) {
+                    } catch (DatabaseException e) {
                         ToastDisplayer.displayHint("Could not connect to database", ToastType.FAILURE, getContext());
                     }
                 } else {

@@ -1,10 +1,5 @@
 package com.austin.goaltracker.gcm;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.FirebaseException;
-import com.firebase.client.ValueEventListener;
 import com.google.appengine.api.ThreadManager;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;

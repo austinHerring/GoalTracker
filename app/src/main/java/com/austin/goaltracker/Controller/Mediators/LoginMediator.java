@@ -8,16 +8,16 @@ package com.austin.goaltracker.Controller.Mediators;
  */
 public class LoginMediator {
     // These are used to copy over a username and password from login screen to registration screen
-    public static String usernameCarryOver;
+    public static String emailCarryOver;
     public static String passwordCarryOver;
 
-    public static void copyLoginInfo(String username, String password) {
-        usernameCarryOver = username;
+    public static void copyLoginInfo(String email, String password) {
+        emailCarryOver = email;
         passwordCarryOver = password;
     }
 
-    public static String pasteUsername() {
-        return usernameCarryOver;
+    public static String pasteEmail() {
+        return emailCarryOver;
     }
 
     public static String pastePassword() {

@@ -33,7 +33,7 @@ import java.util.List;
  * @author Austin Herring
  * @version 1.0
  *
- * List adapter for users. It adapst botha friends list and un-friended users in the community
+ * List adapter for users. It adapts both a friends list and un-friended users in the community
  */
 public class GetAccountListAdapter extends ArrayAdapter<GetAccount> implements Filterable {
     protected Activity activity;

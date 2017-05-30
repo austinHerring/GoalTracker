@@ -16,15 +16,19 @@ import com.austin.goaltracker.Model.Mail.NewPasswordEmail;
 import com.austin.goaltracker.Model.Password;
 import com.austin.goaltracker.Model.Enums.ToastType;
 import com.austin.goaltracker.R;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.FirebaseException;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseException;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 
 public class ForgotPasswordActivity extends Activity {
     private EditText usernameText;
+    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +48,8 @@ public class ForgotPasswordActivity extends Activity {
     }
 
     private void attemptReset(final String username) {
-        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts");
-        com.firebase.client.Query queryRef = firebaseRef.orderByChild("username").equalTo(username);
+        DatabaseReference firebaseRef = mRootRef.child("accounts");
+        com.google.firebase.database.Query queryRef = firebaseRef.orderByChild("username").equalTo(username);
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -64,13 +68,15 @@ public class ForgotPasswordActivity extends Activity {
 
                         Password password = Util.updatePasswordForAccountOnDB(account, null);
                         account.setPassword(password);
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        user.updatePassword(password.toPasswordString());
                         NewPasswordEmail email = new NewPasswordEmail(account);
                         EmailDispatchService dispatcher = new EmailDispatchService(email);
                         dispatcher.send();
                         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                         Intent i = new Intent(getApplicationContext(), LoginActivity.class);
                         startActivity(i);
-                    } catch (FirebaseException e) {
+                    } catch (DatabaseException e) {
                         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                         ToastDisplayer.displayHint(e.getMessage(), ToastType.FAILURE, getApplicationContext());
                     }
@@ -81,7 +87,7 @@ public class ForgotPasswordActivity extends Activity {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });

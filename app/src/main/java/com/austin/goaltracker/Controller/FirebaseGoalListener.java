@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.util.Log;
 
 import com.austin.goaltracker.Model.GoalTrackerApplication;
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.FirebaseError;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 
 import java.util.HashMap;
 
@@ -48,7 +48,7 @@ public class FirebaseGoalListener implements ChildEventListener {
     }
 
     @Override
-    public void onCancelled(FirebaseError firebaseError) {
+    public void onCancelled(DatabaseError firebaseError) {
         Log.e("Goal Listener", "Listen was cancelled, no more updates will occur");
     }
 

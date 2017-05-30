@@ -155,7 +155,7 @@
         <activity
             android:name=".View.Community.CommunityBaseActivity"
             android:label="@string/title_activity_community_base"
-            android:theme="@style/AppThemePurpleAppCompat" ></activity>
+            android:theme="@style/AppThemePurpleAppCompat" />
     </application>
 
 </manifest>

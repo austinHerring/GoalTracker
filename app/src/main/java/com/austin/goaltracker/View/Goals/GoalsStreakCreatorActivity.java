@@ -24,7 +24,7 @@ import com.austin.goaltracker.Model.Enums.IncrementType;
 import com.austin.goaltracker.Model.Goal.StreakSustainerGoal;
 import com.austin.goaltracker.Model.Enums.ToastType;
 import com.austin.goaltracker.R;
-import com.firebase.client.FirebaseException;
+import com.google.firebase.database.DatabaseException;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -83,7 +83,7 @@ public class GoalsStreakCreatorActivity extends Activity implements TimePickerDi
                         ToastDisplayer.displayHint("Goal Created", ToastType.SUCCESS, getApplicationContext());
                         Intent i = new Intent(getApplicationContext(), GoalsBaseActivity.class);
                         startActivity(i);
-                    } catch (FirebaseException e) {
+                    } catch (DatabaseException e) {
                         ToastDisplayer.displayHint("Could not connect to database", ToastType.FAILURE, getApplicationContext());
                     }
                 } else {

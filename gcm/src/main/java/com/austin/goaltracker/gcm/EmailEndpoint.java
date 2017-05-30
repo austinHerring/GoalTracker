@@ -33,7 +33,8 @@ public class EmailEndpoint {
     private static final Logger log = Logger.getLogger(EmailEndpoint.class.getName());
     private final String ADMIN_EMAIL = "noreply.goaltrackerbyaustin@gmail.com";
     private final String ADMIN_NAME = "noreply.goaltrackerbyaustin";
-    private final String PASSWORD = "goaltracker";
+//    private final String PASSWORD = "goaltracker";
+    private final String PASSWORD = "dnwiuuacukkicadx";
     private final String SSL_PORT = "587";
     private final String SSL_HOST = "smtp.gmail.com";
 

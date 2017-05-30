@@ -39,10 +39,12 @@ import com.austin.goaltracker.View.Goals.GoalsTypeSelectActivity;
 import com.austin.goaltracker.View.LoginActivity;
 import com.austin.goaltracker.View.ReminderListActivity;
 import com.austin.goaltracker.View.SettingsActivity;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
@@ -52,7 +54,8 @@ public class HistoryBaseActivity extends AppCompatActivity implements AdapterVie
     private static Button buttonPending;
     private static int mPendingCount = 0;
     private HistoryListAdapter historyListAdapter;
-    private Firebase mFirebaseRef;
+    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference mFirebaseRef;
     private ValueEventListener mConnectedListener;
 
     @Override
@@ -61,7 +64,7 @@ public class HistoryBaseActivity extends AppCompatActivity implements AdapterVie
         setContentView(R.layout.activity_history_base);
         GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
         setupWindowAnimations();
-        mFirebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL)
+        mFirebaseRef = mRootRef
                 .child("accounts")
                 .child(Util.currentUser.getId());
         setUpNotificationCountWithFirebaseListener();
@@ -85,7 +88,7 @@ public class HistoryBaseActivity extends AppCompatActivity implements AdapterVie
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError firebaseError) {
 
             }
         });
@@ -161,6 +164,7 @@ public class HistoryBaseActivity extends AppCompatActivity implements AdapterVie
             return true;
         } else if (id == R.id.action_logout) {
             Util.currentUser = null;    // Clear out the current user
+            FirebaseAuth.getInstance().signOut();
             Intent i = new Intent(getApplicationContext(), LoginActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clean up all activities
             startActivity(i);
@@ -215,7 +219,7 @@ public class HistoryBaseActivity extends AppCompatActivity implements AdapterVie
 
             }
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });

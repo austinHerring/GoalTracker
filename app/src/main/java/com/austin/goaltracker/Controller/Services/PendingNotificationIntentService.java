@@ -4,11 +4,12 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import com.austin.goaltracker.Model.GoalTrackerApplication;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.FirebaseException;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseException;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.logging.Logger;
@@ -21,6 +22,7 @@ import java.util.logging.Logger;
  */
 public class PendingNotificationIntentService extends IntentService {
     private static final String TAG = "PendingNotificationIntentService";
+    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
     public PendingNotificationIntentService() {
         super(TAG);
@@ -38,25 +40,15 @@ public class PendingNotificationIntentService extends IntentService {
         }
     }
 
-    private void addPendingGoalNotificationOnDB(String accountId, String associatedGoalId, long dateTimeNotified) throws FirebaseException
+    private void addPendingGoalNotificationOnDB(String accountId, String associatedGoalId, long dateTimeNotified) throws DatabaseException
     {
-        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL);
-        Firebase accountGoalsRef = firebaseRef.child("accounts").child(accountId).child("pending goal notifications");
-        Firebase row = accountGoalsRef.push();
+//        Firebase firebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL);
+        DatabaseReference accountGoalsRef = mRootRef.child("accounts").child(accountId).child("pending goal notifications");
+        DatabaseReference row = accountGoalsRef.push();
         HashMap<String,Object> newGoalAsEntry = new HashMap<>();
         newGoalAsEntry.put("id", row.getKey());
         newGoalAsEntry.put("associatedGoalId", associatedGoalId);
         newGoalAsEntry.put("dateTimeNotified", dateTimeNotified);
-        row.setValue(newGoalAsEntry, new Firebase.CompletionListener() {
-            @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-            if (firebaseError != null) {
-                System.out.println("Data could not be saved. " + firebaseError.getMessage());
-                throw new FirebaseException(firebaseError.getMessage());
-            } else {
-                System.out.println("Data saved successfully.");
-            }
-            }
-        });
+        row.setValue(newGoalAsEntry);
     }
 }

@@ -21,8 +21,7 @@ import com.austin.goaltracker.Model.Goal.StreakSustainerGoal;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.RealTime.HistoryArtifact;
 import com.austin.goaltracker.R;
-import com.firebase.client.Firebase;
-import com.firebase.client.Query;
+import com.google.firebase.database.Query;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

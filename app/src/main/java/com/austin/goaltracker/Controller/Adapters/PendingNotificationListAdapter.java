@@ -18,7 +18,7 @@ import com.austin.goaltracker.Model.Enums.IncrementType;
 import com.austin.goaltracker.Model.PendingGoalNotification;
 import com.austin.goaltracker.Model.Goal.StreakSustainerGoal;
 import com.daimajia.swipe.SwipeLayout;
-import com.firebase.client.Query;
+import com.google.firebase.database.Query;
 import com.austin.goaltracker.R;
 
 import java.text.SimpleDateFormat;

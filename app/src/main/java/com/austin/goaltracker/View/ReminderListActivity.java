@@ -18,14 +18,17 @@ import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.Model.Enums.ToastType;
 import com.austin.goaltracker.R;
 import com.austin.goaltracker.View.Goals.GoalsBaseActivity;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class ReminderListActivity extends AppCompatActivity {
     private PendingNotificationListAdapter mListAdapter;
-    private Firebase mFirebaseListRef;
+    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference mFirebaseListRef;
     private ValueEventListener mConnectedListener;
 
     @Override
@@ -34,7 +37,7 @@ public class ReminderListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_reminder_list);
         GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
         setupWindowAnimations();
-        mFirebaseListRef = new Firebase(GoalTrackerApplication.FIREBASE_URL).child("accounts")
+        mFirebaseListRef = mRootRef.child("accounts")
                 .child((Util.currentUser.getId())).child("pending goal notifications");
     }
 
@@ -48,7 +51,7 @@ public class ReminderListActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         final ListView listView = (ListView) findViewById(R.id.list_of_reminders);
-        mListAdapter = new PendingNotificationListAdapter(mFirebaseListRef.limit(50), this, R.layout.layout_reminder_row);
+        mListAdapter = new PendingNotificationListAdapter(mFirebaseListRef.limitToFirst(50), this, R.layout.layout_reminder_row);
         listView.setAdapter(mListAdapter);
         mListAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
@@ -69,7 +72,7 @@ public class ReminderListActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError firebaseError) {
 
             }
         });
@@ -100,6 +103,7 @@ public class ReminderListActivity extends AppCompatActivity {
             return true;
         } else if (id == R.id.action_logout) {
             Util.currentUser = null;    // Clear out the current user
+            FirebaseAuth.getInstance().signOut();
             Intent i = new Intent(getApplicationContext(), LoginActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clean up all activities
             startActivity(i);

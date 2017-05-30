@@ -3,7 +3,6 @@ package com.austin.goaltracker.View.Community;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,14 +15,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.austin.goaltracker.Controller.Adapters.BaseActivitySelectorAdapter;
-import com.austin.goaltracker.Controller.Adapters.HistoryListAdapter;
-import com.austin.goaltracker.Controller.ToastDisplayer;
 import com.austin.goaltracker.Controller.Util;
-import com.austin.goaltracker.Model.Enums.ToastType;
 import com.austin.goaltracker.Model.GoalTrackerApplication;
 import com.austin.goaltracker.R;
 import com.austin.goaltracker.View.Friends.FriendsBaseActivity;
@@ -32,10 +27,12 @@ import com.austin.goaltracker.View.History.HistoryBaseActivity;
 import com.austin.goaltracker.View.LoginActivity;
 import com.austin.goaltracker.View.ReminderListActivity;
 import com.austin.goaltracker.View.SettingsActivity;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
@@ -44,9 +41,7 @@ public class CommunityBaseActivity extends AppCompatActivity implements AdapterV
     private Spinner spinner;
     private static Button buttonPending;
     private static int mPendingCount = 0;
-    private HistoryListAdapter historyListAdapter;
-    private Firebase mFirebaseRef;
-    private ValueEventListener mConnectedListener;
+    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +49,17 @@ public class CommunityBaseActivity extends AppCompatActivity implements AdapterV
         setContentView(R.layout.activity_community_base);
         GoalTrackerApplication.INSTANCE.setCurrentActivity(this);
         setupWindowAnimations();
-        mFirebaseRef = new Firebase(GoalTrackerApplication.FIREBASE_URL);
         setUpNotificationCountWithFirebaseListener();
 
         spinner = (Spinner) findViewById(R.id.spinnerSelectBase);
         spinner.setAdapter(new BaseActivitySelectorAdapter(this, R.layout.layout_spinner_dropdown));
         spinner.setOnItemSelectedListener(this);
+
+        //TODO Should be able to add friend from detail
+        //TODO Where to store events and filter
+//        ref.limitToLast(20).on("child_added", function(snapshot) {
+//            // Add link to home page.
+//        });
     }
 
     @Override
@@ -132,6 +132,7 @@ public class CommunityBaseActivity extends AppCompatActivity implements AdapterV
             return true;
         } else if (id == R.id.action_logout) {
             Util.currentUser = null;    // Clear out the current user
+            FirebaseAuth.getInstance().signOut();
             Intent i = new Intent(getApplicationContext(), LoginActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clean up all activities
             startActivity(i);
@@ -175,7 +176,7 @@ public class CommunityBaseActivity extends AppCompatActivity implements AdapterV
     }
 
     private void setUpNotificationCountWithFirebaseListener() {
-        mFirebaseRef.child("accounts").child(Util.currentUser.getId())
+        mRootRef.child("accounts").child(Util.currentUser.getId())
                 .child("pending goal notifications").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -187,7 +188,7 @@ public class CommunityBaseActivity extends AppCompatActivity implements AdapterV
 
             }
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });

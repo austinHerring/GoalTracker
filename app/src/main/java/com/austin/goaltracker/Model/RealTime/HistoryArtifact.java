@@ -11,6 +11,7 @@ public class HistoryArtifact {
     private String id, associatedObject, type, username, userPic;
     private long date, sort;
     private boolean positiveAction;
+
     // Required default constructor for Firebase object mapping
     @SuppressWarnings("unused")
     public HistoryArtifact() {
